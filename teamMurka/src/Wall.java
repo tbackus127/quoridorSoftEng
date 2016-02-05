@@ -10,21 +10,7 @@ public class Wall {
     private final Coord pos;   
 
     /** true = vertical, false = horizontal. Spans ONE tile */
-    private final boolean dir;
-    
-    /** Enum for orientation */
-    public enum Orientation {
-        HORIZ(0), VERT(1)
-    }
-    
-    /** Enum for directions */
-    public enum Direction {
-        NORTH(0), EAST(1), SOUTH(2), WEST(3)
-        
-        public boolean getOrientation(int d) {
-            return (d % 2 == 0) ? Orientation.HORIZ : Orientation.VERT;
-        }
-    }
+    private final Direction dir;
     
     /**
      * Default constructor
@@ -32,19 +18,35 @@ public class Wall {
      * @param dir the direction the wall is set at. Use Dir.HORIZ or Dir.VERT for
      *        distinguishing the directions.
      */
-    public Wall(Coord pos, boolean dir) {
+    public Wall(Coord pos, Direction dir) {
         this.pos = pos;
         this.dir = dir;
+    }
+    
+    /**
+     * Gets the position of the Wall
+     * @return a Coord for the Wall's position
+     */
+    public Coord getPos() {
+        return pos;
+    }
+    
+    /**
+     * Gets the direction of the Wall
+     * @return a Direction of the direction
+     */
+    public Direction getDir() {
+        return dir;
     }
     
     /**
      * toString() method
      * @return a String representation of the Wall.
      */
+    @Override
     public String toString() {
-        return "[" + pos + ":(" (dir == Orientation.VERT) ? 
+        return "[" + pos + ":(" + ((dir.ort() == Orientation.VERT) ? 
             pos.getX() + "," + pos.getY() + 1 :
-            pos.getX() + 1 + "," + pos.getY()
-        ];
+            pos.getX() + 1 + "," + pos.getY() + "]");
     }
 }

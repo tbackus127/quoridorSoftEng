@@ -26,7 +26,7 @@ public class Coord {
      * @return a double of the distance between Coord a and Coord b
      */
     public static double getDistance(Coord a, Coord b) {
-        return Math.sqrt(Math.pow(b.getX() - a.getX(), 2) + Math.pow(b.getY() - a.getY(), 2))
+        return Math.sqrt(Math.pow(b.getX() - a.getX(), 2) + Math.pow(b.getY() - a.getY(), 2));
     }
     
     /**
@@ -49,6 +49,7 @@ public class Coord {
      * toString() method
      * @return a string representation of the Coord object
      */
+    @Override
     public String toString() {
         return "(" + getX() + "," + getY() + ")";
     }

@@ -26,7 +26,7 @@ public class Board {
      */
     public Board(int plNum) {
         numOfPlayers = plNum;
-        playerPositions = new int[numOfPlayers];
+        playerPositions = new Coord[numOfPlayers];
     }
     
     // public HashSet<Coord> getLegalMoves(int plNum) {}
@@ -38,29 +38,29 @@ public class Board {
      * @param dir the direction to move (Use Coord.Direction enum)
      * @return true if the move is blocked
      */
-    public void isBlocked(Coord src, int dir) {
-        for(wall : placedWalls) {
+    public boolean isBlocked(Coord src, Direction dir) {
+        for(Wall wall : placedWalls) {
             
             // Skip the wall if it's too far to matter
             if(Coord.getDistance(wall.getPos(), src) < 2) {
                 
                 // If we're moving East or West, horizontal walls have no effect,
                 // and vice-versa
-                if(Direction.getOrientation(w.getDir() != Direction.getOrientation(dir)) {
+                if(wall.getDir().ort() != dir.ort()) {
                     
                     // Check blocking for the corresponding direction
                     switch(dir) {
-                        case Direction.EAST:
-                            if(w.getPos().getX() + 1 == src.getX())
+                        case EAST:
+                            if(wall.getPos().getX() + 1 == src.getX())
                                 return true;
-                        case Direction.WEST:
-                            if(w.getPos().getX() == src.getX())
+                        case WEST:
+                            if(wall.getPos().getX() == src.getX())
                                 return true;
-                        case Direction.NORTH:
-                            if(w.getPos().getY() == src.getY())
+                        case NORTH:
+                            if(wall.getPos().getY() == src.getY())
                                 return true;
-                        case Direction.SOUTH:
-                            if(w.getPos().getY() + 1 == src.getY())
+                        case SOUTH:
+                            if(wall.getPos().getY() + 1 == src.getY())
                                 return true;
                     }
                 }
