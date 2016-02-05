@@ -20,6 +20,16 @@ public class Coord {
     }
     
     /**
+     * Gets the distance between two Coords
+     * @param a the first Coord to check
+     * @param b the second Coord to check
+     * @return a double of the distance between Coord a and Coord b
+     */
+    public static double getDistance(Coord a, Coord b) {
+        return Math.sqrt(Math.pow(b.getX() - a.getX(), 2) + Math.pow(b.getY() - a.getY(), 2))
+    }
+    
+    /**
      * Gets the X component of the coordinate
      * @return an int representing the X component
      */

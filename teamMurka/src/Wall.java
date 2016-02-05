@@ -9,13 +9,21 @@ public class Wall {
     /** Coordinate the wall is positioned at. Origin is upper-left */
     private final Coord pos;   
 
-    /** true = vertical, false = horizontal. Spans two tiles */
+    /** true = vertical, false = horizontal. Spans ONE tile */
     private final boolean dir;
     
+    /** Enum for orientation */
+    public enum Orientation {
+        HORIZ(0), VERT(1)
+    }
+    
     /** Enum for directions */
-    public enum Dir {
-        HORIZ(false),
-        VERT(true)
+    public enum Direction {
+        NORTH(0), EAST(1), SOUTH(2), WEST(3)
+        
+        public boolean getOrientation(int d) {
+            return (d % 2 == 0) ? Orientation.HORIZ : Orientation.VERT;
+        }
     }
     
     /**
@@ -34,9 +42,9 @@ public class Wall {
      * @return a String representation of the Wall.
      */
     public String toString() {
-        return "[" + pos + ":(" (dir) ? 
-            pos.getX() + "," + pos.getY() + 2 :
-            pos.getX() + 2 + "," + pos.getY()
+        return "[" + pos + ":(" (dir == Orientation.VERT) ? 
+            pos.getX() + "," + pos.getY() + 1 :
+            pos.getX() + 1 + "," + pos.getY()
         ];
     }
 }
