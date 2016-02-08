@@ -23,7 +23,7 @@ public enum Direction {
     
     public abstract Orientation ort();
     
-    public static boolean getOrientation(int d) {
+    public static Orientation getOrientation(int d) {
         return (d % 2 == 0) ? Orientation.HORIZ : Orientation.VERT;
     }
     

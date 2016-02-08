@@ -98,6 +98,21 @@ public class Board {
         return placedWalls;
     }
     
-    // public void placeWall(Coord pos, int dir) {}
+    /**
+     * Places a wall on the board.
+     */
+    public void placeWall(Coord pos, Direction dir) {
+        Wall w1 = new Wall(pos, dir);
+        
+        // Calculate wall 2's coordinate
+        int spanX = (dir.ort() == Orientation.HORIZ) ? pos.getX() + 1 : pos.getX();
+        int spanY = (dir.ort() == Orientation.HORIZ) ? pos.getY() : pos.getY() + 1;
+        Coord spanPos = new Coord(spanX, spanY);
+        Wall w2 = new Wall(spanPos, dir);
+        
+        // Add the walls to the HashSet
+        placedWalls.add(w1);
+        placedWalls.add(w2);
+    }
     
 }
