@@ -51,16 +51,16 @@ public class Board {
                     // Check blocking for the corresponding direction
                     switch(dir) {
                         case EAST:
-                            if(wall.getPos().getX() + 1 == src.getX())
+                            if(wall.getPos().getX() + 1 == src.getX() && wall.getPos().getY() + 1 == src.getY())
                                 return true;
                         case WEST:
-                            if(wall.getPos().getX() == src.getX())
+                            if(wall.getPos().getX() == src.getX() && wall.getPos().getY() + 1 == src.getY())
                                 return true;
                         case NORTH:
-                            if(wall.getPos().getY() == src.getY())
+                            if(wall.getPos().getX() + 1 == src.getX() && wall.getPos().getY() == src.getY())
                                 return true;
                         case SOUTH:
-                            if(wall.getPos().getY() + 1 == src.getY())
+                            if(wall.getPos().getX() + 1 == src.getX() && wall.getPos().getY() + 1 == src.getY())
                                 return true;
                     }
                 }
