@@ -11,8 +11,8 @@ public class Wall {
     /** Coordinate the wall is positioned at. Origin is upper-left */
     private final Coord pos;   
 
-    /** true = vertical, false = horizontal. Spans ONE tile */
-    private final Direction dir;
+    /** Orientation of the wall. Either HORIZ or VERT */
+    private final Orientation dir;
     
     /**
      * Default constructor
@@ -20,7 +20,7 @@ public class Wall {
      * @param dir the direction the wall is set at. Use Dir.HORIZ or Dir.VERT for
      *        distinguishing the directions.
      */
-    public Wall(Coord pos, Direction dir) {
+    public Wall(Coord pos, Orientation dir) {
         this.pos = pos;
         this.dir = dir;
     }
@@ -35,9 +35,9 @@ public class Wall {
     
     /**
      * Gets the direction of the Wall
-     * @return a Direction of the direction
+     * @return an Orientation of the direction
      */
-    public Direction getDir() {
+    public Orientation getDir() {
         return dir;
     }
     
@@ -47,7 +47,7 @@ public class Wall {
      */
     @Override
     public String toString() {
-        return "[" + pos + ":(" + ((dir.ort() == Orientation.VERT) ? 
+        return "[" + pos + ":(" + ((dir == Orientation.VERT) ? 
             pos.getX() + "," + pos.getY() + 1 :
             pos.getX() + 1 + "," + pos.getY() + "]");
     }
