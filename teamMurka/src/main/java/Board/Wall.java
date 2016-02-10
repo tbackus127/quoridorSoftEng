@@ -12,17 +12,17 @@ public class Wall {
     private final Coord pos;   
 
     /** Orientation of the wall. Either HORIZ or VERT */
-    private final Orientation dir;
+    private final Orientation ort;
     
     /**
      * Default constructor
      * @param pos the origin Coord (from upper-left) the wall will be placed at
-     * @param dir the direction the wall is set at. Use Dir.HORIZ or Dir.VERT for
+     * @param ort the direction the wall is set at. Use Orientation.HORIZ or Orientation.VERT for
      *        distinguishing the directions.
      */
-    public Wall(Coord pos, Orientation dir) {
+    public Wall(Coord pos, Orientation ort) {
         this.pos = pos;
-        this.dir = dir;
+        this.ort = ort;
     }
     
     /**
@@ -37,8 +37,8 @@ public class Wall {
      * Gets the direction of the Wall
      * @return an Orientation of the direction
      */
-    public Orientation getDir() {
-        return dir;
+    public Orientation getOrt() {
+        return ort;
     }
     
     /**
@@ -47,8 +47,8 @@ public class Wall {
      */
     @Override
     public String toString() {
-        return "[" + pos + ":(" + ((dir == Orientation.VERT) ? 
-            pos.getX() + "," + pos.getY() + 1 :
-            pos.getX() + 1 + "," + pos.getY() + "]");
+        return "[" + pos + ":(" + ((ort == Orientation.VERT) ? 
+            (pos.getX() + "," + (pos.getY() + 1) + ")") :
+            ((pos.getX() + 1) + "," + pos.getY() + ")")) + "]";
     }
 }

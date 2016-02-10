@@ -1,4 +1,5 @@
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 import com.tmquoridor.Board.*;
 
@@ -16,30 +17,38 @@ public class TestBoard {
         Wall w2 = new Wall(new Coord(2, 3), Orientation.HORIZ);
         Wall w3 = new Wall(new Coord(3, 2), Orientation.VERT);
         
+        System.err.println("W1:" + w1.toString());
+        System.err.println("W2:" + w2.toString());
+        System.err.println("W3:" + w3.toString());
+        
         assertNotNull("One or more walls are null.", w1);
+        assertNotNull("One or more walls are null.", w2);
+        assertNotNull("One or more walls are null.", w3);
         
         b.placeWall(w1);
         b.placeWall(w2);
         b.placeWall(w3);
         
         int wallSize = b.getWalls().size();
-        assertEquals("Three walls were not placed.", wallSize, 3);
+        int wsize = 6;
+        assertEquals("Three (actual: 6) walls were not placed.", wallSize, wsize);
         
-        testPos = new Coord(3, 3);
+        // DEBUG
+        for(Wall w : b.getWalls()) {
+            System.err.print(w.toString());
+        }
         
-        boolean blockedNorth = isBlocked(testPos, Direction.NORTH);
-        boolean blockedEast = isBlocked(testPos, Direction.EAST);
-        boolean blockedSouth = isBlocked(testPos, Direction.SOUTH);
-        boolean blockedWest = isBlocked(testPos, Direction.WEST);
+        Coord testPos = new Coord(3, 3);
         
-        System.out.println("TEST");
+        boolean blockedNorth = b.isBlocked(testPos, Direction.NORTH);
+        boolean blockedEast = b.isBlocked(testPos, Direction.EAST);
+        boolean blockedSouth = b.isBlocked(testPos, Direction.SOUTH);
+        boolean blockedWest = b.isBlocked(testPos, Direction.WEST);
+        
         assertTrue("Blocked move @ NORTH allowed!", blockedNorth);
         assertTrue("Blocked move @ EAST allowed!", blockedEast);
         assertTrue("Blocked move @ NORTH allowed!", blockedSouth);
-        assertTrue("Can't move WEST!", !blockedWest);
-        
-        
-        
-        
+        assertFalse(blockedWest);
+
     }
 }

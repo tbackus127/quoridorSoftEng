@@ -29,6 +29,7 @@ public class Board {
     public Board(int plNum) {
         numOfPlayers = plNum;
         playerPositions = new Coord[numOfPlayers];
+        placedWalls = new HashSet<Wall>();
     }
     
     // public HashSet<Coord> getLegalMoves(int plNum) {}
@@ -48,7 +49,7 @@ public class Board {
                 
                 // If we're moving East or West, horizontal walls have no effect,
                 // and vice-versa
-                if(wall.getDir().ort() != dir.ort()) {
+                if(wall.getOrt() != dir.ort()) {
                     
                     // Check blocking for the corresponding direction
                     switch(dir) {
@@ -103,18 +104,22 @@ public class Board {
     /**
      * Places a wall on the board.
      */
-    public void placeWall(Coord pos, Direction dir) {
-        Wall w1 = new Wall(pos, dir);
+    public void placeWall(Coord pos, Orientation ort) {
+        Wall w1 = new Wall(pos, ort);
         
         // Calculate wall 2's coordinate
-        int spanX = (dir.ort() == Orientation.HORIZ) ? pos.getX() + 1 : pos.getX();
-        int spanY = (dir.ort() == Orientation.HORIZ) ? pos.getY() : pos.getY() + 1;
+        int spanX = (ort == Orientation.HORIZ) ? pos.getX() + 1 : pos.getX();
+        int spanY = (ort == Orientation.HORIZ) ? pos.getY() : pos.getY() + 1;
         Coord spanPos = new Coord(spanX, spanY);
-        Wall w2 = new Wall(spanPos, dir);
+        Wall w2 = new Wall(spanPos, ort);
         
         // Add the walls to the HashSet
         placedWalls.add(w1);
         placedWalls.add(w2);
+    }
+    
+    public void placeWall(Wall w) {
+        placeWall(w.getPos(), w.getOrt());
     }
     
 }

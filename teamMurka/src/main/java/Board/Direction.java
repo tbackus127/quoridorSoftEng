@@ -28,8 +28,4 @@ public enum Direction {
     public static Orientation getOrientation(int d) {
         return (d % 2 == 0) ? Orientation.HORIZ : Orientation.VERT;
     }
-    
-    public Direction getDir(int d) {
-
-    }
 }
