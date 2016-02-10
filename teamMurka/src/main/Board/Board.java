@@ -4,6 +4,8 @@
  * This class contains all data for player positions and walls.
  */
 
+package com.tmquoridor.Board;
+ 
 import java.util.HashSet;
  
 public class Board {

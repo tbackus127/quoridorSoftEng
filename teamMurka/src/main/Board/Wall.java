@@ -1,3 +1,5 @@
+package com.tmquoridor.Board;
+
 /**
  * Wall Class
  * <p>

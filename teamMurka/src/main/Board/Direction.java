@@ -1,3 +1,5 @@
+package com.tmquoridor.Board;
+
 public enum Direction {
     NORTH {
         @Override

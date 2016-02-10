@@ -4,6 +4,8 @@
  * Contains a simple coordinate (x, y).
  */
 
+package com.tmquoridor.Board;
+ 
 public class Coord {
     
     // X and Y parts of the coordinate
