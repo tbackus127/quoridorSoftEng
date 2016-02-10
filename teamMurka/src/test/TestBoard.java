@@ -1,10 +1,13 @@
-import junit.
+import org.junit.Test;
 
 public class TestBoard {
     
     @Test
-    public static void main(String[] args) {
-        Board b = new Board(2);
+    public void testBoardConstructor() {
+        int playerCount = 2;
+        Board b = new Board(playerCount);
+        
+        assertNotNull("Board is null", b);
         
     }
 }
