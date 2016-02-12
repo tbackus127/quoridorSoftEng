@@ -8,7 +8,7 @@ package com.tmquoridor.Board;
 
 public class Wall {
     
-    /** Coordinate the wall is positioned at. Origin is upper-left */
+    /** Coordinate the wall is positioned at. Origin is upper-left of the corresponding tile */
     private final Coord pos;   
 
     /** Orientation of the wall. Either HORIZ or VERT */
@@ -47,8 +47,6 @@ public class Wall {
      */
     @Override
     public String toString() {
-        return "[" + pos + ":(" + ((ort == Orientation.VERT) ? 
-            (pos.getX() + "," + (pos.getY() + 1) + ")") :
-            ((pos.getX() + 1) + "," + pos.getY() + ")")) + "]";
+        return "[" + pos + ":" + ((ort == Orientation.VERT) ? "V" : "H") + "]";
     }
 }

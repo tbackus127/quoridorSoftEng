@@ -14,13 +14,13 @@ public class Board {
     private static final int BOARD_SIZE = 9;
     
     /** The number of players playing */
-    int numOfPlayers;
+    public final int numOfPlayers;
     
     /** ith index contains the ith player's position */
-    Coord[] playerPositions;
+    private Coord[] playerPositions;
     
     /** Contains all walls that have been placed */
-    HashSet<Wall> placedWalls;
+    private HashSet<Wall> placedWalls;
      
     /**
      * Default constructor
@@ -36,36 +36,69 @@ public class Board {
     // public boolean isMoveLegal(Coord src, Coord dest) {}
     
     /**
+     * Checks if a wall is relevant for blocking paths.
+     * @param w the Wall to check
+     * @param plPos the player's position to check
+     * @param dir the Direction the player is moving
+     * @return true if the wall is relevant for collision checking
+     */
+    private boolean isRelevantWall(Wall w, Coord plPos, Direction dir) {
+        int px = plPos.getX();
+        int py = plPos.getY();
+        Coord wCoord = w.getPos();
+        int wx = wCoord.getX();
+        int wy = wCoord.getY();
+        Orientation mOrt = dir.ort();
+        Orientation wOrt = w.getOrt();
+        switch(mOrt) {
+            case VERT:
+                if(px != wx || wy - py > 1 || wy - py < 0 || mOrt == wOrt) {
+                    System.err.println("Irr:" + wOrt + "@" + wCoord + " when moving " + dir);
+                    return false;
+                }
+            break;
+            case HORIZ:
+                if(py != wy || wx - px > 1 || wx - px < 0 || mOrt == wOrt)  {
+                    System.err.println("Irr:" + wOrt + "@" + wCoord + " when moving " + dir);
+                    return false;
+                }
+        }
+        System.err.println("  Rel:" + wOrt + "@" + wCoord + " when moving " + dir);
+        return true;
+    }
+    
+    /**
      * Checks if a direction is blocked at a Coordinate.
      * @param src the starting Coordinate that will be tested from
      * @param dir the direction to move (Use Coord.Direction enum)
      * @return true if the move is blocked
      */
     public boolean isBlocked(Coord src, Direction dir) {
+        
+        // Go through all placed walls
         for(Wall wall : placedWalls) {
             
-            // Skip the wall if it's too far to matter
-            if(Coord.getDistance(wall.getPos(), src) < 2) {
+            // Check if we need to actually check the wall
+            if(isRelevantWall(wall, src, dir)) {
+                int wx = wall.getPos().getX();
+                int wy = wall.getPos().getY();
+                int sx = src.getX();
+                int sy = src.getY();
                 
-                // If we're moving East or West, horizontal walls have no effect,
-                // and vice-versa
-                if(wall.getOrt() != dir.ort()) {
-                    
-                    // Check blocking for the corresponding direction
-                    switch(dir) {
-                        case EAST:
-                            if(wall.getPos().getX() + 1 == src.getX() && wall.getPos().getY() + 1 == src.getY())
-                                return true;
-                        case WEST:
-                            if(wall.getPos().getX() == src.getX() && wall.getPos().getY() + 1 == src.getY())
-                                return true;
-                        case NORTH:
-                            if(wall.getPos().getX() + 1 == src.getX() && wall.getPos().getY() == src.getY())
-                                return true;
-                        case SOUTH:
-                            if(wall.getPos().getX() + 1 == src.getX() && wall.getPos().getY() + 1 == src.getY())
-                                return true;
-                    }
+                // Check for four directions
+                switch(dir) {
+                    case NORTH:
+                        if(wx == sx && wy == sy) return true;
+                    break;
+                    case EAST:
+                        if(wx - 1 == sx && wy == sy) return true;
+                    break;
+                    case SOUTH:
+                        if(wx == sx && wy - 1 == sy) return true;
+                    break;
+                    case WEST:
+                        if(wx == sx && wy == sy) return true;
+                    break;
                 }
             }
         }
@@ -102,7 +135,9 @@ public class Board {
     }
     
     /**
-     * Places a wall on the board.
+     * Places a wall on the board with a length of 2.
+     * @param pos a Coordinate of the position to place the wall (upper-left of tile)
+     * @param ort the Orientation of the wall HORIZ or VERT).
      */
     public void placeWall(Coord pos, Orientation ort) {
         Wall w1 = new Wall(pos, ort);
@@ -118,8 +153,11 @@ public class Board {
         placedWalls.add(w2);
     }
     
+    /**
+     * Places a wall on the board with a length of 2.
+     * @param w the Wall to place on the board.
+     */
     public void placeWall(Wall w) {
         placeWall(w.getPos(), w.getOrt());
     }
-    
 }

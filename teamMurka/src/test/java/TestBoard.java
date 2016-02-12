@@ -17,10 +17,6 @@ public class TestBoard {
         Wall w2 = new Wall(new Coord(2, 3), Orientation.HORIZ);
         Wall w3 = new Wall(new Coord(3, 2), Orientation.VERT);
         
-        System.err.println("W1:" + w1.toString());
-        System.err.println("W2:" + w2.toString());
-        System.err.println("W3:" + w3.toString());
-        
         assertNotNull("One or more walls are null.", w1);
         assertNotNull("One or more walls are null.", w2);
         assertNotNull("One or more walls are null.", w3);
@@ -33,12 +29,16 @@ public class TestBoard {
         int wsize = 6;
         assertEquals("Three (actual: 6) walls were not placed.", wallSize, wsize);
         
+        System.err.println();
+        
         // DEBUG
         for(Wall w : b.getWalls()) {
             System.err.print(w.toString());
         }
         
-        Coord testPos = new Coord(3, 3);
+        System.err.println();
+        
+        Coord testPos = new Coord(2, 2);
         
         boolean blockedNorth = b.isBlocked(testPos, Direction.NORTH);
         boolean blockedEast = b.isBlocked(testPos, Direction.EAST);
@@ -47,7 +47,7 @@ public class TestBoard {
         
         assertTrue("Blocked move @ NORTH allowed!", blockedNorth);
         assertTrue("Blocked move @ EAST allowed!", blockedEast);
-        assertTrue("Blocked move @ NORTH allowed!", blockedSouth);
+        assertTrue("Blocked move @ SOUTH allowed!", blockedSouth);
         assertFalse(blockedWest);
 
     }
