@@ -1,0 +1,13 @@
+Use an interface for the move server, like this?:
+
+public interface MoveServer {
+    public Move requestMove()
+}
+
+public class AIServer implements MoveServer {
+    
+    public Move requestMove() {
+        //TODO: Do stuff here? We'll need a Move object or some
+        // other way to notate the moves.
+    }
+}
