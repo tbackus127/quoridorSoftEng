@@ -1,4 +1,4 @@
-package Servers;
+package com.tmquoridor.Server;
 
 public class UserInputMoveHandler implements MoveServer{
     // Fields
@@ -18,6 +18,16 @@ public class UserInputMoveHandler implements MoveServer{
 	this.port = initPort;
     }
     
+    @Override
+    public void placeMoveOnBoard() {
+        System.err.println("place");
+    }
+    
+    @Override
+    public String getMove() {
+        return "move";
+    }
+    
     /* This is here to allow for the server to be ran without some outside 
      * class. It also allows for you to input the port you would like and also
      * allows for you to override the default name given to the server.
@@ -26,12 +36,12 @@ public class UserInputMoveHandler implements MoveServer{
 	int portValue;
 	int ixargs = 0;
 	// While loop  to run through all of trhe command line arguments
-	while(ixargs > args.length()){
+	while(ixargs > args.length){
 	    if(args[ixargs].equals("--port")){
 		ixargs++;
-		try{
+		try {
 		    portValue = Integer.parseInt(args[ixargs]);
-		}catch{
+		} catch(Exception e) {
 		    System.out.println("After the port argument you entered" +
 		                       " a non-numerical character");
 		    System.exit(0);
