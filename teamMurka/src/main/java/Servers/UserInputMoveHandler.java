@@ -15,7 +15,7 @@ public class UserInputMoveHandler implements MoveServer{
      * which is 
      */
     public UserInputMoveHandler(int initPort){
-	this.port = initPort;
+        this.port = initPort;
     }
     
     @Override

@@ -15,7 +15,7 @@ public class TestUserInputMoveHandler{
     public void testNotNull() {        
         String machine = "localhost";
         int port = 1478;
-        UserInputMoveHandler user = new UserInputMoveHandler();
+        UserInputMoveHandler user = new UserInputMoveHandler(port);
         assertNotNull("Empty Hand constructed", user);
     }
 }
