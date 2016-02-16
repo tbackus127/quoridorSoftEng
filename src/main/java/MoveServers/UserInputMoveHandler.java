@@ -5,17 +5,18 @@ public class UserInputMoveHandler implements MoveServer{
     private int port;
     private String serversName;
     private int playerNumber;
-    private char[][] board;
+    private Board board;
     private int wallCount;
     
     
     // Methods
     
     /* This is the constructor to the move server. It can be passed a string 
-     * which is 
+     * which is the of the move server.
      */
-    public UserInputMoveHandler(int initPort){
+    public UserInputMoveHandler(int initPort, String initName){
 	this.port = initPort;
+	this.name = initName;
     }
     
     /* This is here to allow for the server to be ran without some outside 
@@ -25,7 +26,8 @@ public class UserInputMoveHandler implements MoveServer{
     public static void main(String[] args){
 	int portValue;
 	int ixargs = 0;
-	// While loop  to run through all of trhe command line arguments
+	String name = "teamMurka";
+	// While loop  to run through all of the command line arguments
 	while(ixargs > args.length()){
 	    if(args[ixargs].equals("--port")){
 		ixargs++;
@@ -38,10 +40,14 @@ public class UserInputMoveHandler implements MoveServer{
 		}
 	    }
 	    else if(args[ixargs].equals("--name")){
-		
+		ixargs++;
+		name = args[ixargs];
 	    }
 	    ixargs++;
 	}
+        
+	// Makes the instance of the move server
+	UserInputMoveServer us = new UserInputMoveServer(port, name);
     }
     
     
