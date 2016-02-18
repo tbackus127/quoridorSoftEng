@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="TestUserInputMoveHandler" tests="1" skipped="0" failures="0" errors="0" timestamp="2016-02-15T14:04:46" hostname="Temp-PC" time="0.0">
+<testsuite name="TestUserInputMoveHandler" tests="1" skipped="0" failures="0" errors="0" timestamp="2016-02-18T20:00:02" hostname="whiteface" time="0.002">
   <properties/>
-  <testcase name="testNotNull" classname="TestUserInputMoveHandler" time="0.0"/>
+  <testcase name="testNotNull" classname="TestUserInputMoveHandler" time="0.002"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

@@ -1,4 +1,7 @@
 package com.tmquoridor.Server;
+import com.tmquoridor.Board.*;
+
+import java.util.*;
 
 public class UserInputMoveHandler implements MoveServer{
     // Fields
@@ -10,16 +13,15 @@ public class UserInputMoveHandler implements MoveServer{
     
     
     // Methods
-    
     /* This is the constructor to the move server. It can be passed a string 
      * which is the of the move server.
      */
     public UserInputMoveHandler(int initPort, String initName){
-	this.port = initPort;
-	this.name = initName;
-	
+	port = initPort;
+	serversName = initName;
+    }
     
-    @Override
+    
     public void placeMoveOnBoard() {
         System.err.println("place");
     }
@@ -38,7 +40,7 @@ public class UserInputMoveHandler implements MoveServer{
 	int ixargs = 0;
 	String name = "teamMurka"; // This sets the default name
 	// While loop  to run through all of the command line arguments
-	while(ixargs > args.length()){
+	while(ixargs > args.length){
 	    if(args[ixargs].equals("--port")){
 		ixargs++;
 		try {
@@ -57,7 +59,11 @@ public class UserInputMoveHandler implements MoveServer{
 	}
         
 	// Makes the instance of the move server
-	UserInputMoveServer us = new UserInputMoveServer(port, name);
+	UserInputMoveHandler us = new UserInputMoveHandler(portValue, name);
+    }
+    
+    public void run(){
+	
     }
     
     

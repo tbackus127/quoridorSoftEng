@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="TestBoard" tests="1" skipped="0" failures="0" errors="0" timestamp="2016-02-15T14:04:46" hostname="Temp-PC" time="0.016">
+<testsuite name="TestBoard" tests="1" skipped="0" failures="0" errors="0" timestamp="2016-02-18T20:00:02" hostname="whiteface" time="0.019">
   <properties/>
-  <testcase name="testBoard" classname="TestBoard" time="0.016"/>
+  <testcase name="testBoard" classname="TestBoard" time="0.019"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[
-[(2,2):H][(2,3):H][(3,3):H][(3,2):H][(3,2):V][(3,3):V]
+[(2,2):H][(3,2):H][(3,2):V][(3,3):V][(3,3):H][(2,3):H]
   Rel:H@(2,2) when moving N
 Irr:H@(2,2) when moving E
-Irr:H@(2,3) when moving E
-Irr:H@(3,3) when moving E
 Irr:H@(3,2) when moving E
   Rel:V@(3,2) when moving E
   Rel:H@(2,2) when moving S
+Irr:H@(3,2) when moving S
+Irr:V@(3,2) when moving S
+Irr:V@(3,3) when moving S
+Irr:H@(3,3) when moving S
   Rel:H@(2,3) when moving S
 Irr:H@(2,2) when moving W
-Irr:H@(2,3) when moving W
-Irr:H@(3,3) when moving W
 Irr:H@(3,2) when moving W
   Rel:V@(3,2) when moving W
 Irr:V@(3,3) when moving W
+Irr:H@(3,3) when moving W
+Irr:H@(2,3) when moving W
 ]]></system-err>
 </testsuite>
