@@ -1,0 +1,6 @@
+# .gitignore for Java and Gradle
+
+teamMurka/build/**
+teamMurka/.gradle/**
+**.java~
+**.kate-swp
