@@ -1,24 +1,37 @@
 package com.tmquoridor.Server;
-import com.tmquoridor.Board.*;
+
+import java.io.IOException;
 
 import java.util.*;
+import java.io.PrintStream;
+import java.net.Socket;
+
+import com.tmquoridor.Board.*;
+
 
 public class UserInputMoveHandler implements MoveServer{
+   
+    private static final String DEFAULT_MACHINE_NAME = "localhost";
+    private static final int DEFAULT_PORT = 6478;
+   
     // Fields
-    private int port;
     private String serversName;
+    private int port;
     private int playerNumber;
     private Board board;
     private int wallCount;
     
+    private Socket socket;
+    private Scanner consoleIn;
     
     // Methods
     /* This is the constructor to the move server. It can be passed a string 
      * which is the of the move server.
      */
     public UserInputMoveHandler(int initPort, String initName){
-	port = initPort;
-	serversName = initName;
+        port = initPort;
+        serversName = initName;
+        consoleIn = new Scanner(System.in);
     }
     
     
@@ -36,34 +49,53 @@ public class UserInputMoveHandler implements MoveServer{
      * allows for you to override the default name given to the server.
      */
     public static void main(String[] args){
-	int portValue = 1478; // This sets the default value
-	int ixargs = 0;
-	String name = "teamMurka"; // This sets the default name
-	// While loop  to run through all of the command line arguments
-	while(ixargs > args.length){
-	    if(args[ixargs].equals("--port")){
-		ixargs++;
-		try {
-		    portValue = Integer.parseInt(args[ixargs]);
-		} catch(Exception e) {
-		    System.out.println("After the port argument you entered" +
-		                       " a non-numerical character");
-		    System.exit(0);
-		}
-	    }
-	    else if(args[ixargs].equals("--name")){
-		ixargs++;
-		name = args[ixargs];
-	    }
-	    ixargs++;
-	}
+        int ixargs = 0;
+        int portValue = 0;
+        String name = "";
+        // While loop  to run through all of the command line arguments
+        while(ixargs > args.length){
+            if(args[ixargs].equals("--port")){
+                ixargs++;
+                try {
+                    portValue = Integer.parseInt(args[ixargs]);
+                } catch(Exception e) {
+                    System.out.println("After the port argument you entered" +
+                                       " a non-numerical character");
+                    System.exit(0);
+                }
+            }
+            else if(args[ixargs].equals("--name")) {
+                ixargs++;
+                name = args[ixargs];
+            }
+        ixargs++;
+        }
         
-	// Makes the instance of the move server
-	UserInputMoveHandler us = new UserInputMoveHandler(portValue, name);
+        // Makes the instance of the move server
+        UserInputMoveHandler us = new UserInputMoveHandler(portValue, name);
     }
     
-    public void run(){
-	
+    public void run() {
+        try {
+            socket = new Socket(serversName, port);
+            PrintStream serverOut = new PrintStream(socket.getOutputStream());
+            Scanner serverIn = new Scanner(socket.getInputStream());
+            
+            String clientMsg = "";
+            
+            while(consoleIn.hasNextLine()) {
+                String msg = consoleIn.nextLine();
+                serverOut.println(msg);
+                clientMsg = serverIn.nextLine();
+                System.err.println("C.Resp: " + clientMsg);
+            }
+            
+            serverOut.close();
+            serverIn.close();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     
