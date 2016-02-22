@@ -50,8 +50,8 @@ public class UserInputMoveHandler implements MoveServer{
      */
     public static void main(String[] args){
         int ixargs = 0;
-        int portValue = 0;
-        String name = "";
+        int portValue = DEFAULT_PORT;
+        String name = DEFAULT_MACHINE_NAME;
         // While loop  to run through all of the command line arguments
         while(ixargs > args.length){
             if(args[ixargs].equals("--port")){

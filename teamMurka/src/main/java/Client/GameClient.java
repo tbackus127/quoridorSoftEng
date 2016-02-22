@@ -13,13 +13,17 @@ import com.tmquoridor.Board.*;
 public class GameClient implements Runnable {
     
     private static final Executor exec = Executors.newFixedThreadPool(4);
+    private static final int DEFAULT_PORT = 6478;
+    private static final String DEFAULT_MACHINE_NAME = "localhost";
     
     private boolean running;
     private Board board;
     private int portNumber;
+    private String machineName;
     
-    public GameClient(int portNumber) {
+    public GameClient(int portNumber, String machineName) {
         this.portNumber = portNumber;
+        this.machineName = machineName;
     }
     
     public void start() {
@@ -44,5 +48,32 @@ public class GameClient implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+    
+    public static void main(String[] args) {
+        int ixargs = 0;
+        int portValue = DEFAULT_PORT;
+        String name = DEFAULT_MACHINE_NAME;
+        // While loop  to run through all of the command line arguments
+        while(ixargs > args.length) {
+            if(args[ixargs].equals("--port")){
+                ixargs++;
+                try {
+                    portValue = Integer.parseInt(args[ixargs]);
+                } catch(Exception e) {
+                    System.out.println("After the port argument you entered" +
+                                       " a non-numerical character");
+                    System.exit(0);
+                }
+            }
+            else if(args[ixargs].equals("--name")) {
+                ixargs++;
+                name = args[ixargs];
+            }
+        ixargs++;
+        }
+        
+        // Makes the instance of the move server
+        GameClient gc = new GameClient(portValue, name);
     }
 }
