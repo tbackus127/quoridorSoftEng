@@ -9,7 +9,7 @@ import java.net.Socket;
 import com.tmquoridor.Board.*;
 
 
-public class UserInputMoveHandler implements MoveServer{
+public class UserInputMoveHandler implements MoveServer, Runnable {
    
     private static final String DEFAULT_MACHINE_NAME = "localhost";
     private static final int DEFAULT_PORT = 6478;
@@ -72,7 +72,7 @@ public class UserInputMoveHandler implements MoveServer{
         }
         
         // Makes the instance of the move server
-        UserInputMoveHandler us = new UserInputMoveHandler(portValue, name);
+        new Thread(new UserInputMoveHandler(portValue, name)).start();
     }
     
     public void run() {
@@ -82,12 +82,12 @@ public class UserInputMoveHandler implements MoveServer{
             Scanner serverIn = new Scanner(socket.getInputStream());
             
             String clientMsg = "";
-            
+            System.err.print("Client connected.\n\n> ");
             while(consoleIn.hasNextLine()) {
                 String msg = consoleIn.nextLine();
                 serverOut.println(msg);
                 clientMsg = serverIn.nextLine();
-                System.err.println("C.Resp: " + clientMsg);
+                System.err.println("C.Resp: " + clientMsg + "\n\n> ");
             }
             
             serverOut.close();

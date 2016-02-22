@@ -26,27 +26,19 @@ public class GameClient implements Runnable {
         this.machineName = machineName;
     }
     
-    public void start() {
-        running = true;
-        run();
-    }
-    
     public void run() {
-        
-        while(running) {
-            try {
-                ServerSocket server = new ServerSocket(portNumber);
-                System.out.println("Server accepting connections on port " + portNumber);
+        try {
+            ServerSocket server = new ServerSocket(portNumber);
+            System.out.println("Server accepting connections on port " + portNumber);
 
-                Socket client = null;
+            Socket client = null;
 
-                while ((client = server.accept()) != null) {
-                    ServerHandler sHand = new ServerHandler(client);
-                    exec.execute(sHand);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            while ((client = server.accept()) != null) {
+                ServerHandler sHand = new ServerHandler(client);
+                exec.execute(sHand);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
     
@@ -73,7 +65,7 @@ public class GameClient implements Runnable {
         ixargs++;
         }
         
-        // Makes the instance of the move server
-        GameClient gc = new GameClient(portValue, name);
+        // Create a new thread of the Game Client
+        new Thread(new GameClient(portValue, name)).start();
     }
 }
