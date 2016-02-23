@@ -1,6 +1,7 @@
 package com.tmquoridor.Server;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.io.PrintStream;
 
 import java.util.*;
@@ -34,9 +35,9 @@ public class UserInputMoveHandler implements MoveServer, Runnable {
      */
     public UserInputMoveHandler(int initPort, String initName, Socket cSocket) throws Exception{
         port = initPort;
-	serversName = "USA:" + initName;
-	server = new ServerSocket(initPort);
-	client = cSocket;
+        serversName = "USA:" + initName;
+        server = new ServerSocket(initPort);
+        client = cSocket;
         console = new Scanner(System.in);
     }
     

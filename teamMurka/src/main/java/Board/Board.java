@@ -21,9 +21,17 @@ public class Board {
     
     /** Contains all walls that have been placed */
     private HashSet<Wall> placedWalls;
-     
+    
     /**
-     * Default constructor
+     * Default contructor
+     * Defaults to two players
+     */
+    public Board() {
+        this(2);
+    }
+    
+    /**
+     * Alternative constructor
      * @param plNum the number of players
      */
     public Board(int plNum) {
