@@ -1,9 +1,11 @@
 package com.tmquoridor.Server;
 
 import java.io.IOException;
+import java.io.PrintStream;
 
 import java.util.*;
 import java.io.PrintStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 import com.tmquoridor.Board.*;
@@ -11,7 +13,7 @@ import com.tmquoridor.Board.*;
 
 public class UserInputMoveHandler implements MoveServer, Runnable {
    
-    private static final String DEFAULT_MACHINE_NAME = "localhost";
+    private static final String DEFAULT_SERVER_NAME = "America";
     private static final int DEFAULT_PORT = 6478;
    
     // Fields
@@ -21,17 +23,25 @@ public class UserInputMoveHandler implements MoveServer, Runnable {
     private Board board;
     private int wallCount;
     
-    private Socket socket;
-    private Scanner consoleIn;
+    private ServerSocket server;
+    private Socket client;
+    
+    private Scanner console;
     
     // Methods
     /* This is the constructor to the move server. It can be passed a string 
      * which is the of the move server.
      */
-    public UserInputMoveHandler(int initPort, String initName){
+    public UserInputMoveHandler(int initPort, String initName, Socket cSocket) throws Exception{
         port = initPort;
-        serversName = initName;
-        consoleIn = new Scanner(System.in);
+	serversName = "USA:" + initName;
+	server = new ServerSocket(initPort);
+	client = cSocket;
+        console = new Scanner(System.in);
+    }
+    
+    public UserInputMoveHandler(int initPort, String initName) throws Exception {
+        this(initPort, initName, new Socket("localhost", initPort));
     }
     
     
@@ -48,10 +58,10 @@ public class UserInputMoveHandler implements MoveServer, Runnable {
      * class. It also allows for you to input the port you would like and also
      * allows for you to override the default name given to the server.
      */
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception{
         int ixargs = 0;
         int portValue = DEFAULT_PORT;
-        String name = DEFAULT_MACHINE_NAME;
+        String name = DEFAULT_SERVER_NAME;
         // While loop  to run through all of the command line arguments
         while(ixargs > args.length){
             if(args[ixargs].equals("--port")){
@@ -72,26 +82,36 @@ public class UserInputMoveHandler implements MoveServer, Runnable {
         }
         
         // Makes the instance of the move server
-        new Thread(new UserInputMoveHandler(portValue, name)).start();
+        UserInputMoveHandler mh = new UserInputMoveHandler(portValue, name);
+	mh.run();
     }
     
     public void run() {
         try {
-            socket = new Socket(serversName, port);
-            PrintStream serverOut = new PrintStream(socket.getOutputStream());
-            Scanner serverIn = new Scanner(socket.getInputStream());
+	    System.out.println("Server now accepting connections "+
+	    "on port " + port);
+	    
+	    // This while loop allows for the client to connect
+	    while ((client = server.accept()) != null) {
+		PrintStream serverOut = new PrintStream(client.getOutputStream());
+		Scanner serverIn = new Scanner(client.getInputStream());
+		
+		serverOut.close();
+		serverIn.close();
+	    }
+            // need the actual client to make the streams
             
-            String clientMsg = "";
-            System.err.print("Client connected.\n\n> ");
-            while(consoleIn.hasNextLine()) {
-                String msg = consoleIn.nextLine();
-                serverOut.println(msg);
-                clientMsg = serverIn.nextLine();
-                System.err.println("C.Resp: " + clientMsg + "\n\n> ");
-            }
             
-            serverOut.close();
-            serverIn.close();
+//             String clientMsg = "";
+//             System.err.print("Client connected.\n\n> ");
+//             while(console.hasNextLine()) {
+//                 String msg = console.nextLine();
+//                 serverOut.println(msg);
+//                 clientMsg = serverIn.nextLine();
+//                 System.err.println("C.Resp: " + clientMsg + "\n\n> ");
+//             }
+            
+            
             
         } catch (Exception e) {
             e.printStackTrace();
