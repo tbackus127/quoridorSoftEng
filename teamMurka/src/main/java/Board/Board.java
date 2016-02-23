@@ -32,8 +32,77 @@ public class Board {
         placedWalls = new HashSet<Wall>();
     }
     
-    // public HashSet<Coord> getLegalMoves(int plNum) {}
-    // public boolean isMoveLegal(Coord src, Coord dest) {}
+    public boolean isLegalWall(Wall w) throws Exception {
+        
+        // Get the wall we're placing's data
+        Coord wPos = w.getPos();
+        Orientation wOrt = w.getOrt();
+        int wx = wPos.getX();
+        int wy = wPos.getY();
+        
+        // Check board bounds (within 0-8)
+        switch(wOrt) {
+            case HORIZ:
+                if(wy <= 0 || wy >= 9) 
+                    return false;
+            break;
+            case VERT:
+                if(wx <= 0 || wx >= 9) 
+                    return false;
+            break;
+            default:
+                throw new Exception("SOMETHING WENT HORRIBLY WRONG!\nIn Board:isLegalWall00");
+        }
+        
+        // Break the walls into segments
+        HashSet<Segment> segs = getSegments();
+        for(Segment s : segs) {
+            
+            // Get each Segment's data
+            Coord sPos = s.getPos();
+            int sx = sPos.getX();
+            int sy = sPos.getY();
+            Orientation sOrt = s.getOrt();
+            
+            // If it overlaps with the wall we're placing's first segment, illegal
+            if(sPos.equals(wPos) && sOrt == wOrt)
+                return false;
+            
+            // Get the wall we're placing's extension (second segment)
+            Segment wExt = w.getSegment(1);
+            Coord wExtPos = wExt.getPos();
+            
+            // If it overlaps with any segment, illegal
+            if(sPos.equals(wExtPos) && sOrt == wOrt)
+                return false;
+            
+            // If the wall crosses another perpendicular to it, illegal (same midpoint, different orientations)
+            if(s.isExt() && sPos.equals(wExtPos))
+                return false;
+        }
+        return true;
+    }
+    
+    // public HashSet<Coord> getLegalMoves(int plNum) {
+        // Also take into account adjacent players
+    //}
+    
+    public HashSet<Coord> getLegalMoves(Coord pos) {
+        HashSet<Coord> result = new HashSet<Coord>();
+        
+        //TODO: Take adjacent players into account
+        // Check each cardinal direction
+        if(isBlocked(pos, Direction.NORTH))
+            result.add(new Coord(pos.getX(), pos.getY() - 1));
+        if(isBlocked(pos, Direction.SOUTH))
+            result.add(new Coord(pos.getX(), pos.getY() + 1));
+        if(isBlocked(pos, Direction.WEST))
+            result.add(new Coord(pos.getX() - 1, pos.getY()));
+        if(isBlocked(pos, Direction.EAST))
+            result.add(new Coord(pos.getX() + 1, pos.getY()));
+        
+        return result;
+    }
     
     /**
      * Checks if a wall is relevant for blocking paths.
@@ -43,13 +112,20 @@ public class Board {
      * @return true if the wall is relevant for collision checking
      */
     private boolean isRelevantWall(Wall w, Coord plPos, Direction dir) {
+        
+        // Get the playerPos's data
         int px = plPos.getX();
         int py = plPos.getY();
+        
+        // Get the Wall's data
         Coord wCoord = w.getPos();
         int wx = wCoord.getX();
         int wy = wCoord.getY();
+        
+        // Get orientation data
         Orientation mOrt = dir.ort();
         Orientation wOrt = w.getOrt();
+        
         switch(mOrt) {
             case VERT:
                 if(px != wx || wy - py > 1 || wy - py < 0 || mOrt == wOrt) {
@@ -74,6 +150,16 @@ public class Board {
      * @return true if the move is blocked
      */
     public boolean isBlocked(Coord src, Direction dir) {
+        
+        // Check Board bounds
+        if(src.getY() <= 0 && dir == Direction.NORTH)
+            return false;
+        if(src.getY() >= 8 && dir == Direction.SOUTH)
+            return false;
+        if(src.getX() <= 0 && dir == Direction.WEST)
+            return false;
+        if(src.getX() >= 8 && dir == Direction.EAST)
+            return false;
         
         // Go through all placed walls
         for(Wall wall : placedWalls) {
@@ -118,6 +204,36 @@ public class Board {
     }
     
     /**
+     * Places a wall on the board with a length of 2.
+     * @param pos a Coordinate of the position to place the wall (upper-left of tile)
+     * @param ort the Orientation of the wall HORIZ or VERT).
+     */
+    public void placeWall(Coord pos, Orientation ort) {
+        placedWalls.add(new Wall(pos, ort));
+    }
+    
+    /**
+     * Places a wall on the board with a length of 2.
+     * @param w the Wall to place on the board.
+     */
+    public void placeWall(Wall w) {
+        placedWalls.add(w);
+    }
+    
+    /**
+     * Gets a copy of the placed walls as individual Segments.
+     * @return a HashSet of Segments
+     */
+    public HashSet<Segment> getSegments() {
+        HashSet<Segment> result = new HashSet<Segment>();
+        for(Wall w : placedWalls) {
+            result.add(w.getSegment(0));
+            result.add(w.getSegment(1));
+        }
+        return result;
+    }
+    
+    /**
      * Gets a player's position
      * @param plNum the player to get the position of
      * @return a Coord where the specified player is located
@@ -132,32 +248,5 @@ public class Board {
      */
     public HashSet<Wall> getWalls() {
         return placedWalls;
-    }
-    
-    /**
-     * Places a wall on the board with a length of 2.
-     * @param pos a Coordinate of the position to place the wall (upper-left of tile)
-     * @param ort the Orientation of the wall HORIZ or VERT).
-     */
-    public void placeWall(Coord pos, Orientation ort) {
-        Wall w1 = new Wall(pos, ort);
-        
-        // Calculate wall 2's coordinate
-        int spanX = (ort == Orientation.HORIZ) ? pos.getX() + 1 : pos.getX();
-        int spanY = (ort == Orientation.HORIZ) ? pos.getY() : pos.getY() + 1;
-        Coord spanPos = new Coord(spanX, spanY);
-        Wall w2 = new Wall(spanPos, ort);
-        
-        // Add the walls to the HashSet
-        placedWalls.add(w1);
-        placedWalls.add(w2);
-    }
-    
-    /**
-     * Places a wall on the board with a length of 2.
-     * @param w the Wall to place on the board.
-     */
-    public void placeWall(Wall w) {
-        placeWall(w.getPos(), w.getOrt());
     }
 }

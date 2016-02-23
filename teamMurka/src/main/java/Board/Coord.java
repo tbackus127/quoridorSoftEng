@@ -32,6 +32,19 @@ public class Coord {
     }
     
     /**
+     * Checks if this Coord is equal to another Coord.
+     * @param other the other Coord to check this Coord with
+     * @return true if they are equal; false otherwise
+     */
+    public boolean equals(Coord other) {
+        int ox = other.getX();
+        int oy = other.getY();
+        if(ox != this.x || oy != this.y)
+            return false;
+        return true;
+    }
+    
+    /**
      * Gets the X component of the coordinate
      * @return an int representing the X component
      */

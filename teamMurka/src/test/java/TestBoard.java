@@ -26,8 +26,8 @@ public class TestBoard {
         b.placeWall(w3);
         
         int wallSize = b.getWalls().size();
-        int wsize = 6;
-        assertEquals("Three (actual: 6) walls were not placed.", wallSize, wsize);
+        int wsize = 3;
+        assertEquals("Three walls were not placed.", wallSize, wsize);
         
         System.err.println();
         

@@ -26,6 +26,25 @@ public class Wall {
     }
     
     /**
+     * Gets the corresponding segment (half) of the wall.
+     * @param sid the Segment ID. 0 = Wall origin, 1 = Wall extension
+     * @return the desired Segment.
+     */
+    public Segment getSegment(int sid) {
+        switch(sid) {
+            case 0:
+                return new Segment(pos, ort, false);
+            case 1:
+                int wx = pos.getX();
+                int wy = pos.getY();
+                int sx = (ort == Orientation.HORIZ) ? wx + 1 : wx;
+                int sy = (ort == Orientation.VERT) ? wy + 1 : wy;
+                return new Segment(new Coord(sx, sy), ort, true);
+        }
+        return null;
+    }
+    
+    /**
      * Gets the position of the Wall
      * @return a Coord for the Wall's position
      */
