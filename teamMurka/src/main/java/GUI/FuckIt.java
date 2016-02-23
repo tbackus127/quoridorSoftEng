@@ -1,12 +1,14 @@
+package com.tmquoridor.GUI;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class FuckIt {
 
-private JFrame frame;
-private JPanel panel;
-private JButton button;
-private JLabel label;
+    private JFrame frame;
+    private JPanel panel;
+    private JButton button;
+    private JLabel label;
 
 
 	public FuckIt() {
