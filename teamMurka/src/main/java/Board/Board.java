@@ -121,13 +121,13 @@ public class Board {
         
         //TODO: Take adjacent players into account
         // Check each cardinal direction
-        if(isBlocked(pos, Direction.NORTH))
+        if(!isBlocked(pos, Direction.NORTH))
             result.add(new Coord(pos.getX(), pos.getY() - 1));
-        if(isBlocked(pos, Direction.SOUTH))
+        if(!isBlocked(pos, Direction.SOUTH))
             result.add(new Coord(pos.getX(), pos.getY() + 1));
-        if(isBlocked(pos, Direction.WEST))
+        if(!isBlocked(pos, Direction.WEST))
             result.add(new Coord(pos.getX() - 1, pos.getY()));
-        if(isBlocked(pos, Direction.EAST))
+        if(!isBlocked(pos, Direction.EAST))
             result.add(new Coord(pos.getX() + 1, pos.getY()));
         
         return result;

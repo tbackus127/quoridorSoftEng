@@ -115,8 +115,8 @@ public class TestBoard {
         Board b = new Board();
         
         assertTrue("North should be blocked!", b.isBlocked(b.getPlayerPos(0), Direction.NORTH));
-        // HashSet<Coord> legalMoves = b.getLegalMoves(b.getPlayerPos(0));
-        // System.err.println("\n\n" + legalMoves.size() + "\n\n");
-        // assertEquals("There are not 3 legal moves for player 1!", legalMoves.size(), 3);
+        HashSet<Coord> legalMoves = b.getLegalMoves(b.getPlayerPos(0));
+        System.err.println("\n\n" + legalMoves.size() + "\n\n");
+        assertEquals("There are not 3 legal moves for player 1!", legalMoves.size(), 3);
     }
 }
