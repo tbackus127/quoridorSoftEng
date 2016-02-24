@@ -1,3 +1,5 @@
+import java.util.HashSet;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -82,5 +84,39 @@ public class TestBoard {
         assertFalse("Wall 6 is legal and should not be! (Problem with first segment overlap)", b.isLegalWall(w7));
         Wall w8 = new Wall(new Coord(6, 3), Orientation.VERT);
         assertFalse("Wall 6 is legal and should not be! (Problem with extension segment overlap)", b.isLegalWall(w8));
+    }
+    
+    @Test
+    public void testPlayerSetup() {
+        Board b1 = new Board(4);
+        Coord b1p1pos = b1.getPlayerPos(0);
+        assertNotNull("Player 1 position is null!", b1p1pos);
+        Coord b1p2pos = b1.getPlayerPos(1);
+        assertNotNull("Player 2 position is null!", b1p2pos);
+        Coord b1p3pos = b1.getPlayerPos(2);
+        assertNotNull("Player 3 position is null!", b1p3pos);
+        Coord b1p4pos = b1.getPlayerPos(3);
+        assertNotNull("Player 4 position is null!", b1p4pos);
+        
+        Coord b1p1comp = new Coord(4, 0);
+        Coord b1p2comp = new Coord(4, 8);
+        Coord b1p3comp = new Coord(0, 4);
+        Coord b1p4comp = new Coord(8, 4);
+        
+        assertTrue("Player 1 position was not set at 4, 0!", b1p1pos.equals(b1p1comp));
+        assertTrue("Player 2 position was not set at 4, 8!", b1p2pos.equals(b1p2comp));
+        assertTrue("Player 3 position was not set at 0, 4!", b1p3pos.equals(b1p3comp));
+        assertTrue("Player 4 position was not set at 8, 4!", b1p4pos.equals(b1p4comp));
+        
+    }
+    
+    @Test
+    public void testPlayerMovement() {
+        Board b = new Board();
+        
+        assertTrue("North should be blocked!", b.isBlocked(b.getPlayerPos(0), Direction.NORTH));
+        // HashSet<Coord> legalMoves = b.getLegalMoves(b.getPlayerPos(0));
+        // System.err.println("\n\n" + legalMoves.size() + "\n\n");
+        // assertEquals("There are not 3 legal moves for player 1!", legalMoves.size(), 3);
     }
 }

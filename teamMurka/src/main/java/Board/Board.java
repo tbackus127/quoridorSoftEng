@@ -13,6 +13,14 @@ public class Board {
     /** Length and width of the board */
     private static final int BOARD_SIZE = 9;
     
+    /** Player Starting Positions */
+    private static final Coord[] startPos = {
+        new Coord(4, 0),
+        new Coord(4, 8),
+        new Coord(0, 4),
+        new Coord(8, 4)
+    };
+    
     /** The number of players playing */
     public final int numOfPlayers;
     
@@ -37,6 +45,9 @@ public class Board {
     public Board(int plNum) {
         numOfPlayers = plNum;
         playerPositions = new Coord[numOfPlayers];
+        for(int i = 0; i < playerPositions.length; i++) {
+            playerPositions[i] = startPos[i];
+        }
         placedWalls = new HashSet<Wall>();
     }
     
@@ -91,10 +102,20 @@ public class Board {
         return true;
     }
     
-    // public HashSet<Coord> getLegalMoves(int plNum) {
-        // Also take into account adjacent players
-    //}
+    /**
+     * Gets the legal moves of a specified player
+     * @param plNum the player number to get legal moves of
+     * @return a HashSet of Coords that can be moved to.
+     */
+    public HashSet<Coord> getLegalMoves(int plNum) {
+        return getLegalMoves(getPlayerPos(plNum));
+    }
     
+    /**
+     * Gets the legal moves at a Coordinate.
+     * @param pos Coord to check.
+     * @return a HashSet of Coords that can be moved to.
+     */
     public HashSet<Coord> getLegalMoves(Coord pos) {
         HashSet<Coord> result = new HashSet<Coord>();
         
@@ -161,13 +182,13 @@ public class Board {
         
         // Check Board bounds
         if(src.getY() <= 0 && dir == Direction.NORTH)
-            return false;
+            return true;
         if(src.getY() >= 8 && dir == Direction.SOUTH)
-            return false;
+            return true;
         if(src.getX() <= 0 && dir == Direction.WEST)
-            return false;
+            return true;
         if(src.getX() >= 8 && dir == Direction.EAST)
-            return false;
+            return true;
         
         // Go through all placed walls
         for(Wall wall : placedWalls) {
@@ -182,16 +203,20 @@ public class Board {
                 // Check for four directions
                 switch(dir) {
                     case NORTH:
-                        if(wx == sx && wy == sy) return true;
+                        if(wx == sx && wy == sy) 
+                            return true;
                     break;
                     case EAST:
-                        if(wx - 1 == sx && wy == sy) return true;
+                        if(wx - 1 == sx && wy == sy) 
+                            return true;
                     break;
                     case SOUTH:
-                        if(wx == sx && wy - 1 == sy) return true;
+                        if(wx == sx && wy - 1 == sy) 
+                            return true;
                     break;
                     case WEST:
-                        if(wx == sx && wy == sy) return true;
+                        if(wx == sx && wy == sy) 
+                            return true;
                     break;
                 }
             }
