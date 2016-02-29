@@ -11,7 +11,11 @@ import java.util.Scanner;
 public class ManualInputServer{
 
     public final static int DEFAULT_PORT_NUMBER = 1478;
+    public final static String DEFAULT_NAME = "America";
     public final static String ARG_PORT = "--port";
+    
+    
+    
     public final static String eoln = "\r\n";
     
     private int port;
