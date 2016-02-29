@@ -12,6 +12,7 @@ public class ManualInputServer{
 
     public final static int DEFAULT_PORT_NUMBER = 1478;
     public final static String ARG_PORT = "--port";
+    public final static String eoln = "\r\n";
     
     private int port;
     
@@ -81,7 +82,7 @@ public class ManualInputServer{
 		    String clientMessage = cin.nextLine();
 		    System.out.println(clientMessage);
 		
-		    cout.print(console.nextLine());
+		    cout.print(console.nextLine() + eoln);
 		}
 	    }
 	}catch(Exception e){
