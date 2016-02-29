@@ -15,7 +15,7 @@ import com.tmquoridor.Board.*;
 public class UserInputMoveHandler implements MoveServer, Runnable {
    
     private static final String DEFAULT_SERVER_NAME = "America";
-    private static final int DEFAULT_PORT = 6478;
+    private static final int DEFAULT_PORT = 1478;
    
     // Fields
     private String serversName;
@@ -35,7 +35,7 @@ public class UserInputMoveHandler implements MoveServer, Runnable {
      */
     public UserInputMoveHandler(int initPort, String initName, Socket cSocket) throws Exception{
         port = initPort;
-        serversName = "USA:" + initName;
+        serversName = "mur:" + initName;
         server = new ServerSocket(initPort);
         client = cSocket;
         console = new Scanner(System.in);
