@@ -111,12 +111,25 @@ public class TestBoard {
     }
     
     @Test
-    public void testPlayerMovement() {
-        Board b = new Board();
+    public void testMoveLegality() {
+        Board b = new Board(4);
+        b.movePlayer(0, new Coord(2, 2));
+        b.movePlayer(1, new Coord(2, 1));
+        b.movePlayer(2, new Coord(1, 1));
+        b.movePlayer(3, new Coord(1, 2));
         
-        assertTrue("North should be blocked!", b.isBlocked(b.getPlayerPos(0), Direction.NORTH));
-        HashSet<Coord> legalMoves = b.getLegalMoves(b.getPlayerPos(0));
-        System.err.println("\n\n" + legalMoves.size() + "\n\n");
-        assertEquals("There are not 3 legal moves for player 1!", legalMoves.size(), 3);
+        b.placeWall(new Coord(1, 0), Orientation.VERT);
+        b.placeWall(new Coord(2, 1), Orientation.HORIZ);
+        b.placeWall(new Coord(3, 2), Orientation.HORIZ);
+        b.placeWall(new Coord(1, 3), Orientation.VERT);
+        
+        HashSet<Coord> hslm = b.getLegalMoves(0);
+        assertEquals("There are not 5 legal moves!", hslm, 5);
+        
+        assertTrue("Coord #1 was not added to legal moves!", hslm.contains(new Coord(3, 1));
+        assertTrue("Coord #2 was not added to legal moves!", hslm.contains(new Coord(1, 0));
+        assertTrue("Coord #3 was not added to legal moves!", hslm.contains(new Coord(1, 3));
+        assertTrue("Coord #4 was not added to legal moves!", hslm.contains(new Coord(0, 2));
+        assertTrue("Coord #5 was not added to legal moves!", hslm.contains(new Coord(2, 3));
     }
 }

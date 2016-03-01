@@ -276,6 +276,23 @@ public class Board {
     }
     
     /**
+     * Gets the player ID at a Coord
+     * @param c the Coord to check the player at
+     * @return the player ID found at the Coord c (-1 if no player)
+     */
+    public int getPlayerAtCoord(Coord c) {
+        int cx = c.getX();
+        int cy = c.getY();
+        for(int i = 0; i < playerPositions.length; i++) {
+            int px = playerPositions[i].getX();
+            int py = playerPositions[i].getY();
+            if(px == cx && py == cy)
+                return i;
+        }
+        return -1;
+    }
+    
+    /**
      * Gets all placed walls in the game
      * @return a HashSet of all Walls placed
      */
