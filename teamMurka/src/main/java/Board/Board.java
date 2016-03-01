@@ -103,34 +103,51 @@ public class Board {
     }
     
     /**
-     * Gets the legal moves of a specified player
-     * @param plNum the player number to get legal moves of
+     * Gets the legal moves at a Coordinate.
+     * @param pid the player ID to check.
      * @return a HashSet of Coords that can be moved to.
      */
-    public HashSet<Coord> getLegalMoves(int plNum) {
-        return getLegalMoves(getPlayerPos(plNum));
+    public HashSet<Coord> getLegalMoves(int pid) {
+        MoveTrace mt = new MoveTrace();
+        mt.addPlayer(pid);
+        Coord c = getPlayerPos(pid);
+        return getLegalMoves(mt, c).getMoves();
     }
     
     /**
-     * Gets the legal moves at a Coordinate.
-     * @param pos Coord to check.
-     * @return a HashSet of Coords that can be moved to.
+     * Legal moves helper method.
+     * @param mt the MoveTrace so far
+     * @param curr the current Coord we're checking
+     * @return the MoveTrace thus far
      */
-    public HashSet<Coord> getLegalMoves(Coord pos) {
-        HashSet<Coord> result = new HashSet<Coord>();
+    private MoveTrace getLegalMoves(MoveTrace mt, Coord curr) {
         
-        //TODO: Take adjacent players into account
-        // Check each cardinal direction
-        if(!isBlocked(pos, Direction.NORTH))
-            result.add(new Coord(pos.getX(), pos.getY() - 1));
-        if(!isBlocked(pos, Direction.SOUTH))
-            result.add(new Coord(pos.getX(), pos.getY() + 1));
-        if(!isBlocked(pos, Direction.WEST))
-            result.add(new Coord(pos.getX() - 1, pos.getY()));
-        if(!isBlocked(pos, Direction.EAST))
-            result.add(new Coord(pos.getX() + 1, pos.getY()));
-        
-        return result;
+        // For all four directions
+        for(Direction dir : Direction.values()) {
+            Coord c2 = null;
+            try {
+                c2 = curr.translate(dir);
+            } catch (Exception e) {
+                System.err.println("!! TRANSLATION FAILED!");
+                c2 = curr;
+            }
+            int pid = getPlayerAtCoord(c2);
+            
+            // If there is a player in this direction
+            if(pid >= 0) {
+                
+                // If they haven't been seen yet, add their legal moves to this
+                if(!mt.isSeen(pid)) {
+                    mt.addPlayer(pid);
+                    mt.add(getLegalMoves(mt, c2));
+                }
+                
+            // If no player and not blocked, add it
+            } else if(!isBlocked(curr, dir)) {
+                mt.addMove(c2);
+            }
+        }
+        return mt;
     }
     
     /**
@@ -140,35 +157,35 @@ public class Board {
      * @param dir the Direction the player is moving
      * @return true if the wall is relevant for collision checking
      */
-    private boolean isRelevantWall(Wall w, Coord plPos, Direction dir) {
+    private boolean isRelevantWall(Segment s, Coord plPos, Direction dir) {
         
         // Get the playerPos's data
         int px = plPos.getX();
         int py = plPos.getY();
         
-        // Get the Wall's data
-        Coord wCoord = w.getPos();
-        int wx = wCoord.getX();
-        int wy = wCoord.getY();
+        // Get the Segment's data
+        Coord sCoord = s.getPos();
+        int sx = sCoord.getX();
+        int sy = sCoord.getY();
         
         // Get orientation data
         Orientation mOrt = dir.ort();
-        Orientation wOrt = w.getOrt();
+        Orientation sOrt = s.getOrt();
         
         switch(mOrt) {
             case VERT:
-                if(px != wx || wy - py > 1 || wy - py < 0 || mOrt == wOrt) {
-                    System.err.println("Irr:" + wOrt + "@" + wCoord + " when moving " + dir);
+                if(px != sx || sy - py > 1 || sy - py < 0 || mOrt == sOrt) {
+                    System.err.println("Irr:" + sOrt + "@" + sCoord + " when moving " + dir);
                     return false;
                 }
             break;
             case HORIZ:
-                if(py != wy || wx - px > 1 || wx - px < 0 || mOrt == wOrt)  {
-                    System.err.println("Irr:" + wOrt + "@" + wCoord + " when moving " + dir);
+                if(py != sy || sx - px > 1 || sx - px < 0 || mOrt == sOrt)  {
+                    System.err.println("Irr:" + sOrt + "@" + sCoord + " when moving " + dir);
                     return false;
                 }
         }
-        System.err.println("  Rel:" + wOrt + "@" + wCoord + " when moving " + dir);
+        System.err.println("  Rel:" + sOrt + "@" + sCoord + " when moving " + dir);
         return true;
     }
     
@@ -190,13 +207,15 @@ public class Board {
         if(src.getX() >= 8 && dir == Direction.EAST)
             return true;
         
+        HashSet<Segment> segs = getSegments();
+        
         // Go through all placed walls
-        for(Wall wall : placedWalls) {
+        for(Segment s : segs) {
             
-            // Check if we need to actually check the wall
-            if(isRelevantWall(wall, src, dir)) {
-                int wx = wall.getPos().getX();
-                int wy = wall.getPos().getY();
+            // Check if we need to actually check the segment
+            if(isRelevantWall(s, src, dir)) {
+                int wx = s.getPos().getX();
+                int wy = s.getPos().getY();
                 int sx = src.getX();
                 int sy = src.getY();
                 

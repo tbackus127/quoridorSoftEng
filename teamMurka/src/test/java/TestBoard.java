@@ -120,16 +120,31 @@ public class TestBoard {
         
         b.placeWall(new Coord(1, 0), Orientation.VERT);
         b.placeWall(new Coord(2, 1), Orientation.HORIZ);
-        b.placeWall(new Coord(3, 2), Orientation.HORIZ);
+        b.placeWall(new Coord(3, 2), Orientation.VERT);
         b.placeWall(new Coord(1, 3), Orientation.VERT);
         
         HashSet<Coord> hslm = b.getLegalMoves(0);
-        assertEquals("There are not 5 legal moves!", hslm, 5);
+        System.err.println("\n\n  hslm size=" + hslm.size());
+        for(Coord c : hslm) {
+            System.err.println(c);
+        }
         
-        assertTrue("Coord #1 was not added to legal moves!", hslm.contains(new Coord(3, 1));
-        assertTrue("Coord #2 was not added to legal moves!", hslm.contains(new Coord(1, 0));
-        assertTrue("Coord #3 was not added to legal moves!", hslm.contains(new Coord(1, 3));
-        assertTrue("Coord #4 was not added to legal moves!", hslm.contains(new Coord(0, 2));
-        assertTrue("Coord #5 was not added to legal moves!", hslm.contains(new Coord(2, 3));
+        Coord[] resCoords = {
+            new Coord(3, 1),
+            new Coord(1, 0),
+            new Coord(1, 3),
+            new Coord(0, 2),
+            new Coord(2, 3)
+        };
+        
+        for(int i = 0; i < resCoords.length; i++) {
+            Coord r = resCoords[i];
+            boolean found = false;
+            for(Coord c : hslm) {
+                if(c.equals(r))
+                    found = true;
+            }
+            assertTrue("Coord #" + i + " not found in hslm!", found);
+        }
     }
 }

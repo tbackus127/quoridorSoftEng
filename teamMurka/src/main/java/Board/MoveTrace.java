@@ -25,6 +25,15 @@ public class MoveTrace {
     }
     
     /**
+     * Checks if there is a record of the passed player
+     * @param pid the player to search for
+     * @return true if the player ID is found; false otherwise
+     */
+    public boolean isSeen(int pid) {
+        return (this.seenPlayers.contains(pid));
+    }
+    
+    /**
      * Gets the legal moves
      * @return a HashSet of legal moves, in Coords
      */

@@ -36,7 +36,7 @@ public class Coord {
      * @param dir the Direction to move
      * @return the resulting Coord (bounded if OoB) if the move would be made.
      */
-    public Coord translate(Coord c) {
+    public Coord translate(Direction dir) throws Exception {
         int x2 = this.x;
         int y2 = this.y;
         switch(dir) {
