@@ -58,7 +58,8 @@ public class ManualInputServer{
 	    "       where options:\n" + "       --port port\n");
     }
     
-    private ManualInputServer(int initPort){
+    // Constructor
+    public ManualInputServer(int initPort){
 	port = initPort;
     }
     
@@ -82,6 +83,9 @@ public class ManualInputServer{
 		Scanner cin = new Scanner(client.getInputStream());
 		PrintStream cout = new PrintStream(client.getOutputStream());
 		Scanner console = new Scanner(System.in);
+		
+		establishProtocol(cin, cout);
+		
 		while(true){
 		    String clientMessage = cin.nextLine();
 		    System.out.println(clientMessage);
@@ -92,6 +96,10 @@ public class ManualInputServer{
 	}catch(Exception e){
 	    
 	}
+    }
+    
+    public void establishProtocol(Scanner cin, PrintStream cout){
+	
     }
     
 }
