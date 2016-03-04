@@ -27,7 +27,7 @@ public class TestManualServer{
     public void testConstructor() throws Exception {        
         // String serverName = "America";
         int port = 1478;
-        ManualInputServer user = new ManualInputServer(port);
+        ManualInputServer user = new ManualInputServer(port, "mur:America");
         assertNotNull("Nothing was constructed", user);
     }
     
@@ -41,7 +41,7 @@ public class TestManualServer{
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	PrintStream outGoingFromClient = new PrintStream(baos);
 	
-	ManualInputServer ms = new ManualInputServer(1478);
+	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
 	ms.establishProtocol(incomingReader, outGoingFromClient);
 	
 	String messagesFromClient = baos.toString();
