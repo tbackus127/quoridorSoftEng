@@ -7,6 +7,7 @@
 package com.tmquoridor.Board;
  
 import java.util.HashSet;
+import java.util.HashMap;
  
 public class Board {
     
@@ -30,6 +31,9 @@ public class Board {
     /** Contains all walls that have been placed */
     private HashSet<Wall> placedWalls;
     
+    private HashMap<String, Direction> dirMap;
+    private HashMap<String, Orientation> ortMap;
+    
     /**
      * Default contructor
      * Defaults to two players
@@ -49,6 +53,26 @@ public class Board {
             playerPositions[i] = startPos[i];
         }
         placedWalls = new HashSet<Wall>();
+        buildMaps();
+    }
+    
+    public Direction toDir(String s) {
+        return dirMap.get(s);
+    }
+    
+    public Orientation toOrt(String s) {
+        return ortMap.get(s);
+    }
+    
+    public void printBoard() {
+        System.out.println("\n:: BOARD ::\n");
+        for(int i = 0; i < numOfPlayers; i++) {
+            System.out.println("Player " + (i+1) + ": " + getPlayerPos(i));
+        }
+        System.out.println();
+        for(Wall w : placedWalls) {
+            System.out.println("Wall@" + w);
+        }
     }
     
     public boolean isLegalWall(Wall w) throws Exception {
@@ -317,5 +341,35 @@ public class Board {
      */
     public HashSet<Wall> getWalls() {
         return placedWalls;
+    }
+    
+    private void buildMaps() {
+        dirMap = new HashMap<String, Direction>();
+        dirMap.put("n", Direction.NORTH);
+        dirMap.put("s", Direction.SOUTH);
+        dirMap.put("e", Direction.EAST);
+        dirMap.put("w", Direction.WEST);
+        dirMap.put("N", Direction.NORTH);
+        dirMap.put("S", Direction.SOUTH);
+        dirMap.put("E", Direction.EAST);
+        dirMap.put("W", Direction.WEST);
+        dirMap.put("north", Direction.NORTH);
+        dirMap.put("south", Direction.SOUTH);
+        dirMap.put("east", Direction.EAST);
+        dirMap.put("west", Direction.WEST);
+        dirMap.put("up", Direction.NORTH);
+        dirMap.put("down", Direction.SOUTH);
+        dirMap.put("right", Direction.EAST);
+        dirMap.put("left", Direction.WEST);
+        
+        ortMap = new HashMap<String, Orientation>();
+        ortMap.put("h", Orientation.HORIZ);
+        ortMap.put("v", Orientation.VERT);
+        ortMap.put("H", Orientation.HORIZ);
+        ortMap.put("V", Orientation.VERT);
+        ortMap.put("horiz", Orientation.HORIZ);
+        ortMap.put("HORIZ", Orientation.HORIZ);
+        ortMap.put("vert", Orientation.VERT);
+        ortMap.put("VERT", Orientation.VERT);
     }
 }

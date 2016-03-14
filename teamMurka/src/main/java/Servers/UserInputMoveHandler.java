@@ -45,7 +45,7 @@ public class UserInputMoveHandler implements MoveServer, Runnable {
         this(initPort, initName, new Socket("localhost", initPort));
     }
     
-    
+      
     public void placeMoveOnBoard() {
         System.err.println("place");
     }
@@ -84,22 +84,23 @@ public class UserInputMoveHandler implements MoveServer, Runnable {
         
         // Makes the instance of the move server
         UserInputMoveHandler mh = new UserInputMoveHandler(portValue, name);
-	mh.run();
+        mh.run();
     }
     
     public void run() {
         try {
-	    System.out.println("Server now accepting connections "+
-	    "on port " + port);
-	    
-	    // This while loop allows for the client to connect
-	    while ((client = server.accept()) != null) {
-		PrintStream serverOut = new PrintStream(client.getOutputStream());
-		Scanner serverIn = new Scanner(client.getInputStream());
-		
-		serverOut.close();
-		serverIn.close();
-	    }
+            System.out.println("Server now accepting connections "+
+            "on port " + port);
+            
+            // This while loop allows for the client to connect
+            while ((client = server.accept()) != null) {
+                PrintStream serverOut = new PrintStream(client.getOutputStream());
+                Scanner serverIn = new Scanner(client.getInputStream());
+                
+                serverOut.close();
+                serverIn.close();
+            }
+            
             // need the actual client to make the streams
             
             

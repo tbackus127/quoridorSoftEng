@@ -61,6 +61,7 @@ public class Coord {
                     x2 = 0;
             break;
             default:
+                System.err.println("Error while translating Coord");
                 throw new Exception("SOMETHING WENT HORRIBLY WRONG! (Coord 01)");
         }
         return new Coord(x2, y2);
