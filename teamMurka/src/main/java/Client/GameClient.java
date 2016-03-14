@@ -1,71 +1,172 @@
 package com.tmquoridor.Client;
 
 import java.io.IOException;
+import java.io.PrintStream;
 
-import java.net.ServerSocket;
 import java.net.Socket;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.Scanner;
 
 import com.tmquoridor.Board.*;
 
 public class GameClient implements Runnable {
     
-    private static final Executor exec = Executors.newFixedThreadPool(4);
-    private static final int DEFAULT_PORT = 6478;
-    private static final String DEFAULT_MACHINE_NAME = "localhost";
-    
-    private boolean running;
     private Board board;
-    private int portNumber;
-    private String machineName;
     
-    public GameClient(int portNumber, String machineName) {
-        this.portNumber = portNumber;
-        this.machineName = machineName;
+    private Socket[] playerSockets;
+    
+    public GameClient(Socket[] argSocks) {
+        playerSockets = argSocks;
     }
     
     public void run() {
-        try {
-            ServerSocket server = new ServerSocket(portNumber);
-            System.out.println("Server accepting connections on port " + portNumber);
-
-            Socket client = null;
-
-            while ((client = server.accept()) != null) {
-                ServerHandler sHand = new ServerHandler(client);
-                exec.execute(sHand);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(!handshake()) {
+          System.err.println("Something went wrong while handshaking!");
+          System.exit(0);
         }
+        doGameLoop();
+    }
+    
+    private void doGameLoop() {
+        board = new Board(playerSockets.length);
+        board.printBoard();
+        while(true) {
+            for(int i = 0; i < playerSockets.length; i++) {
+              
+                try {
+                    // Set up communication
+                    PrintStream cout = new PrintStream(playerSockets[i].getOutputStream());
+                    Scanner cin =  new Scanner(playerSockets[i].getInputStream());
+                    
+                    cout.println("turn");
+                    String move = cin.nextLine();
+                    
+                    // Check move legality
+                    while(!isMoveLegal(i, move)) {
+                        cout.println("invalid");
+                        System.out.println("Player " + i + " made an illegal move!");
+                        move = cin.nextLine();
+                    }
+                    
+                    doMove(i, move);
+                    board.printBoard();
+                    
+                } catch (Exception e) {
+                    System.err.println("Server DC'd");
+                    e.printStackTrace();
+                    System.exit(0);
+                }
+            }
+        }
+    }
+    
+    private void doMove(int pid, String move) {
+        String[] tokens = move.split(" ");
+        
+        switch(tokens[0]) {
+            case "move":
+                Coord pPos = board.getPlayerPos(pid);
+                Direction mDir = board.toDir(tokens[1]);
+                try {
+                    board.movePlayer(pid, pPos.translate(mDir));
+                } catch (Exception e) {
+                  e.printStackTrace();
+                }
+            break;
+            case "wall":
+                try {
+                    int wx = Integer.parseInt(tokens[1]);
+                    int wy = Integer.parseInt(tokens[2]);
+                    Coord wPos = new Coord(wx, wy);
+                    Orientation wOrt = board.toOrt(tokens[3]);
+                    board.placeWall(wPos, wOrt);
+                } catch (Exception e) {
+                    System.err.println("Wall legality checking doesn't work for some reason!");
+                    e.printStackTrace();
+                    return;
+                }
+        }
+    }
+    
+    private boolean isMoveLegal(int pid, String move) {
+        String[] tokens = move.split(" ");
+        
+        switch(tokens[0]) {
+            case "move":
+                Coord pPos = board.getPlayerPos(pid);
+                Direction mDir = board.toDir(tokens[1]);
+                return !board.isBlocked(pPos, mDir);
+            case "wall":
+                try {
+                    int wx = Integer.parseInt(tokens[1]);
+                    int wy = Integer.parseInt(tokens[2]);
+                    Coord wPos = new Coord(wx, wy);
+                    Orientation wOrt = board.toOrt(tokens[3]);
+                    return board.isLegalWall(new Wall(wPos, wOrt));
+                } catch (Exception e) {
+                    return false;
+                }
+            default:
+                return false;
+        }
+    }
+    
+    private boolean handshake() {
+        System.out.println("Client attempting connections...");
+        for(int i = 0; i < playerSockets.length; i++) {
+            
+            try {
+                PrintStream cout = new PrintStream(playerSockets[i].getOutputStream());
+                Scanner cin =  new Scanner(playerSockets[i].getInputStream());
+            
+                // Send PID to each Server
+                cout.println(i);
+                if(cin.nextLine().toLowerCase().equals("ok"))
+                    System.out.println("Player " + (i+1) + " OK");
+              
+            } catch (Exception e) {
+                System.err.println("Something blew up.");
+                return false;
+            }
+            
+        }
+        return true;
     }
     
     public static void main(String[] args) {
         int ixargs = 0;
-        int portValue = DEFAULT_PORT;
-        String name = DEFAULT_MACHINE_NAME;
-        // While loop  to run through all of the command line arguments
-        while(ixargs > args.length) {
-            if(args[ixargs].equals("--port")){
-                ixargs++;
-                try {
-                    portValue = Integer.parseInt(args[ixargs]);
-                } catch(Exception e) {
-                    System.out.println("After the port argument you entered" +
-                                       " a non-numerical character");
-                    System.exit(0);
-                }
+        int seenPlayers = 0;
+        // String[] playerNames = {null, null, null, null};
+        int[] playerPorts = {-1, -1, -1, -1};
+        
+        // Parse runtime args
+        while(ixargs < args.length) {
+            String arg = args[ixargs++];
+            switch(arg) {
+                case "--port":
+                    try {
+                        int port = Integer.parseInt(args[ixargs]);
+                        playerPorts[seenPlayers] = port;
+                        System.out.println("Set port of P" + seenPlayers + " to " + port);
+                        seenPlayers++;
+                    } catch(Exception e) {
+                        System.err.println("Illegal port number.");
+                        System.exit(0);
+                    }
             }
-            else if(args[ixargs].equals("--name")) {
-                ixargs++;
-                name = args[ixargs];
+        }
+        
+        Socket[] socks = new Socket[seenPlayers];
+        for(int i = 0; i < socks.length; i++) {
+            try {
+                socks[i] = new Socket("localhost", playerPorts[i]);
+                System.out.println("New socket@localhost:" + playerPorts[i]);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        ixargs++;
         }
         
         // Create a new thread of the Game Client
-        new Thread(new GameClient(portValue, name)).start();
+        new Thread(new GameClient(socks)).start();
     }
 }

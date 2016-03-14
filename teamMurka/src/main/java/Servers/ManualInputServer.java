@@ -9,7 +9,7 @@ import java.net.Socket;
 
 import java.util.Scanner;
 
-public class ManualInputServer{
+public class ManualInputServer {
 
     public final static int DEFAULT_PORT_NUMBER = 1478;
     public final static String DEFAULT_NAME = "mur:America";
@@ -19,7 +19,6 @@ public class ManualInputServer{
     public final static String ARG_PORT = "--port";
     public final static String ARG_NAME = "--name";
     
-    
     public final static String eoln = "\r\n";
     
     private int port;
@@ -27,7 +26,6 @@ public class ManualInputServer{
     private int playerCount;
     private Board board;
     private int thisServersPlayerNumber;
-    
     
     // Main that uses the command line arguments
     public static void main(String[] args) {
@@ -37,12 +35,12 @@ public class ManualInputServer{
 	
 	int argNdx = 0;
 
-	// This runs through all of the command line arguments and applies the proper ones
-	while (argNdx < args.length) {
-	    String curr = args[argNdx];
+        // This runs through all of the command line arguments and applies the proper ones
+        while (argNdx < args.length) {
+            String curr = args[argNdx];
 
-	    if (curr.equals(ARG_PORT)) {
-		++argNdx;
+            if (curr.equals(ARG_PORT)) {
+                ++argNdx;
 
 		String numberStr = args[argNdx];
 		port = Integer.parseInt(numberStr);
@@ -52,14 +50,14 @@ public class ManualInputServer{
 		name = DEFAULT_PREFIX + args[argNdx];
 	    } else {
 
-	    // if there is an unknown parameter, give usage and quit
-	    System.err.println("Unknown parameter \"" + curr + "\"");
-	    usage();
-	    System.exit(1);
-	    }
+                // if there is an unknown parameter, give usage and quit
+                System.err.println("Unknown parameter \"" + curr + "\"");
+                usage();
+                System.exit(1);
+            }
 
-	++argNdx;
-	}
+        ++argNdx;
+        }
 
 	ManualInputServer ms = new ManualInputServer(port, name);
 	ms.run();
@@ -67,8 +65,8 @@ public class ManualInputServer{
     
     // Lets them know if they put in an invalid argument
     private static void usage() {
-	System.err.print("usage: java BirthdayServer [options]\n" +
-	    "       where options:\n" + "       --port port\n");
+        System.err.print("usage: java BirthdayServer [options]\n" +
+            "       where options:\n" + "       --port port\n");
     }
     
     // Constructor

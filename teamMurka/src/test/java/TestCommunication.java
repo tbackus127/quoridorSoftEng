@@ -8,11 +8,11 @@ import com.tmquoridor.Server.*;
 
 public class TestCommunication {
   
-  @Test
-  public void testClient() {
-      GameClient gc = new GameClient(6478, "localhost");
-      assertNotNull("Game client is null!", gc);
-  }
+  // @Test
+  // public void testClient() {
+      // GameClient gc = new GameClient(6478, "localhost");
+      // assertNotNull("Game client is null!", gc);
+  // }
   
   // @Test
   // public void testServer() throws Exception {

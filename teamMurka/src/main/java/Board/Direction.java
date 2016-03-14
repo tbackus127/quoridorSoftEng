@@ -1,5 +1,7 @@
 package com.tmquoridor.Board;
 
+import java.util.HashMap;
+
 public enum Direction {
     NORTH {
         @Override
