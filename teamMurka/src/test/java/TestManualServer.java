@@ -36,7 +36,7 @@ public class TestManualServer{
 	
 	// Sets up the variables
 	String x = "HELLO\nGAME 2 abc:One mur:America\n";
-	String expected = "IAM mur:America\n";
+	String expected = "IAM mur:America" + (char)10 + (char)13;
 	Scanner incomingReader = new Scanner(x);
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	PrintStream outGoingFromClient = new PrintStream(baos);

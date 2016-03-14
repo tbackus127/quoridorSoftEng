@@ -1,4 +1,5 @@
 package com.tmquoridor.Server;
+import com.tmquoridor.Board.*;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -23,6 +24,9 @@ public class ManualInputServer{
     
     private int port;
     private String name;
+    private int playerCount;
+    private Board board;
+    private int thisServersPlayerNumber;
     
     
     // Main that uses the command line arguments
@@ -109,6 +113,25 @@ public class ManualInputServer{
     }
     
     public void establishProtocol(Scanner cin, PrintStream cout){
+	String clientMessage = cin.nextLine();
+	if(!clientMessage.equals("HELLO")){
+	    System.out.println("Incorrect contact protocol!");
+	    cin.close();
+	    cout.close();
+	    return;
+	}
+	cout.print("IAM " + name + (char)10 + (char)13);
+	clientMessage = cin.nextLine();
+	String[] players = clientMessage.split(" ");
+	playerCount = Integer.parseInt(players[1]);
+	for(int i = 2; i < 1 + playerCount;i++){
+	    if(players[i].equals(name)){
+		thisServersPlayerNumber = i-1;
+	    }
+	}
+	
+	// Creates the board now
+	board = new Board(playerCount);
 	
     }
     
