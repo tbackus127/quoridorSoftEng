@@ -101,7 +101,7 @@ public class ManualInputServer {
 		while(true){
 		    String clientMessage = cin.nextLine();
 		    if(clientMessage.startsWith("MYOUSHU")){
-			
+			sendMove(cout, console);
 		    }
 		}
 	    }
@@ -133,7 +133,12 @@ public class ManualInputServer {
 	// Creates the board now
 	board = new Board(playerCount);
     }
-    
+    /*
+     * This takes a string in the format of  "t c r"
+     * where t is the type of move being either m = move, v = verticle wall or
+     * h = horizontal wall. It then returns the String in the correct format 
+     * for the protocol 
+    */
     public String moveWrapper(String move){
 	String message = "TESUJI ";
 	String[] splitMessage = move.split(" ");
@@ -147,5 +152,9 @@ public class ManualInputServer {
 	    return message + "\n\r";
 	}
 	return "";
+    }
+    
+    public void sendMove(PrintStream cout, Scanner console){
+	
     }
 }

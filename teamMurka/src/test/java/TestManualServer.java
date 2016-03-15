@@ -68,4 +68,19 @@ public class TestManualServer{
 		     expectedWallH ,ms.moveWrapper(wallh));
     }
     
+    @Test
+    public void testSendMove() {
+	String input = "";
+	Scanner fakeConsole = new Scanner(input);
+	
+	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	PrintStream outGoingFromClient = new PrintStream(baos);
+	
+	String expected = "IAM mur:America" + (char)10 + (char)13;
+	
+	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
+	ms.sendMove(outGoingFromClient, fakeConsole);
+	
+	assertEquals("The move did not for mat correctly", expected, baos.toString());
+    }
 }
