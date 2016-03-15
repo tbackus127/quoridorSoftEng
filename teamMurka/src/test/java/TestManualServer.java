@@ -50,5 +50,14 @@ public class TestManualServer{
 							expected, messagesFromClient);
     }
     
+    @Test
+    public void testMoveWrapper(){
+	String move = "m 5 6";
+	String expected = "TESUJI \n\r";
+	
+	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
+	
+	assertEquals(expected, ms.moveWrapper(move), "The move wrapper did not wrap Properly");
+    }
     
 }

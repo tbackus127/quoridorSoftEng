@@ -1,0 +1,206 @@
+Quoridor 2016 Client/Server Protocol
+
+General
+
+This project turns the client/server paradigm for networked games
+on its head. Instead of each player having a client and connecting
+them through a shared game server, this game will use move servers
+connected through a game display client.
+
+
+ +----------+                        +----------+
+ |   Move   |        Display         |   Move   |
+ |  Server  |    +-------------+     |  Server  |
+ +----+-----+    |             |     +----+-----+
+      |          |  X |   | O  |          |
+      +----------+ ---+---+--- +----------+
+                 |  X | O |    |
+                 | ---+---+--- |
+                 |    |   |    |
+                 |             |
+                 +-------------+
+
+Notice that the architecture of the system does not specify how the
+move servers generate their moves. They can be typed in by a human or
+calculated by an AI. The project for this course will have you do
+both.
+
+* Starting the Programs
+** Server
+
+As is standard with client/server programs, both servers must be
+started before the client. The server command-line specifies the
+listen port to which display clients will connect.
+
+   $ java Server --port <number>
+
+Here "Server" is the name of the class containing the main method
+starting the server process. <number> is the port number where the
+server will listen.
+
+Using the standard gradle build, assuming the project is Quoridor,
+version 1.0, the command-line would be something like
+
+  $ java -cp build/lib/Quoridor-1.0.jar Server --port <number>
+
+** Client
+
+Starting the client requires specification of the location (machine
+address and port pair) where all move servers are running (while this
+document focuses on two-player games, a four-player game could be
+specified by supplying four move servers on the command line). So the
+client could be run with the following:
+
+  $ java client <machine1>:<port number1> <machine2>:<port number2> \
+                [<machine3>:<port number3> <machine4>:<port number4>]
+
+The colon separates a machine name from the corresponding port number.
+The third and fourth server identifiers are optional but there must be
+exactly two or exactly four machine:port pairs.
+
+So the client could be run with the following:
+
+  $ java Client localhost:5858 marcy:9685
+
+Assuming, of course, that there are two move servers running, one on
+the local machine and one on marcy.
+
+* Coordinates
+
+The board is viewed canonically with player 1 moving from the top to
+the bottom and player 3 moving from left to right. Columns and rows
+are numbered from 0-8 (from left-to-right for columns; from
+top-to-bottom for rows).
+
+A board position (a square where a pawn moves) is specified by an
+ordered pair (column, row). Each index ranges from 0-8. Since both
+rows and columns are labeled alike, make sure to keep track of which
+is which.
+
+Player 1 starts in position (4, 0) and is moving to row 8; player 2
+starts in position (4, 8) and is moving to row 0.
+
+Walls are specified by a starting square ABOVE or to the LEFT of the
+wall and an h or w for a horizontal or vertical wall. The whole wall
+designation is enclosed in square brackets: [(1, 0), v] or [(1, 0), h].
+
+Note that there are wall coordinates that are not actually valid: Any
+horizontal wall with 8 as its row, or any vertical wall with 8 as its
+column is not permitted.
+
+|---+---+----+-----+----+---+----+-----+------+----|
+|   | 0 | 1  |  2  | 3  | 4 | 5  |  6  |   7  | 8  |
+|---+---+----+-----+----+---+----+-----+------+----|
+|   |   |   ||     |    |   |    |     |      |    |
+| 0 |   |   ||     |    | & |    |     |      |    |
+|   |   |   ||     |    |   |    |     |      |    |
+|---+---+---++-----+----+---+----+-----+------+----|
+|   |   |   ||     |    |   |    |     |      |    |
+| 1 |   |   ||     |    |   |    |     |      |    |
+|   |   |   ||     |    |   |    |     |      |    |
+|---+---+----+-----+----+---+-- -+-----+------+----|
+|   |   |    |     |    |   |    |     |      |    |
+| 2 |   |    |     |    |   |    |     |      |    |
+|   |   |    |     |    |   |    |     |      |    |
+|---+---+----+-----+----+---+----+-----+------+----|
+|   |   |    |     |    |   |    |     |      |    |
+| 3 |   |    |     |    |   |    |     |      |    |
+|   |   |    |     |    |   |    |     |      |    |
+|---+---+----+-----+----+---+----+-----+------+----|
+|   |   |    |     |    |   |    |     |      |    |
+| 4 |   |    |     |    |   |    |     |      |    |
+|   |   |    |     |    |   |    |     |      |    |
+|---+---+----+-----+----+---+----+-----+------+----|
+|   |   |    |     |    |   |    |    ||      |    |
+| 5 |   |    |     |    |   |    |    ||      |    |
+|   |   |    |     |    |   |    |    ||------+----|
+|---+---+----+-----+----+---+----+----++------+----|
+|   |   |    |     |    |   |    |    ||      |    |
+| 6 |   |    |     |    |   |    |    ||      |    |
+|   |   |    |-----+----|   |    |    ||      |    |
+|---+---+----+-----+----+---+----+-----+------+----|
+|   |   |    |     |    |   |    |     |      |    |
+| 7 |   |    |     |    |   |    |     |      |    |
+|   |   |    |     |    |   |    |     |      |    |
+|---+---+----+-----+----+---+----+-----+------+----|
+|   |   |    |     |    |   |    |     |      |    |
+| 8 |   |    |     |    | * |    |     |      |    |
+|   |   |    |     |    |   |    |     |      |    |
+|---+---+----+-----+----+---+----+-----+------+----|
+
+The walls in the diagram above are at locations
+[(1, 0), v], [(2, 6), h], [(6, 5), v], [(7, 5), h]
+
+(column, row)
+  column [0-8]
+  row    [0-8]
+
+Move
+  (c, r)
+
+Wall
+  [(c, r), d]
+  d - direction h, v
+
+  below/right of given starting square.
+
+
+
+
+* Protocol
+
+** Initial Contacted
+HELLO
+
+    Client - Initial contact. Sent to elicit the IAM message.
+
+IAM <name>
+
+    Server - Response to HELLO; includes server's preferred display
+    name. Display name cannot contain any whitespace.
+
+
+GAME <p> <name1> <name2> [<name3> <name4>]
+
+    Client - Game is ready to start. <p> is the player number for the
+    server receiving this message. Players are numbered from 1. There
+    are either 2 or 4 names. As in IAM, names cannot contain any
+    whitespace.
+
+    Players are numbered (clockwise from the top of the board)
+    1, 4, 2, 3. This means that the player moving from lower to higher
+    numbers (be it rows for player 1 and columns for player 3) comes
+    first in the pair. The order of play is clockwise around the board
+    from player 1.
+
+** During Play
+
+MYOUSHU
+
+    Client - Request for a move. Server should be expecting this
+    message as it knows which player last moved as well as its own
+    player number.
+
+TESUJI <move-string>
+
+    Server - Response to MYOUSHU, includes the move made by the
+    player. The move is the target location for the player's pawn or
+    the location to place a wall.
+
+ATARI <p> <move-string>
+
+    Client - Communicates player #p's move to all players.
+
+GOTE <p>
+
+    Message sent by game-client to all move-servers informing them
+    that <p> made an illegal move and is no longer in the game. The
+    pawn for <p> should be removed from the game board and any
+    remaining walls are lost. Note: sent as the very last message to
+    the offending move-server.
+
+KIKASHI <p>
+    Message sent by game-client to all move-servers informing them
+    that the game is over and the given player won. The game-client
+    cannot send any additional messages to any move-server after
+    sending this message.

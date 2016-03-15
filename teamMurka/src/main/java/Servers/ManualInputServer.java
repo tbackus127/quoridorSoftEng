@@ -100,9 +100,9 @@ public class ManualInputServer {
 		
 		while(true){
 		    String clientMessage = cin.nextLine();
-		    System.out.println(clientMessage);
-		
-		    cout.print(console.nextLine() + eoln);
+		    if(clientMessage.startsWith("MYOUSHU")){
+			
+		    }
 		}
 	    }
 	}catch(Exception e){
@@ -110,6 +110,8 @@ public class ManualInputServer {
 	}
     }
     
+    // This method handles the initial contact protocol
+    // It gets passed a scanner on the client and a print stream to the client
     public void establishProtocol(Scanner cin, PrintStream cout){
 	String clientMessage = cin.nextLine();
 	if(!clientMessage.equals("HELLO")){
@@ -130,7 +132,9 @@ public class ManualInputServer {
 	
 	// Creates the board now
 	board = new Board(playerCount);
-	
     }
     
+    public String moveWrapper(String move){
+	return "";
+    }
 }
