@@ -53,11 +53,19 @@ public class TestManualServer{
     @Test
     public void testMoveWrapper(){
 	String move = "m 5 6";
-	String expected = "TESUJI (5,6)\n\r";
+	String wallv = "v 5 6";
+	String wallh = "h 5 6";
+	String expectedMove = "TESUJI (5, 6)\n\r";
+	String expectedWallV = "TESUJI [(5, 6) v]\n\r";
+	String expectedWallH = "TESUJI [(5, 6) h]\n\r";
 	
 	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
 	
-	assertEquals("The move wrapper did not wrap Properly",expected,ms.moveWrapper(move));
+	assertEquals("The move wrapper did not wrap the move Properly",expectedMove,ms.moveWrapper(move));
+	assertEquals("The move wrapper did not wrap the wall placement Properly",
+		     expectedWallV ,ms.moveWrapper(wallv));
+	assertEquals("The move wrapper did not wrap the wall placement Properly",
+		     expectedWallH ,ms.moveWrapper(wallh));
     }
     
 }

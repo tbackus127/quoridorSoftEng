@@ -138,7 +138,7 @@ public class ManualInputServer {
 	String message = "TESUJI ";
 	if(move.startsWith("m ")){
 	    String[] splitMessage = move.split(" ");
-	    message += "(" + splitMessage[1] + "," + splitMessage[2] + ")";
+	    message += "(" + splitMessage[1] + ", " + splitMessage[2] + ")";
 	    return message + "\n\r";
 	}
 	return "";
