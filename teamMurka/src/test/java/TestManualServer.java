@@ -85,7 +85,7 @@ public class TestManualServer{
 	assertEquals("The move did not format correctly", expected, baos.toString());
 	
 	// Tests wall placement
-	input = "w 5 6 h";
+	input = "w h 5 6";
 	fakeConsole = new Scanner(input);
 	
 	baos = new ByteArrayOutputStream();
