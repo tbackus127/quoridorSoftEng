@@ -161,7 +161,9 @@ public class ManualInputServer {
 	    String unwrappedMessage = moveType + " ";
 	    System.out.print("What colum would you like to move to: ");
 	    unwrappedMessage += console.next() + " ";
-	    
+	    System.out.print("What row would you like to move to: ");
+	    unwrappedMessage += console.next();
+	    cout.print(moveWrapper(unwrappedMessage));
 	}
     }
 }
