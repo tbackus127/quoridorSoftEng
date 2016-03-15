@@ -70,6 +70,7 @@ public class TestManualServer{
     
     @Test
     public void testSendMove() {
+	// Tests pawn movement
 	String input = "m 5 6";
 	Scanner fakeConsole = new Scanner(input);
 	
@@ -81,6 +82,19 @@ public class TestManualServer{
 	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
 	ms.sendMove(outGoingFromClient, fakeConsole);
 	
-	assertEquals("The move did not for mat correctly", expected, baos.toString());
+	assertEquals("The move did not format correctly", expected, baos.toString());
+	
+	// Tests wall placement
+	input = "w 5 6 h";
+	fakeConsole = new Scanner(input);
+	
+	baos = new ByteArrayOutputStream();
+	outGoingFromClient = new PrintStream(baos);
+	
+	expected = "TESUJI [(5, 6) h]\n\r";
+	
+	ms.sendMove(outGoingFromClient, fakeConsole);
+	
+	assertEquals("The wall did not format correctly", expected, baos.toString());
     }
 }
