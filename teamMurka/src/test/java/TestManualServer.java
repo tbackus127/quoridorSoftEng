@@ -70,13 +70,13 @@ public class TestManualServer{
     
     @Test
     public void testSendMove() {
-	String input = "";
+	String input = "m 5 6";
 	Scanner fakeConsole = new Scanner(input);
 	
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	PrintStream outGoingFromClient = new PrintStream(baos);
 	
-	String expected = "IAM mur:America" + (char)10 + (char)13;
+	String expected = "TESUJI (5, 6)\n\r";
 	
 	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
 	ms.sendMove(outGoingFromClient, fakeConsole);

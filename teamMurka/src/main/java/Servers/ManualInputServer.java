@@ -155,6 +155,13 @@ public class ManualInputServer {
     }
     
     public void sendMove(PrintStream cout, Scanner console){
-	
+	System.out.print("Enter \"m\" to move your peice, or w to place a wall: ");
+	String moveType = console.next();
+	if (moveType.equals("m")) {
+	    String unwrappedMessage = moveType + " ";
+	    System.out.print("What colum would you like to move to: ");
+	    unwrappedMessage += console.next() + " ";
+	    
+	}
     }
 }
