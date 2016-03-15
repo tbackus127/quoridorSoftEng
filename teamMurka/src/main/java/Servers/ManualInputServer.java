@@ -136,9 +136,14 @@ public class ManualInputServer {
     
     public String moveWrapper(String move){
 	String message = "TESUJI ";
+	String[] splitMessage = move.split(" ");
 	if(move.startsWith("m ")){
-	    String[] splitMessage = move.split(" ");
 	    message += "(" + splitMessage[1] + ", " + splitMessage[2] + ")";
+	    return message + "\n\r";
+	}
+	else if(move.startsWith("v ") || move.startsWith("h ")){
+	    message += "[(" + splitMessage[1] + ", " + splitMessage[2] + ")";
+	    message += " " + splitMessage[0] + "]";
 	    return message + "\n\r";
 	}
 	return "";
