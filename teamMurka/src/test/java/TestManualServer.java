@@ -35,8 +35,8 @@ public class TestManualServer{
     public void testEstablishProtocol(){
 	
 	// Sets up the variables
-	String x = "HELLO\nGAME 2 abc:One mur:America\n";
-	String expected = "IAM mur:America" + (char)10 + (char)13;
+	String x = "HELLO\r\nGAME 2 abc:One mur:America\r\n";
+	String expected = "IAM mur:America\r\n";
 	Scanner incomingReader = new Scanner(x);
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	PrintStream outGoingFromClient = new PrintStream(baos);
@@ -55,9 +55,9 @@ public class TestManualServer{
 	String move = "m 5 6";
 	String wallv = "v 5 6";
 	String wallh = "h 5 6";
-	String expectedMove = "TESUJI (5, 6)\n\r";
-	String expectedWallV = "TESUJI [(5, 6) v]\n\r";
-	String expectedWallH = "TESUJI [(5, 6) h]\n\r";
+	String expectedMove = "TESUJI (5, 6)\r\n";
+	String expectedWallV = "TESUJI [(5, 6), v]\r\n";
+	String expectedWallH = "TESUJI [(5, 6), h]\r\n";
 	
 	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
 	
@@ -77,7 +77,7 @@ public class TestManualServer{
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	PrintStream outGoingFromClient = new PrintStream(baos);
 	
-	String expected = "TESUJI (5, 6)\n\r";
+	String expected = "TESUJI (5, 6)\r\n";
 	
 	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
 	ms.sendMove(outGoingFromClient, fakeConsole);
@@ -91,7 +91,7 @@ public class TestManualServer{
 	baos = new ByteArrayOutputStream();
 	outGoingFromClient = new PrintStream(baos);
 	
-	expected = "TESUJI [(5, 6) h]\n\r";
+	expected = "TESUJI [(5, 6), h]\r\n";
 	
 	ms.sendMove(outGoingFromClient, fakeConsole);
 	

@@ -10,20 +10,26 @@ import com.tmquoridor.Board.*;
 public class GameClient {
     
     /** Timeout (in seconds) for any socket */
-    private static final int DEFAULT_SOCKET_TIMEOUT = 5;
+    private static final int DEFAULT_SOCKET_TIMEOUT = 60;
+    
+    /** End-of-line string */
+    private static final String EOLN = "\r\n";
     
     /** Handshake response regex */
-    private static final String HANDSHAKE_RESP_REGEX = "IAM\\s+\\w+\\s*";
+    private static final String HANDSHAKE_RESP_REGEX = "IAM\\s+\\w+:\\w+\\s*";
     
     /** Move validation regex */
-    private static final String MOVE_VAL_REGEX = "TESUJI\\s+Move\\s+\\(\\s*[0-8],\\s*[0-8]\\s*\\)\\s*";
+    private static final String MOVE_VAL_REGEX = "TESUJI\\s+\\(\\s*[0-8],\\s*[0-8]\\s*\\)\\s*\\n*";
     
     /** Wall validation regex */
-    private static final String WALL_VAL_REGEX = "TESUJI\\s+Wall\\s+\\[\\s*\\(\\s*[0-8]\\s*,\\s*[0-8]\\s*\\)\\s*,\\s*[hv]\\s*\\]\\s*";
+    private static final String WALL_VAL_REGEX = "TESUJI\\s+\\[\\s*\\(\\s*[0-8]\\s*,\\s*[0-8]\\s*\\)\\s*,\\s*[hv]\\s*\\]\\s*\\n*";
     // This is only slightly obnoxious...
     
     /** The internal Board instance */
     private Board board;
+    
+    /** Number of players */
+    private int numOfPlayers;
     
     /** Socket array */
     private Socket[] socks;
@@ -57,6 +63,7 @@ public class GameClient {
      * Sets up the internal Board instance
      */
     private void setupBoard() {
+        System.err.println("Setting up...");
         board = new Board(socks.length);
     }
     
@@ -64,60 +71,77 @@ public class GameClient {
      * Performs the game loop
      */
     private void doGameLoop() {
-        for(int i = 0; i < socks.length; i++) {
-            PrintStream cout = null;
-            Scanner cin = null;
-
-            try {
+        System.err.println("Entering game loop...");
+        board.printBoard();
+        boolean playing = true;
+        while(playing) {
+            for(int i = 0; i < socks.length; i++) {
+                PrintStream cout = null;
+                Scanner cin = null;
                 
-                // Send GO (see what I did there?) message and await response.
-                cout = new PrintStream(socks[i].getOutputStream());
-                cin = new Scanner(socks[i].getInputStream());
+                // Skip over kicked players
+                if(socks[i] == null) continue;
                 
-                cout.println("MYOUSHU");
-                String srvMove = cin.nextLine();
-                
-                // If the server's move syntax is correct
-                if(Pattern.matches(MOVE_VAL_REGEX, srvMove)) {
+                try {
                     
-                    // Check move legality
-                    Coord mCoord = extractCoord(srvMove);
-                    if(!board.isLegalMove(i, mCoord)) {
-                        System.err.println("Player " + i + " made illegal move!:\n    Illegal destination: " + mCoord.getX() + "," + mCoord.getY());
+                    // Send GO (see what I did there?) message and await response.
+                    cout = new PrintStream(socks[i].getOutputStream());
+                    cin = new Scanner(socks[i].getInputStream());
+                    
+                    cout.print("MYOUSHU" + EOLN);
+                    String srvMove = cin.nextLine();
+                    System.err.println("  Msg: \"" + srvMove + "\"");
+                    
+                    // If the server's move syntax is correct
+                    if(Pattern.matches(MOVE_VAL_REGEX, srvMove)) {
+                        
+                        // Check move legality
+                        Coord mCoord = extractCoord(srvMove);
+                        System.err.println("Coord: " + mCoord);
+                        if(!board.isLegalMove(i, mCoord)) {
+                            System.err.println("Player " + (i+1) + " made illegal move!:\n    Illegal destination: " + mCoord.getX() + "," + mCoord.getY());
+                            madeIllegalMove(i);
+                            continue;
+                        }
+                        board.movePlayer(i, mCoord);
+                        broadcastAll("ATARI" + " " + (i + 1) + " " + srvMove);
+                        board.printBoard();
+                        
+                    // If the server's wall placement syntax is correct
+                    } else if(Pattern.matches(WALL_VAL_REGEX, srvMove)) {
+                        
+                        // Check move legality
+                        Coord wCoord = extractCoord(srvMove);
+                        Orientation wOrt = extractOrt(srvMove);
+                        if(!board.isLegalWall(i, new Wall(wCoord, wOrt))) {
+                            System.err.println("Player " + (i+1) + " made illegal move!:\n    Illegal wall at " + wCoord.getX() + "," + wCoord.getY());
+                            madeIllegalMove(i);
+                            continue;
+                        }
+                        board.placeWall(i, wCoord, wOrt);
+                        broadcastAll("ATARI" + (i + 1) + " " + srvMove);
+                        board.printBoard();
+                    
+                    // If it matches no valid syntax, it's illegal
+                    } else {
+                        System.err.println("  Matched no valid syntaxes.");
                         madeIllegalMove(i);
                         continue;
                     }
-                    board.movePlayer(i, mCoord);
-                    broadcastAll("ATARI" + (i + 1) + " " + srvMove);
                     
-                // If the server's wall placement syntax is correct
-                } else if(Pattern.matches(WALL_VAL_REGEX, srvMove)) {
-                    
-                    // Check move legality
-                    Coord wCoord = extractCoord(srvMove);
-                    Orientation wOrt = extractOrt(srvMove);
-                    if(!board.isLegalWall(i, new Wall(wCoord, wOrt))) {
-                        System.err.println("Player " + i + " made illegal move!:\n    Illegal wall at " + wCoord.getX() + "," + wCoord.getY());
-                        madeIllegalMove(i);
-                        continue;
+                    // If there is a winner, announce it
+                    if(board.getWinner() > 0) {
+                        broadcastAll("KIKASHI " + board.getWinner());
+                        playing = false;
                     }
-                    board.placeWall(i, wCoord, wOrt);
-                    broadcastAll("ATARI" + (i + 1) + " " + srvMove);
-                
-                // If it matches no valid syntax, it's illegal
-                } else {
-                    madeIllegalMove(i);
-                    continue;
+                    
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    playing = false;
                 }
-                
-                // If there is a winner, announce it
-                if(board.getWinner() > 0)
-                    broadcastAll("KIKASHI " + board.getWinner());
-                
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
+        
     }
     
     /**
@@ -125,8 +149,14 @@ public class GameClient {
      * @param pid the player ID
      */
     private void madeIllegalMove(int pid) {
-        broadcastAll("GOTE" + (pid + 1));
+        broadcastAll("GOTE" + " " + (pid + 1));
         board.removePlayer(pid);
+        try {
+            socks[pid].close();
+        } catch (IOException e) {
+            System.err.println("Socket closed");
+        }
+        socks[pid] = null;
     }
     
     /**
@@ -136,15 +166,7 @@ public class GameClient {
      */
     private Orientation extractOrt(String msg) {
         
-        Scanner sc = new Scanner(msg);
-        // Seek to ')'
-        while(sc.next() != ")") {}
-        
-        // Get the char
-        char c = sc.next().trim().toLowerCase().charAt(0);
-        
-        // Return HORIZ for 'h', VERT for 'v'
-        return (c == 'h') ? Orientation.HORIZ : (c == 'v') ? Orientation.VERT : null;
+        return (msg.contains("h")) ? Orientation.HORIZ : (msg.contains("v")) ? Orientation.VERT : null;
     }
     
     /**
@@ -153,16 +175,15 @@ public class GameClient {
      * @return a Coord representing the desired move. Returns null if in the improper format.
      */
     private Coord extractCoord(String msg) {
-        Scanner sc = new Scanner(msg);
-        int x = -1;
-        int y = -1;
-        try {
-            x = sc.nextInt();
-            y = sc.nextInt();
-        } catch (Exception e) {
-            return null;
+        int[] res = new int[2];
+        int cnt = 0;
+        for(int i = 0; i < msg.length(); i++) {
+            char c = msg.charAt(i);
+            if(c >= '0' && c <= '9') {
+                res[cnt++] = c - '0';
+            }
         }
-        return new Coord(x, y);
+        return new Coord(res[0], res[1]);
     }
     
     
@@ -174,7 +195,7 @@ public class GameClient {
     private int translateSocket(int pid) {
         switch(pid) {
             case 0: return 0;
-            case 1: return (socks.length > 2) ? 3 : 1;
+            case 1: return (numOfPlayers > 2) ? 3 : 1;
             case 2: return 1;
             case 3: return 2;
             default: return 0;
@@ -186,16 +207,13 @@ public class GameClient {
      * @param msg the message to broadcast
      */
     private void broadcastAll(String msg) {
-        
+        System.err.println("Broadcast: \"" + msg + "\"");
         try {
-            PrintStream ps1 = new PrintStream(socks[0].getOutputStream());
-            PrintStream ps2 = new PrintStream(socks[1].getOutputStream());
-            PrintStream ps3 = new PrintStream(socks[2].getOutputStream());
-            PrintStream ps4 = new PrintStream(socks[3].getOutputStream());
-            ps1.println(msg);
-            ps2.println(msg);
-            ps3.println(msg);
-            ps4.println(msg);
+            for(int i = 0; i < socks.length; i++) {
+                if(socks[i] == null) continue;
+                PrintStream ps = new PrintStream(socks[i].getOutputStream());
+                ps.print(msg + EOLN);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -214,10 +232,10 @@ public class GameClient {
         
         // Build the message and send it to each move server
         for(int i = 1; i <= socks.length; i++) {
-            String bcMsg = "GAME " + i + "" + msgSrvNames;
+            String bcMsg = "GAME " + i + " " + msgSrvNames;
             try {
-                PrintStream cout = new PrintStream(socks[i].getOutputStream());
-                cout.println(bcMsg);
+                PrintStream cout = new PrintStream(socks[i - 1].getOutputStream());
+                cout.print(bcMsg + EOLN);
             } catch(Exception e) {
                 e.printStackTrace();
             }
@@ -236,6 +254,7 @@ public class GameClient {
         for(int i = 0; i < socks.length; i++) {
             String srvName = "";
             try {
+                System.out.println("Handshaking with " + i);
                 srvName = handshakeWithSocket(socks[i]);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -258,30 +277,27 @@ public class GameClient {
         PrintStream cout = null;
         Scanner cin = null;
         String srvResp = "";
-        short toCount = 0;
         
-        // Try 3 times to handshake.
-        while(toCount < 3) {
+        
             try {
                 cout = new PrintStream(sock.getOutputStream());
                 cin = new Scanner(sock.getInputStream());
                 
                 // Send and receive
-                cout.println("HELLO");
+                cout.print("HELLO" + EOLN);
+                System.err.println("  Sent HELLO");
                 srvResp = cin.nextLine();
-            } catch (SocketTimeoutException ste) {
-                if(toCount >= 3)
-                    throw new IOException("Client <-> Server handshake not successfull.");
-                System.err.println("Socket timed out. Retrying...");
-                toCount++;
+                System.err.println("Resp: " + srvResp);
             } catch (Exception e) {
                 e.printStackTrace();
+                return null;
             }
-        }
         
         // If the server's response isn't in the form: "IAM <NAME>", return false
-        if(!Pattern.matches(HANDSHAKE_RESP_REGEX, srvResp))
+        if(!Pattern.matches(HANDSHAKE_RESP_REGEX, srvResp)) {
+            System.err.println("  Handshake response mismatch.");
             return null;
+        }
         
         // Return the server's name
         return srvResp.substring(srvResp.indexOf(' ') + 1);
@@ -294,11 +310,14 @@ public class GameClient {
      */
     private Socket[] buildSocks(String[] args) {
         
+        System.err.println("Building sockets...");
+        
         // Check for only 2 or 4 players
         int argc = args.length;
-        if(argc != 2 || argc != 4)
+        if(argc != 2 && argc != 4)
             throw new IllegalArgumentException("Only 2 or 4 players are allowed.");
         
+        numOfPlayers = argc;
         Socket[] result = new Socket[argc];
         
         // Go through each pair and check syntax. If it checks out, construct a Socket.
@@ -318,10 +337,12 @@ public class GameClient {
             Socket sk = null;
             try {
                 port = Integer.parseInt(pair[1]);
+                
+                System.err.println("  Creating new socket: " + machine + ":" + port);
                 sk = new Socket(machine, port);
                 sk.setSoTimeout(DEFAULT_SOCKET_TIMEOUT * 1000);
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("machine:port pair syntax incorrect (port must be a valid int).");
+                throw new IllegalArgumentException("Machine:port pair syntax incorrect (port must be a valid int).");
             } catch (Exception e) {
                 e.printStackTrace();
             }

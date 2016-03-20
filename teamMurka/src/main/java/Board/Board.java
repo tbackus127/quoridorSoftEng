@@ -100,13 +100,16 @@ public class Board {
     public void printBoard() {
         System.out.println("\n:: BOARD ::\n");
         for(int i = 0; i < numOfPlayers; i++) {
-            if(playerPositions[i] != null)
+            if(playerPositions[i] != null) {
                 System.out.println("Player " + (i+1) + ": " + getPlayerPos(i));
+                System.out.println("  Moves: " + getLegalMoves(i));
+            }
         }
         System.out.println();
         for(Wall w : placedWalls) {
             System.out.println("Wall@" + w);
         }
+        
     }
     
     /**
@@ -143,6 +146,8 @@ public class Board {
         
         if(wallsLeft[pid] <= 0)
             return false;
+        
+        System.err.println("w: " + w);
         
         // Get the wall we're placing's data
         Coord wPos = w.getPos();
@@ -202,7 +207,10 @@ public class Board {
      */
     public boolean isLegalMove(int pid, Coord dest) {
         HashSet<Coord> legalMoves = getLegalMoves(pid);
-        return legalMoves.contains(dest);
+        for(Coord c : legalMoves) {
+            if(dest.equals(c)) return true;
+        }
+        return false;
     }
     
     
@@ -212,8 +220,10 @@ public class Board {
      * @return a HashSet of Coords that can be moved to.
      */
     public HashSet<Coord> getLegalMoves(int pid) {
-        if(kickedPlayers.contains(pid))
+        if(kickedPlayers.contains(pid)) {
+            System.err.println("Tried to get legal moves of kicked player.");
             return new HashSet<Coord>();
+        }
         MoveTrace mt = new MoveTrace();
         mt.addPlayer(pid);
         Coord c = getPlayerPos(pid);
@@ -434,17 +444,17 @@ public class Board {
         switch(mOrt) {
             case VERT:
                 if(px != sx || sy - py > 1 || sy - py < 0 || mOrt == sOrt) {
-                    System.err.println("Irr:" + sOrt + "@" + sCoord + " when moving " + dir);
+                    // System.err.println("Irr:" + sOrt + "@" + sCoord + " when moving " + dir);
                     return false;
                 }
             break;
             case HORIZ:
                 if(py != sy || sx - px > 1 || sx - px < 0 || mOrt == sOrt)  {
-                    System.err.println("Irr:" + sOrt + "@" + sCoord + " when moving " + dir);
+                    // System.err.println("Irr:" + sOrt + "@" + sCoord + " when moving " + dir);
                     return false;
                 }
         }
-        System.err.println("  Rel:" + sOrt + "@" + sCoord + " when moving " + dir);
+        // System.err.println("  Rel:" + sOrt + "@" + sCoord + " when moving " + dir);
         return true;
     }
     
