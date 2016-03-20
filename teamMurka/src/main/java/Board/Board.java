@@ -31,6 +31,12 @@ public class Board {
     /** Contains all walls that have been placed */
     private HashSet<Wall> placedWalls;
     
+    /** Contains the PID of all kicked players */
+    private HashSet<Integer> kickedPlayers;
+    
+    /** Contains how many walls each player has left */
+    private int[] wallsLeft;
+    
     private HashMap<String, Direction> dirMap;
     private HashMap<String, Orientation> ortMap;
     
@@ -49,25 +55,53 @@ public class Board {
     public Board(int plNum) {
         numOfPlayers = plNum;
         playerPositions = new Coord[numOfPlayers];
-        for(int i = 0; i < playerPositions.length; i++) {
+        for(int i = 0; i < playerPositions.length; i++)
             playerPositions[i] = startPos[i];
-        }
         placedWalls = new HashSet<Wall>();
+        kickedPlayers = new HashSet<Integer>();
         buildMaps();
+        wallsLeft = new int[numOfPlayers];
+        for(int i = 0; i < wallsLeft.length; i++) {
+            wallsLeft[i] = 20 / numOfPlayers;
+        }
     }
     
+    /**
+     * Removes a player from the Board
+     * @param plNum the player ID to remove
+     */
+    public void removePlayer(int plNum) {
+        playerPositions[plNum] = null;
+        kickedPlayers.add(plNum);
+        wallsLeft[plNum] = 0;
+    }
+    
+    /**
+     * Converts a string to a Direction
+     * @param s the string
+     * @return the Direction equivalent (Ex: "WEST" -> Direction.WEST)
+     */
     public Direction toDir(String s) {
         return dirMap.get(s);
     }
     
+    /**
+     * Converts a string to an Orientation
+     * @param s the string
+     * @return the Orientation equivalent (Ex: "HORIZ" -> Orientation.HORIZ)
+     */
     public Orientation toOrt(String s) {
         return ortMap.get(s);
     }
     
+    /**
+     * Prints the Board's data
+     */
     public void printBoard() {
         System.out.println("\n:: BOARD ::\n");
         for(int i = 0; i < numOfPlayers; i++) {
-            System.out.println("Player " + (i+1) + ": " + getPlayerPos(i));
+            if(playerPositions[i] != null)
+                System.out.println("Player " + (i+1) + ": " + getPlayerPos(i));
         }
         System.out.println();
         for(Wall w : placedWalls) {
@@ -75,7 +109,40 @@ public class Board {
         }
     }
     
-    public boolean isLegalWall(Wall w) throws Exception {
+    /**
+     * Gets the winner (if any yet)
+     * @return 0 if no winner; returns the PID of the winner otherwise.
+     */
+    public int getWinner() {
+        
+        // Go through each player
+        for(int i = 0; i < numOfPlayers; i++) {
+            if(kickedPlayers.contains(i)) continue;
+            
+            // Get player coord
+            Coord pCoord = getPlayerPos(i);
+            int px = pCoord.getX();
+            int py = pCoord.getY();
+            
+            // If any are on their far side, return the winner
+            if(i == 0 && py == 8) return 1;
+            if(i == 1 && py == 0) return 2;
+            if(i == 2 && px == 8) return 3;
+            if(i == 3 && px == 0) return 4;
+        }
+        
+        return 0;
+    }
+    
+    /**
+     * Checks if a wall is legal
+     * @param w the Wall to check
+     * @return true if legal; false otherwise
+     */
+    public boolean isLegalWall(int pid, Wall w) throws Exception {
+        
+        if(wallsLeft[pid] <= 0)
+            return false;
         
         // Get the wall we're placing's data
         Coord wPos = w.getPos();
@@ -126,19 +193,187 @@ public class Board {
         return true;
     }
     
+    
+    /**
+     * Tests if a player's move is legal
+     * @param pid the player ID
+     * @param dest the player's destination to check validity
+     * @return true if it's a legal move; false otherwise
+     */
+    public boolean isLegalMove(int pid, Coord dest) {
+        HashSet<Coord> legalMoves = getLegalMoves(pid);
+        return legalMoves.contains(dest);
+    }
+    
+    
     /**
      * Gets the legal moves at a Coordinate.
      * @param pid the player ID to check.
      * @return a HashSet of Coords that can be moved to.
      */
     public HashSet<Coord> getLegalMoves(int pid) {
+        if(kickedPlayers.contains(pid))
+            return new HashSet<Coord>();
         MoveTrace mt = new MoveTrace();
         mt.addPlayer(pid);
         Coord c = getPlayerPos(pid);
         return getLegalMoves(mt, c).getMoves();
     }
     
+    
     /**
+     * Checks if a direction is blocked at a Coordinate.
+     * @param src the starting Coordinate that will be tested from
+     * @param dir the direction to move (Use Coord.Direction enum)
+     * @return true if the move is blocked
+     */
+    public boolean isBlocked(Coord src, Direction dir) {
+        
+        // Check Board bounds
+        if(src.getY() <= 0 && dir == Direction.NORTH)
+            return true;
+        if(src.getY() >= 8 && dir == Direction.SOUTH)
+            return true;
+        if(src.getX() <= 0 && dir == Direction.WEST)
+            return true;
+        if(src.getX() >= 8 && dir == Direction.EAST)
+            return true;
+        
+        HashSet<Segment> segs = getSegments();
+        
+        // Go through all placed walls
+        for(Segment s : segs) {
+            
+            // Check if we need to actually check the segment
+            if(isRelevantWall(s, src, dir)) {
+                int wx = s.getPos().getX();
+                int wy = s.getPos().getY();
+                int sx = src.getX();
+                int sy = src.getY();
+                
+                // Check for four directions
+                switch(dir) {
+                    case NORTH:
+                        if(wx == sx && wy == sy) 
+                            return true;
+                    break;
+                    case EAST:
+                        if(wx - 1 == sx && wy == sy) 
+                            return true;
+                    break;
+                    case SOUTH:
+                        if(wx == sx && wy - 1 == sy) 
+                            return true;
+                    break;
+                    case WEST:
+                        if(wx == sx && wy == sy) 
+                            return true;
+                    break;
+                }
+            }
+        }
+        
+        // If we haven't found any blocked directions, all is well
+        return false;
+    }
+    
+    /**
+     * Moves a player to a destination. Does not check for collisions,
+     * so an upper layer of control is needed.
+     * @param plNum the player number to move
+     * @param dest the destination Coordinate
+     */
+    public void movePlayer(int plNum, Coord dest) {
+        if(kickedPlayers.contains(plNum)) {
+            System.err.println("Tried to move a player that was kicked!");
+            return;
+        }
+        playerPositions[plNum] = dest;
+    }
+    
+    /**
+     * Places a wall on the board with a length of 2 and subtracts one from the player's wall count.
+     * @param pid the player who placed the wall.
+     * @param pos a Coordinate of the position to place the wall (upper-left of tile)
+     * @param ort the Orientation of the wall HORIZ or VERT).
+     */
+    public void placeWall(int pid, Coord pos, Orientation ort) {
+        if(wallsLeft[pid] <= 0)
+            System.err.println("Placed too many walls! (Player: " + pid);
+        wallsLeft[pid]--;
+        placeWall(pos, ort);
+    }
+    
+    /**
+     * Places a wall on the board with a length of 2.
+     * @param pos a Coordinate of the position to place the wall (upper-left of tile)
+     * @param ort the Orientation of the wall HORIZ or VERT).
+     */
+    public void placeWall(Coord pos, Orientation ort) {
+        placedWalls.add(new Wall(pos, ort));
+    }
+    
+    /**
+     * Places a wall on the board with a length of 2.
+     * @param w the Wall to place on the board.
+     */
+    public void placeWall(Wall w) {
+        placedWalls.add(w);
+    }
+    
+    /**
+     * Gets a copy of the placed walls as individual Segments.
+     * @return a HashSet of Segments
+     */
+    public HashSet<Segment> getSegments() {
+        HashSet<Segment> result = new HashSet<Segment>();
+        for(Wall w : placedWalls) {
+            result.add(w.getSegment(0));
+            result.add(w.getSegment(1));
+        }
+        return result;
+    }
+    
+    /**
+     * Gets a player's position
+     * @param plNum the player to get the position of
+     * @return a Coord where the specified player is located
+     */
+    public Coord getPlayerPos(int plNum) {
+        if(kickedPlayers.contains(plNum)) {
+            System.err.println("Tried to get kicked player's coordinates!");
+            return null;
+        }
+        return playerPositions[plNum];
+    }
+    
+    /**
+     * Gets the player ID at a Coord
+     * @param c the Coord to check the player at
+     * @return the player ID found at the Coord c (-1 if no player)
+     */
+    public int getPlayerAtCoord(Coord c) {
+        int cx = c.getX();
+        int cy = c.getY();
+        for(int i = 0; i < playerPositions.length; i++) {
+            if(kickedPlayers.contains(i)) continue;
+            int px = playerPositions[i].getX();
+            int py = playerPositions[i].getY();
+            if(px == cx && py == cy)
+                return i;
+        }
+        return -1;
+    }
+    
+    /**
+     * Gets all placed walls in the game
+     * @return a HashSet of all Walls placed
+     */
+    public HashSet<Wall> getWalls() {
+        return placedWalls;
+    }
+    
+        /**
      * Legal moves helper method.
      * @param mt the MoveTrace so far
      * @param curr the current Coord we're checking
@@ -211,136 +446,6 @@ public class Board {
         }
         System.err.println("  Rel:" + sOrt + "@" + sCoord + " when moving " + dir);
         return true;
-    }
-    
-    /**
-     * Checks if a direction is blocked at a Coordinate.
-     * @param src the starting Coordinate that will be tested from
-     * @param dir the direction to move (Use Coord.Direction enum)
-     * @return true if the move is blocked
-     */
-    public boolean isBlocked(Coord src, Direction dir) {
-        
-        // Check Board bounds
-        if(src.getY() <= 0 && dir == Direction.NORTH)
-            return true;
-        if(src.getY() >= 8 && dir == Direction.SOUTH)
-            return true;
-        if(src.getX() <= 0 && dir == Direction.WEST)
-            return true;
-        if(src.getX() >= 8 && dir == Direction.EAST)
-            return true;
-        
-        HashSet<Segment> segs = getSegments();
-        
-        // Go through all placed walls
-        for(Segment s : segs) {
-            
-            // Check if we need to actually check the segment
-            if(isRelevantWall(s, src, dir)) {
-                int wx = s.getPos().getX();
-                int wy = s.getPos().getY();
-                int sx = src.getX();
-                int sy = src.getY();
-                
-                // Check for four directions
-                switch(dir) {
-                    case NORTH:
-                        if(wx == sx && wy == sy) 
-                            return true;
-                    break;
-                    case EAST:
-                        if(wx - 1 == sx && wy == sy) 
-                            return true;
-                    break;
-                    case SOUTH:
-                        if(wx == sx && wy - 1 == sy) 
-                            return true;
-                    break;
-                    case WEST:
-                        if(wx == sx && wy == sy) 
-                            return true;
-                    break;
-                }
-            }
-        }
-        
-        // If we haven't found any blocked directions, all is well
-        return false;
-    }
-    
-    /**
-     * Moves a player to a destination. Does not check for collisions,
-     * so an upper layer of control is needed.
-     * @param plNum the player number to move
-     * @param dest the destination Coordinate
-     */
-    public void movePlayer(int plNum, Coord dest) {
-        playerPositions[plNum] = dest;
-    }
-    
-    /**
-     * Places a wall on the board with a length of 2.
-     * @param pos a Coordinate of the position to place the wall (upper-left of tile)
-     * @param ort the Orientation of the wall HORIZ or VERT).
-     */
-    public void placeWall(Coord pos, Orientation ort) {
-        placedWalls.add(new Wall(pos, ort));
-    }
-    
-    /**
-     * Places a wall on the board with a length of 2.
-     * @param w the Wall to place on the board.
-     */
-    public void placeWall(Wall w) {
-        placedWalls.add(w);
-    }
-    
-    /**
-     * Gets a copy of the placed walls as individual Segments.
-     * @return a HashSet of Segments
-     */
-    public HashSet<Segment> getSegments() {
-        HashSet<Segment> result = new HashSet<Segment>();
-        for(Wall w : placedWalls) {
-            result.add(w.getSegment(0));
-            result.add(w.getSegment(1));
-        }
-        return result;
-    }
-    
-    /**
-     * Gets a player's position
-     * @param plNum the player to get the position of
-     * @return a Coord where the specified player is located
-     */
-    public Coord getPlayerPos(int plNum) {
-        return playerPositions[plNum];
-    }
-    
-    /**
-     * Gets the player ID at a Coord
-     * @param c the Coord to check the player at
-     * @return the player ID found at the Coord c (-1 if no player)
-     */
-    public int getPlayerAtCoord(Coord c) {
-        int cx = c.getX();
-        int cy = c.getY();
-        for(int i = 0; i < playerPositions.length; i++) {
-            int px = playerPositions[i].getX();
-            int py = playerPositions[i].getY();
-            if(px == cx && py == cy)
-                return i;
-        }
-        return -1;
-    }
-    
-    /**
-     * Gets all placed walls in the game
-     * @return a HashSet of all Walls placed
-     */
-    public HashSet<Wall> getWalls() {
-        return placedWalls;
     }
     
     private void buildMaps() {

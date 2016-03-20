@@ -1,172 +1,350 @@
 package com.tmquoridor.Client;
 
-import java.io.IOException;
-import java.io.PrintStream;
-
-import java.net.Socket;
-
-import java.util.Scanner;
+import java.util.*;
+import java.util.regex.*;
+import java.io.*;
+import java.net.*;
 
 import com.tmquoridor.Board.*;
 
-public class GameClient implements Runnable {
+public class GameClient {
     
+    /** Timeout (in seconds) for any socket */
+    private static final int DEFAULT_SOCKET_TIMEOUT = 5;
+    
+    /** Handshake response regex */
+    private static final String HANDSHAKE_RESP_REGEX = "IAM\\s+\\w+\\s*";
+    
+    /** Move validation regex */
+    private static final String MOVE_VAL_REGEX = "TESUJI\\s+Move\\s+\\(\\s*[0-8],\\s*[0-8]\\s*\\)\\s*";
+    
+    /** Wall validation regex */
+    private static final String WALL_VAL_REGEX = "TESUJI\\s+Wall\\s+\\[\\s*\\(\\s*[0-8]\\s*,\\s*[0-8]\\s*\\)\\s*,\\s*[hv]\\s*\\]\\s*";
+    // This is only slightly obnoxious...
+    
+    /** The internal Board instance */
     private Board board;
     
-    private Socket[] playerSockets;
+    /** Socket array */
+    private Socket[] socks;
     
-    public GameClient(Socket[] argSocks) {
-        playerSockets = argSocks;
-    }
+    /** Server name array */
+    private String[] srvNames;
     
-    public void run() {
-        if(!handshake()) {
-          System.err.println("Something went wrong while handshaking!");
-          System.exit(0);
+    /**
+     * Default constructor
+     * @param args runtime arguments passed in
+     */
+    public GameClient(String[] args) {
+        
+        // Set sockets.
+        try {
+            socks = buildSocks(args);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
         }
-        doGameLoop();
+        
+        // If handshaking is successfull
+        if(handshake()) {
+            sendStartMsgs();
+            setupBoard();
+            doGameLoop();
+        }
+        
     }
     
+    /**
+     * Sets up the internal Board instance
+     */
+    private void setupBoard() {
+        board = new Board(socks.length);
+    }
+    
+    /**
+     * Performs the game loop
+     */
     private void doGameLoop() {
-        board = new Board(playerSockets.length);
-        board.printBoard();
-        while(true) {
-            for(int i = 0; i < playerSockets.length; i++) {
-              
-                try {
-                    // Set up communication
-                    PrintStream cout = new PrintStream(playerSockets[i].getOutputStream());
-                    Scanner cin =  new Scanner(playerSockets[i].getInputStream());
-                    
-                    cout.println("turn");
-                    String move = cin.nextLine();
+        for(int i = 0; i < socks.length; i++) {
+            PrintStream cout = null;
+            Scanner cin = null;
+
+            try {
+                
+                // Send GO (see what I did there?) message and await response.
+                cout = new PrintStream(socks[i].getOutputStream());
+                cin = new Scanner(socks[i].getInputStream());
+                
+                cout.println("MYOUSHU");
+                String srvMove = cin.nextLine();
+                
+                // If the server's move syntax is correct
+                if(Pattern.matches(MOVE_VAL_REGEX, srvMove)) {
                     
                     // Check move legality
-                    while(!isMoveLegal(i, move)) {
-                        cout.println("invalid");
-                        System.out.println("Player " + i + " made an illegal move!");
-                        move = cin.nextLine();
+                    Coord mCoord = extractCoord(srvMove);
+                    if(!board.isLegalMove(i, mCoord)) {
+                        System.err.println("Player " + i + " made illegal move!:\n    Illegal destination: " + mCoord.getX() + "," + mCoord.getY());
+                        madeIllegalMove(i);
+                        continue;
                     }
+                    board.movePlayer(i, mCoord);
+                    broadcastAll("ATARI" + (i + 1) + " " + srvMove);
                     
-                    doMove(i, move);
-                    board.printBoard();
+                // If the server's wall placement syntax is correct
+                } else if(Pattern.matches(WALL_VAL_REGEX, srvMove)) {
                     
-                } catch (Exception e) {
-                    System.err.println("Server DC'd");
-                    e.printStackTrace();
-                    System.exit(0);
+                    // Check move legality
+                    Coord wCoord = extractCoord(srvMove);
+                    Orientation wOrt = extractOrt(srvMove);
+                    if(!board.isLegalWall(i, new Wall(wCoord, wOrt))) {
+                        System.err.println("Player " + i + " made illegal move!:\n    Illegal wall at " + wCoord.getX() + "," + wCoord.getY());
+                        madeIllegalMove(i);
+                        continue;
+                    }
+                    board.placeWall(i, wCoord, wOrt);
+                    broadcastAll("ATARI" + (i + 1) + " " + srvMove);
+                
+                // If it matches no valid syntax, it's illegal
+                } else {
+                    madeIllegalMove(i);
+                    continue;
                 }
-            }
-        }
-    }
-    
-    private void doMove(int pid, String move) {
-        String[] tokens = move.split(" ");
-        
-        switch(tokens[0]) {
-            case "move":
-                Coord pPos = board.getPlayerPos(pid);
-                Direction mDir = board.toDir(tokens[1]);
-                try {
-                    board.movePlayer(pid, pPos.translate(mDir));
-                } catch (Exception e) {
-                  e.printStackTrace();
-                }
-            break;
-            case "wall":
-                try {
-                    int wx = Integer.parseInt(tokens[1]);
-                    int wy = Integer.parseInt(tokens[2]);
-                    Coord wPos = new Coord(wx, wy);
-                    Orientation wOrt = board.toOrt(tokens[3]);
-                    board.placeWall(wPos, wOrt);
-                } catch (Exception e) {
-                    System.err.println("Wall legality checking doesn't work for some reason!");
-                    e.printStackTrace();
-                    return;
-                }
-        }
-    }
-    
-    private boolean isMoveLegal(int pid, String move) {
-        String[] tokens = move.split(" ");
-        
-        switch(tokens[0]) {
-            case "move":
-                Coord pPos = board.getPlayerPos(pid);
-                Direction mDir = board.toDir(tokens[1]);
-                return !board.isBlocked(pPos, mDir);
-            case "wall":
-                try {
-                    int wx = Integer.parseInt(tokens[1]);
-                    int wy = Integer.parseInt(tokens[2]);
-                    Coord wPos = new Coord(wx, wy);
-                    Orientation wOrt = board.toOrt(tokens[3]);
-                    return board.isLegalWall(new Wall(wPos, wOrt));
-                } catch (Exception e) {
-                    return false;
-                }
-            default:
-                return false;
-        }
-    }
-    
-    private boolean handshake() {
-        System.out.println("Client attempting connections...");
-        for(int i = 0; i < playerSockets.length; i++) {
-            
-            try {
-                PrintStream cout = new PrintStream(playerSockets[i].getOutputStream());
-                Scanner cin =  new Scanner(playerSockets[i].getInputStream());
-            
-                // Send PID to each Server
-                cout.println(i);
-                if(cin.nextLine().toLowerCase().equals("ok"))
-                    System.out.println("Player " + (i+1) + " OK");
-              
+                
+                // If there is a winner, announce it
+                if(board.getWinner() > 0)
+                    broadcastAll("KIKASHI " + board.getWinner());
+                
             } catch (Exception e) {
-                System.err.println("Something blew up.");
-                return false;
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    /**
+     * Broadcasts illegal move made.
+     * @param pid the player ID
+     */
+    private void madeIllegalMove(int pid) {
+        broadcastAll("GOTE" + (pid + 1));
+        board.removePlayer(pid);
+    }
+    
+    /**
+     * Extracts the Orientation from a move string.
+     * @param msg the move string to extract from
+     * @return a Orientation representing the desired move. Returns null if in the improper format.
+     */
+    private Orientation extractOrt(String msg) {
+        
+        Scanner sc = new Scanner(msg);
+        // Seek to ')'
+        while(sc.next() != ")") {}
+        
+        // Get the char
+        char c = sc.next().trim().toLowerCase().charAt(0);
+        
+        // Return HORIZ for 'h', VERT for 'v'
+        return (c == 'h') ? Orientation.HORIZ : (c == 'v') ? Orientation.VERT : null;
+    }
+    
+    /**
+     * Extracts the Coord from a move string.
+     * @param msg the move string to extract from
+     * @return a Coord representing the desired move. Returns null if in the improper format.
+     */
+    private Coord extractCoord(String msg) {
+        Scanner sc = new Scanner(msg);
+        int x = -1;
+        int y = -1;
+        try {
+            x = sc.nextInt();
+            y = sc.nextInt();
+        } catch (Exception e) {
+            return null;
+        }
+        return new Coord(x, y);
+    }
+    
+    
+    /**
+     * Translates [0, 1, [2, 3]] to [0, [3], 1, [2]]. Be aware this is zero-based.
+     * @param pid the player turn number
+     * @return the socket ID for who's turn it is
+     */
+    private int translateSocket(int pid) {
+        switch(pid) {
+            case 0: return 0;
+            case 1: return (socks.length > 2) ? 3 : 1;
+            case 2: return 1;
+            case 3: return 2;
+            default: return 0;
+        } 
+    }
+    
+    /**
+     * Broadcasts a message to all clients
+     * @param msg the message to broadcast
+     */
+    private void broadcastAll(String msg) {
+        
+        try {
+            PrintStream ps1 = new PrintStream(socks[0].getOutputStream());
+            PrintStream ps2 = new PrintStream(socks[1].getOutputStream());
+            PrintStream ps3 = new PrintStream(socks[2].getOutputStream());
+            PrintStream ps4 = new PrintStream(socks[3].getOutputStream());
+            ps1.println(msg);
+            ps2.println(msg);
+            ps3.println(msg);
+            ps4.println(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
+    /**
+     * Broadcasts the start message to all connected Servers
+     */
+    private void sendStartMsgs() {
+        
+        // Build the names of the servers
+        String msgSrvNames = srvNames[0];
+        for(int i = 1; i < srvNames.length; i++)
+            msgSrvNames += " " + srvNames[i];
+        
+        // Build the message and send it to each move server
+        for(int i = 1; i <= socks.length; i++) {
+            String bcMsg = "GAME " + i + "" + msgSrvNames;
+            try {
+                PrintStream cout = new PrintStream(socks[i].getOutputStream());
+                cout.println(bcMsg);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    
+    /**
+     * Performs the handshaking for sockets
+     * @return true if handshaking was successfull, false if not.
+     */
+    private boolean handshake() {
+        
+        // Set server names
+        srvNames = new String[socks.length];
+        for(int i = 0; i < socks.length; i++) {
+            String srvName = "";
+            try {
+                srvName = handshakeWithSocket(socks[i]);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             
+            if(srvName == null) return false;
+            srvNames[i] = srvName;
         }
         return true;
     }
     
-    public static void main(String[] args) {
-        int ixargs = 0;
-        int seenPlayers = 0;
-        // String[] playerNames = {null, null, null, null};
-        int[] playerPorts = {-1, -1, -1, -1};
+    
+    /**
+     * Handshakes with the specified Move Server
+     * @param sock the socket for connecting to the Move Server
+     * @return the server's name (String) if handshaking is successfull, null if not.
+     */
+    private String handshakeWithSocket(Socket sock) throws IOException {
         
-        // Parse runtime args
-        while(ixargs < args.length) {
-            String arg = args[ixargs++];
-            switch(arg) {
-                case "--port":
-                    try {
-                        int port = Integer.parseInt(args[ixargs]);
-                        playerPorts[seenPlayers] = port;
-                        System.out.println("Set port of P" + seenPlayers + " to " + port);
-                        seenPlayers++;
-                    } catch(Exception e) {
-                        System.err.println("Illegal port number.");
-                        System.exit(0);
-                    }
-            }
-        }
+        PrintStream cout = null;
+        Scanner cin = null;
+        String srvResp = "";
+        short toCount = 0;
         
-        Socket[] socks = new Socket[seenPlayers];
-        for(int i = 0; i < socks.length; i++) {
+        // Try 3 times to handshake.
+        while(toCount < 3) {
             try {
-                socks[i] = new Socket("localhost", playerPorts[i]);
-                System.out.println("New socket@localhost:" + playerPorts[i]);
+                cout = new PrintStream(sock.getOutputStream());
+                cin = new Scanner(sock.getInputStream());
+                
+                // Send and receive
+                cout.println("HELLO");
+                srvResp = cin.nextLine();
+            } catch (SocketTimeoutException ste) {
+                if(toCount >= 3)
+                    throw new IOException("Client <-> Server handshake not successfull.");
+                System.err.println("Socket timed out. Retrying...");
+                toCount++;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         
-        // Create a new thread of the Game Client
-        new Thread(new GameClient(socks)).start();
+        // If the server's response isn't in the form: "IAM <NAME>", return false
+        if(!Pattern.matches(HANDSHAKE_RESP_REGEX, srvResp))
+            return null;
+        
+        // Return the server's name
+        return srvResp.substring(srvResp.indexOf(' ') + 1);
+    }
+    
+    /**
+     * Sets up the Sockets for each connected Move Server
+     * @param args the <machine>:<port> pairs passed at runtime
+     * @return an array of Socket objects cooresponding to each player (zero-based, in proper turn order)
+     */
+    private Socket[] buildSocks(String[] args) {
+        
+        // Check for only 2 or 4 players
+        int argc = args.length;
+        if(argc != 2 || argc != 4)
+            throw new IllegalArgumentException("Only 2 or 4 players are allowed.");
+        
+        Socket[] result = new Socket[argc];
+        
+        // Go through each pair and check syntax. If it checks out, construct a Socket.
+        int plNum = 0;
+        for(String arg : args) {
+            String[] pair = arg.split(":");
+            
+            // Machine
+            String machine = null;
+            if(pair[0].length() > 0)
+                machine = pair[0];
+            else
+                throw new IllegalArgumentException("Machine was not specified.");
+            
+            // Port
+            int port = -1;
+            Socket sk = null;
+            try {
+                port = Integer.parseInt(pair[1]);
+                sk = new Socket(machine, port);
+                sk.setSoTimeout(DEFAULT_SOCKET_TIMEOUT * 1000);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("machine:port pair syntax incorrect (port must be a valid int).");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            result[translateSocket(plNum++)] = sk;
+        }
+        return result;
+    }
+    
+    
+    /**
+     * Main method
+     * @param args the runtime arguments ("<machine>:<port>" pairs.)
+     */
+    public static void main(String[] args) {
+        GameClient gc = new GameClient(args);
     }
 }
+
+
+
+
+
+
+
+

@@ -66,24 +66,24 @@ public class TestBoard {
         Wall w4 = new Wall(new Coord(6, 4), Orientation.VERT);
         Wall w5 = new Wall(new Coord(4, 2), Orientation.VERT);
         
-        assertTrue("Wall 1 is not legal and should be!", b.isLegalWall(w1));
+        assertTrue("Wall 1 is not legal and should be!", b.isLegalWall(0, w1));
         b.placeWall(w1);
-        assertTrue("Wall 2 is not legal and should be!", b.isLegalWall(w2));
+        assertTrue("Wall 2 is not legal and should be!", b.isLegalWall(0, w2));
         b.placeWall(w2);
-        assertTrue("Wall 3 is not legal and should be!", b.isLegalWall(w3));
+        assertTrue("Wall 3 is not legal and should be!", b.isLegalWall(0, w3));
         b.placeWall(w3);
-        assertTrue("Wall 4 is not legal and should be!", b.isLegalWall(w4));
+        assertTrue("Wall 4 is not legal and should be!", b.isLegalWall(0, w4));
         b.placeWall(w4);
-        assertTrue("Wall 5 is not legal and should be!", b.isLegalWall(w5));
+        assertTrue("Wall 5 is not legal and should be!", b.isLegalWall(0, w5));
         b.placeWall(w5);
         
         // Illegal wall checking
         Wall w6 = new Wall(new Coord(5, 5), Orientation.HORIZ);
-        assertFalse("Wall 6 is legal and should not be! (Problem with crossing)", b.isLegalWall(w6));
+        assertFalse("Wall 6 is legal and should not be! (Problem with crossing)", b.isLegalWall(0, w6));
         Wall w7 = new Wall(new Coord(4, 2), Orientation.HORIZ);
-        assertFalse("Wall 6 is legal and should not be! (Problem with first segment overlap)", b.isLegalWall(w7));
+        assertFalse("Wall 6 is legal and should not be! (Problem with first segment overlap)", b.isLegalWall(0, w7));
         Wall w8 = new Wall(new Coord(6, 3), Orientation.VERT);
-        assertFalse("Wall 6 is legal and should not be! (Problem with extension segment overlap)", b.isLegalWall(w8));
+        assertFalse("Wall 6 is legal and should not be! (Problem with extension segment overlap)", b.isLegalWall(0, w8));
     }
     
     @Test
