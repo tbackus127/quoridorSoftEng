@@ -158,7 +158,7 @@ public class Board {
      * @param w the Wall to check
      * @return true if legal; false otherwise
      */
-    public boolean isLegalWall(int pid, Wall ) throws Exception {
+    public boolean isLegalWall(int pid, Wall w) throws Exception {
         
         if(wallsLeft[pid] <= 0)
             return false;
@@ -221,7 +221,7 @@ public class Board {
      * @param dest the player's destination to check validity
      * @return true if it's a legal move; false otherwise
      */
-    public boolean isLegalMove(int pid, Coord  {
+    public boolean isLegalMove(int pid, Coord dest) {
         HashSet<Coord> legalMoves = getLegalMoves(pid);
         for(Coord c : legalMoves) {
             if(dest.equals(c)) return true;
