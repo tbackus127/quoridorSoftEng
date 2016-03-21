@@ -22,7 +22,7 @@ public class FranksAIServer extends ManualInputServer {
                 // a random place (row / column) to move to 
                 int move1 = rand.nextInt(9);
                 int move2 = rand.nextInt(9);
-                Coord dest = (move1, move2);
+                Coord dest = new Coord(move1, move2);
                 if (isLegalMove(thisServersPlayerNumber-1, dest) == true) {
                     cout.print(moveWrapper("m " + move1 + " " + move2));
                     return;
@@ -33,7 +33,9 @@ public class FranksAIServer extends ManualInputServer {
                 // a random for the posible placements for a wall 
                 int wall1 = rand.nextInt(8);
                 int wall2 = rand.nextInt(8);
-                Coord dest = (wall1, wall2); 
+                Coord pos = new Coord(wall1, wall2);
+                Orientation ort1 = Orientation.HORIZ;
+                Orientation ort2 = Orientation.VERT;
                 if (board.wallsRemaining() == 0) {
                     choice = 0; 
                     break;

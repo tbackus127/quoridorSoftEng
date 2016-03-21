@@ -8,7 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import java.util.Scanner;
-//import java.util.Array;
+import java.lang.String;
 
 public class ManualInputServer {
 
@@ -103,6 +103,9 @@ public class ManualInputServer {
 		    if(clientMessage.startsWith("MYOUSHU")){
 			sendMove(cout);
 		    }
+		    else if(clientMessage.startsWith("ATARI")){
+			updateBoard(clientMessage);
+		    }
 		}
 	    }
 	}catch(Exception e){
@@ -179,6 +182,28 @@ public class ManualInputServer {
     }
     
     public void updateBoard(String message){
+	message = message.substring(6).replaceAll("\\s","");
+	int playerNumber = (int)message.charAt(0)-(int)'0';
+	message = message.substring(1);
+	if(message.startsWith("[")){
+	    Orientation ort = null;
+	    if(message.charAt(8) == 'h'){
+		ort = Orientation.HORIZ;
+	    }
+	    else{
+		ort = Orientation.VERT;
+	    }
+	    int column = (int)message.charAt(2)-(int)'0';
+	    int row = (int)message.charAt(4) - (int)'0';
+	    Coord coord = new Coord(column, row);
+	    board.placeWall(playerNumber-1, coord, ort);
+	}
+	else if(message.startsWith("(")){
+	    int column = (int)message.charAt(1)-(int)'0';
+	    int row = (int)message.charAt(3) - (int)'0';
+	    Coord coord = new Coord(column, row);
+	    board.movePlayer(playerNumber-1, coord);
+	}
 	
     }
     
