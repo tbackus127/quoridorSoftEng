@@ -474,6 +474,10 @@ public class Board {
         return true;
     }
     
+    public int wallsRemaining(int plNum){
+	return wallsLeft[plNum];
+    }
+    
     private void buildMaps() {
         dirMap = new HashMap<String, Direction>();
         dirMap.put("n", Direction.NORTH);
