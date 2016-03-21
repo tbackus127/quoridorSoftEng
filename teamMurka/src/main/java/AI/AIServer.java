@@ -13,33 +13,52 @@ import java.util.*;
 public class FranksAIServer extends ManualInputServer {
     // @override  
     public void sendMove(PrintStream cout) {
-        Random rand = new Random();
-        int choice = rand.nextInt(3);
-        int moves = rand.nextInt(9);
-        int walls = rand.nextInt(8);
-        if (choice == 0) {
-            if (isLegalMove == true) {
-            cout.print(moveWrapper("m " + moves + " " + walls));
-            }
-        }
-        if (choice == 1) {
-            if (isLegalWall == true) {
-                
-            }
-            
-        }
-        if (choice == 2) {
-            
-        }
-        int m = 0;
-        int h = 1; 
-        int v = 2; 
-        // checks all possible moves
-        // wall or advance 
-        // make one 
+        Random rand = new Random(); 
+        int choice = rand.nextInt(2);        
         
-        cout.print(moveWrapper("v h m"));
+        while (true) {
+            // choice 0 is to make a move            
+            if (choice == 0) {
+                // a random place (row / column) to move to 
+                int move1 = rand.nextInt(9);
+                int move2 = rand.nextInt(9);
+                Coord dest = (move1, move2);
+                if (isLegalMove(thisServersPlayerNumber-1, dest) == true) {
+                    cout.print(moveWrapper("m " + move1 + " " + move2));
+                    return;
+                }
+            }
+            // choice 1 is to place a wall 
+            if (choice == 1) {     
+                // a random for the posible placements for a wall 
+                int wall1 = rand.nextInt(8);
+                int wall2 = rand.nextInt(8);
+                Coord dest = (wall1, wall2); 
+                if (board.wallsRemaining() == 0) {
+                    choice = 0; 
+                    break;
+                } else {
+                    // wallOrient is the orientation of wall verticle / horizontal
+                    int wallOrient = rand.nextInt(2);
+                    if (wallOrient == 1) {
+                        
+                        if (isLegalWall(thisServersPlayerNumber-1, Wall) == true) {
+                            cout.print(moveWrapper("v" + wall1 + " " + wall2));
+                            return;
+                        }
+                    }
+                    if (wallOrient == 2) {
+                        if (isLegalWall(thisServersPlayerNumber-1, Wall) == true) {
+                            cout.print(moveWrapper("h" + wall1 + " " + wall2));
+                            return;
+                        }
+                    }
+                }           
+            }
+        }            
     }
+}
+
       
    
            // if (splitter[0].equals("m") {
@@ -62,12 +81,12 @@ public class FranksAIServer extends ManualInputServer {
               // place horizontal wall at chosen coordinate
               // update board 
    
-  public void thinker(code) {
+  //public void thinker(code) {
     // Should we always make the same first move 
     // (A wall one space to the right and forward from the opponent)
     // *Should we develop something to guard against that move* 
     // if there is a possible move to increase the oponents shortest path
     // choose the move that will increase their path by the most
-  } 
-}
+  //} 
+//}
             
