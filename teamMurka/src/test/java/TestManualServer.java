@@ -7,6 +7,7 @@ import java.util.Scanner;
 import java.io.PrintStream;
 
 import com.tmquoridor.Server.*;
+import com.tmquoridor.Board.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -97,4 +98,20 @@ public class TestManualServer{
 	
 	assertEquals("The wall did not format correctly", expected, baos.toString());
     }
+    
+    @Test
+    public void testUpdateBoard() {
+	String fakedMove = "ATARI 1 (4, 1)";
+	
+	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
+	ms.updateBoard(fakedMove);
+	
+	Board expected = new Board();
+	Coord move = new Coord(4, 1);
+	expected.movePlayer(1, move);
+	
+	assertEquals("It did not move the player Properly",expected.toString(),
+		     ms.getBoard().toString());
+    }
+    
 }
