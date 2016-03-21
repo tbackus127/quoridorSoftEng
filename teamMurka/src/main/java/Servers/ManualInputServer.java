@@ -25,8 +25,8 @@ public class ManualInputServer {
     private int port;
     private String name;
     private int playerCount;
-    private Board board;
-    private int thisServersPlayerNumber;
+    protected Board board;
+    protected int thisServersPlayerNumber;
     
     // Main that uses the command line arguments
     public static void main(String[] args) {
@@ -176,5 +176,13 @@ public class ManualInputServer {
 	    unwrappedMessage += console.next();
 	    cout.print(moveWrapper(unwrappedMessage));
 	}
+    }
+    
+    public void updateBoard(String message){
+	
+    }
+    
+    public Board getBoard(){
+	return board;
     }
 }

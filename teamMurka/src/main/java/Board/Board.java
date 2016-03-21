@@ -112,6 +112,22 @@ public class Board {
         
     }
     
+    public String toString(){
+	String message = "";
+	message += ("\n:: BOARD ::\n");
+        for(int i = 0; i < numOfPlayers; i++) {
+            if(playerPositions[i] != null) {
+                message += ("Player " + (i+1) + ": " + getPlayerPos(i)) + "\n";
+                message += ("  Moves: " + getLegalMoves(i)) + "\n";
+            }
+        }
+        System.out.println();
+        for(Wall w : placedWalls) {
+            message += ("Wall@" + w) + "\n";
+        }
+        return message;
+    }
+    
     /**
      * Gets the winner (if any yet)
      * @return 0 if no winner; returns the PID of the winner otherwise.
