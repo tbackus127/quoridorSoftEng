@@ -10,7 +10,12 @@ import java.net.Socket;
 import java.util.Scanner;
 import java.util.*;
 
-public class FranksAIServer extends ManualInputServer {
+public class AIServer extends ManualInputServer {
+    
+    public AIServer(int port, String name) {
+        super(port, name);
+    }
+    
     // @override  
     public void sendMove(PrintStream cout) {
         Random rand = new Random(); 
@@ -23,7 +28,7 @@ public class FranksAIServer extends ManualInputServer {
                 int move1 = rand.nextInt(9);
                 int move2 = rand.nextInt(9);
                 Coord dest = new Coord(move1, move2);
-                if (isLegalMove(thisServersPlayerNumber-1, dest) == true) {
+                if (board.isLegalMove(thisServersPlayerNumber - 1, dest) == true) {
                     cout.print(moveWrapper("m " + move1 + " " + move2));
                     return;
                 }
@@ -36,7 +41,7 @@ public class FranksAIServer extends ManualInputServer {
                 Coord pos = new Coord(wall1, wall2);
                 Orientation ort1 = Orientation.HORIZ;
                 Orientation ort2 = Orientation.VERT;
-                if (board.wallsRemaining() == 0) {
+                if (board.wallsRemaining(thisServersPlayerNumber) == 0) {
                     choice = 0; 
                     break;
                 } else {
@@ -44,15 +49,24 @@ public class FranksAIServer extends ManualInputServer {
                     int wallOrient = rand.nextInt(2);
                     if (wallOrient == 1) {
                         
-                        if (isLegalWall(thisServersPlayerNumber-1, Wall) == true) {
-                            cout.print(moveWrapper("v" + wall1 + " " + wall2));
-                            return;
+                        try {
+                            if (board.isLegalWall(thisServersPlayerNumber-1, new Wall(pos, ort1)) == true) {
+                                cout.print(moveWrapper("v" + wall1 + " " + wall2));
+                                return;
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
                     if (wallOrient == 2) {
-                        if (isLegalWall(thisServersPlayerNumber-1, Wall) == true) {
-                            cout.print(moveWrapper("h" + wall1 + " " + wall2));
-                            return;
+                        
+                        try {
+                            if (board.isLegalWall(thisServersPlayerNumber-1, new Wall(pos, ort2)) == true) {
+                                cout.print(moveWrapper("h" + wall1 + " " + wall2));
+                                return;
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
                 }           

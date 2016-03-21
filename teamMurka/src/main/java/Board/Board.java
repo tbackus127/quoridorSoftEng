@@ -112,6 +112,10 @@ public class Board {
         
     }
     
+    /**
+     * toString method
+     * @return a String representation of the Board
+     */
     public String toString(){
 	String message = "";
 	message += ("\n:: BOARD ::\n");
@@ -474,8 +478,13 @@ public class Board {
         return true;
     }
     
+    /**
+     * Get remaining walls for a player
+     * @param plNum the player to get the remaining walls for.
+     * @return an int for the number of walls left
+     */
     public int wallsRemaining(int plNum){
-	return wallsLeft[plNum];
+        return wallsLeft[plNum];
     }
     
     private void buildMaps() {
