@@ -122,7 +122,7 @@ public class Board {
         for(int i = 0; i < numOfPlayers; i++) {
             if(playerPositions[i] != null) {
                 message += ("Player " + (i+1) + ": " + getPlayerPos(i)) + "\n";
-                message += ("  Moves: " + getLegalMoves(i)) + "\n";
+                // message += ("  Moves: " + getLegalMoves(i)) + "\n";
             }
         }
         System.out.println();
