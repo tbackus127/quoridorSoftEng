@@ -125,7 +125,7 @@ public class TestManualServer{
 	String fakedMove = "GOTE 1";
 	
 	Board expectedB = new Board();
-	expectedB.removePlayer(1);
+	expectedB.removePlayer(0);
 	
 	String x = "HELLO\r\nGAME 2 abc:One mur:America\r\n";
 	String expected = "IAM mur:America\r\n";

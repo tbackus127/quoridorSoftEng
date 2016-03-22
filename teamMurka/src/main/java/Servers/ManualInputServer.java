@@ -107,7 +107,7 @@ public class ManualInputServer {
 			updateBoard(clientMessage);
 		    }
 		    else if(clientMessage.startsWith("GOTE")) {
-			
+			removePlayer(clientMessage);
 		    }
 		}
 	    }
@@ -215,6 +215,8 @@ public class ManualInputServer {
     }
     
     public void removePlayer(String message){
-	
+	message = message.substring(5).replaceAll("\\s","");
+	int playerNumber = (int)message.charAt(0)-(int)'0';
+	board.removePlayer(playerNumber-1);
     }
 }
