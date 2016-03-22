@@ -106,6 +106,9 @@ public class ManualInputServer {
 		    else if(clientMessage.startsWith("ATARI")){
 			updateBoard(clientMessage);
 		    }
+		    else if(clientMessage.startsWith("GOTE")) {
+			
+		    }
 		}
 	    }
 	}catch(Exception e){
@@ -209,5 +212,9 @@ public class ManualInputServer {
     
     public Board getBoard(){
 	return board;
+    }
+    
+    public void removePlayer(String message){
+	
     }
 }

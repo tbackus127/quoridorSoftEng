@@ -117,7 +117,28 @@ public class TestManualServer{
 	Coord move = new Coord(4, 1);
 	expectedB.movePlayer(0, move);
 	
-	// assertEquals("It did not move the player Properly", expectedB.toString(), ms.getBoard().toString());
+	assertEquals("It did not move the player Properly", expectedB.toString(), ms.getBoard().toString());
     }
     
+    @Test
+    public void testRemovePlayer(){
+	String fakedMove = "GOTE 1";
+	
+	Board expectedB = new Board();
+	expectedB.removePlayer(1);
+	
+	String x = "HELLO\r\nGAME 2 abc:One mur:America\r\n";
+	String expected = "IAM mur:America\r\n";
+	Scanner incomingReader = new Scanner(x);
+	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	PrintStream outGoingFromClient = new PrintStream(baos);
+	
+	ManualInputServer ms = new ManualInputServer(1478, "mur:America");
+	ms.establishProtocol(incomingReader, outGoingFromClient);
+	ms.removePlayer(fakedMove);
+	
+	
+	
+	assertEquals("It did not move the player Properly", expectedB.toString(), ms.getBoard().toString());
+    }
 }
