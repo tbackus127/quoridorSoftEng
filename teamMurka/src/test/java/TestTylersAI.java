@@ -8,7 +8,6 @@ import java.io.PrintStream;
 
 import com.tmquoridor.Server.*;
 import com.tmquoridor.Board.*;
-import com.tmquoridor.AI.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
