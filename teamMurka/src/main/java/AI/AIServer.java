@@ -11,6 +11,49 @@ import java.util.Scanner;
 import java.util.*;
 
 public class AIServer extends ManualInputServer {
+    
+    // Main that uses the command line arguments
+    public static void main(String[] args) {
+	// This sets the defaults
+	int port = DEFAULT_PORT_NUMBER;
+	String name = DEFAULT_NAME;
+	
+	int argNdx = 0;
+
+        // This runs through all of the command line arguments and applies the proper ones
+        while (argNdx < args.length) {
+            String curr = args[argNdx];
+
+            if (curr.equals(ARG_PORT)) {
+                ++argNdx;
+
+		String numberStr = args[argNdx];
+		port = Integer.parseInt(numberStr);
+	    } else if(curr.equals(ARG_NAME)){
+		++argNdx;
+		
+		name = DEFAULT_PREFIX + args[argNdx];
+	    } else {
+
+                // if there is an unknown parameter, give usage and quit
+                System.err.println("Unknown parameter \"" + curr + "\"");
+                usage();
+                System.exit(1);
+            }
+
+        ++argNdx;
+        }
+
+	AIServer ai = new AIServer(port, name);
+	ai.run();
+    }
+    
+    
+    // Lets them know if they put in an invalid argument
+    private static void usage() {
+        System.err.print("usage: java BirthdayServer [options]\n" +
+            "       where options:\n" + "       --port port\n");
+    }
 
     //constructor
 
@@ -18,11 +61,6 @@ public class AIServer extends ManualInputServer {
         super(port, name);
     }
     
-    //@Override
-    public static void mainTwo(int port, String name){
-        AIServer ai =  new AIServer(port, name);
-        ai.run();
-    }
     
     // @override  
     public void sendMove(PrintStream cout) {

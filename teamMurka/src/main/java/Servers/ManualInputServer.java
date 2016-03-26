@@ -64,6 +64,7 @@ public class ManualInputServer {
 	ms.run();
     }
     
+    
     // Lets them know if they put in an invalid argument
     private static void usage() {
         System.err.print("usage: java BirthdayServer [options]\n" +
@@ -160,6 +161,7 @@ public class ManualInputServer {
     }
     
     public void sendMove(PrintStream cout){
+	System.out.println("NOOOOOO, WHY");
 	Scanner console = new Scanner(System.in);
 	sendMove(cout, console);
     }
