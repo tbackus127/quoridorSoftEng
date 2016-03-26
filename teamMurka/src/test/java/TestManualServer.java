@@ -144,7 +144,7 @@ public class TestManualServer{
     @Test
     public void testWinner() {
 	String fakedMove = "KIKASHI 2";
-	String expected = "Congratulations you have won the game!";
+	String expected = "Congratulations you have won the game!\n";
 	
 	String x = "HELLO\r\nGAME 2 abc:One mur:America\r\n";
 	Scanner incomingReader = new Scanner(x);
@@ -160,5 +160,16 @@ public class TestManualServer{
 	ms.winnerDeclared(outGoingToConsole, fakedMove);
 	
 	assertEquals("The winner was not declared properly", expected, baos.toString());
+	
+	// This tests you not winning
+	fakedMove = "KIKASHI 1";
+	expected = "Sorry you didn't win this time, better luck next time.\n";
+	
+	baos = new ByteArrayOutputStream();
+	outGoingToConsole = new PrintStream(baos);
+	
+	ms.winnerDeclared(outGoingToConsole, fakedMove);
+	
+	assertEquals("You not winning was not declared properly", expected, baos.toString());
     }
 }
