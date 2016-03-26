@@ -11,7 +11,7 @@ import com.tmquoridor.GUI.*;
 public class GameClient {
     
     /** Timeout (in seconds) for any socket */
-    private static final int DEFAULT_SOCKET_TIMEOUT = 60;
+    private static final int DEFAULT_SOCKET_TIMEOUT = 600;
     
     /** End-of-line string */
     private static final String EOLN = "\r\n";
@@ -144,6 +144,7 @@ public class GameClient {
                     e.printStackTrace();
                     playing = false;
                 }
+                gui.repaintGUI();
             }
         }
         

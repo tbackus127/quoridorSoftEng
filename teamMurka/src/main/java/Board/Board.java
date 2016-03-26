@@ -67,6 +67,14 @@ public class Board {
     }
     
     /**
+     * Gets the number of players still playing
+     * @return the number of players as an int.
+     */
+    public int getNumOfPlayers() {
+        return numOfPlayers - kickedPlayers.size();
+    }
+    
+    /**
      * Removes a player from the Board
      * @param plNum the player ID to remove
      */

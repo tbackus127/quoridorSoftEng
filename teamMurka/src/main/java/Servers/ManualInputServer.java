@@ -161,9 +161,9 @@ public class ManualInputServer {
     }
     
     public void sendMove(PrintStream cout){
-	System.out.println("NOOOOOO, WHY");
-	Scanner console = new Scanner(System.in);
-	sendMove(cout, console);
+        System.out.println("NOOOOOO, WHY");
+        Scanner console = new Scanner(System.in);
+        sendMove(cout, console);
     }
     
     // 
