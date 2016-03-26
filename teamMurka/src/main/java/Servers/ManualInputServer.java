@@ -109,6 +109,9 @@ public class ManualInputServer {
 		    else if(clientMessage.startsWith("GOTE")) {
 			removePlayer(clientMessage);
 		    }
+		    else if(clientMessage.startsWith("KIKASHI")){
+			winnerDeclared(System.out, clientMessage);
+		    }
 		}
 	    }
 	}catch(Exception e){
@@ -161,6 +164,7 @@ public class ManualInputServer {
 	sendMove(cout, console);
     }
     
+    // 
     public void sendMove(PrintStream cout, Scanner console){
 	System.out.print("Enter \"m\" to move your peice, or \"w\" to place a wall: ");
 	String moveType = console.next();
@@ -183,7 +187,7 @@ public class ManualInputServer {
 	    cout.print(moveWrapper(unwrappedMessage));
 	}
     }
-    
+    // 
     public void updateBoard(String message){
 	message = message.substring(6).replaceAll("\\s","");
 	int playerNumber = (int)message.charAt(0)-(int)'0';
@@ -210,12 +214,23 @@ public class ManualInputServer {
 	
     }
     
+    //
     public Board getBoard(){
 	return board;
     }
     
+    // 
     public void removePlayer(String message){
 	message = message.substring(5).replaceAll("\\s","");
 	board.removePlayer((int)message.charAt(0)-(int)'0'-1);
+    }
+    
+    public void winnerDeclared(PrintStream console, String message){
+	message = message.substring(7).replaceAll("\\s","");
+	if((int)message.charAt(0)-(int)'0' == thisServersPlayerNumber){
+	    console.print("Congratulations you have won the game!");
+	}else{
+	    
+	}
     }
 }
