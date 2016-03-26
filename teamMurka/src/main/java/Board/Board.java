@@ -112,13 +112,17 @@ public class Board {
         
     }
     
+    /**
+     * toString method
+     * @return a String representation of the Board
+     */
     public String toString(){
 	String message = "";
 	message += ("\n:: BOARD ::\n");
         for(int i = 0; i < numOfPlayers; i++) {
             if(playerPositions[i] != null) {
                 message += ("Player " + (i+1) + ": " + getPlayerPos(i)) + "\n";
-                message += ("  Moves: " + getLegalMoves(i)) + "\n";
+                // message += ("  Moves: " + getLegalMoves(i)) + "\n";
             }
         }
         System.out.println();
@@ -474,8 +478,13 @@ public class Board {
         return true;
     }
     
+    /**
+     * Get remaining walls for a player
+     * @param plNum the player to get the remaining walls for.
+     * @return an int for the number of walls left
+     */
     public int wallsRemaining(int plNum){
-	return wallsLeft[plNum];
+        return wallsLeft[plNum];
     }
     
     private void buildMaps() {

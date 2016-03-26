@@ -109,7 +109,7 @@ public class TestManualServer{
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	PrintStream outGoingFromClient = new PrintStream(baos);
 	
-	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
+	ManualInputServer ms = new ManualInputServer(1478, "mur:America");
 	ms.establishProtocol(incomingReader, outGoingFromClient);
 	ms.updateBoard(fakedMove);
 	
@@ -117,8 +117,59 @@ public class TestManualServer{
 	Coord move = new Coord(4, 1);
 	expectedB.movePlayer(0, move);
 	
-	assertEquals("It did not move the player Properly",expectedB.toString(),
-		     ms.getBoard().toString());
+	assertEquals("It did not move the player Properly", expectedB.toString(), ms.getBoard().toString());
     }
     
+    @Test
+    public void testRemovePlayer(){
+	String fakedMove = "GOTE 1";
+	
+	Board expectedB = new Board();
+	expectedB.removePlayer(0);
+	
+	String x = "HELLO\r\nGAME 2 abc:One mur:America\r\n";
+	String expected = "IAM mur:America\r\n";
+	Scanner incomingReader = new Scanner(x);
+	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	PrintStream outGoingFromClient = new PrintStream(baos);
+	
+	ManualInputServer ms = new ManualInputServer(1478, "mur:America");
+	ms.establishProtocol(incomingReader, outGoingFromClient);
+	
+	ms.removePlayer(fakedMove);
+	
+	assertEquals("It did not move the player Properly", expectedB.toString(), ms.getBoard().toString());
+    }
+    
+    @Test
+    public void testWinner() {
+	String fakedMove = "KIKASHI 2";
+	String expected = "Congratulations you have won the game!\n";
+	
+	String x = "HELLO\r\nGAME 2 abc:One mur:America\r\n";
+	Scanner incomingReader = new Scanner(x);
+	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	PrintStream outGoingToConsole = new PrintStream(baos);
+	
+	ManualInputServer ms = new ManualInputServer(1478, "mur:America");
+	ms.establishProtocol(incomingReader, outGoingToConsole);
+	
+	baos = new ByteArrayOutputStream();
+	outGoingToConsole = new PrintStream(baos);
+	
+	ms.winnerDeclared(outGoingToConsole, fakedMove);
+	
+	assertEquals("The winner was not declared properly", expected, baos.toString());
+	
+	// This tests you not winning
+	fakedMove = "KIKASHI 1";
+	expected = "Sorry you didn't win this time, better luck next time.\n";
+	
+	baos = new ByteArrayOutputStream();
+	outGoingToConsole = new PrintStream(baos);
+	
+	ms.winnerDeclared(outGoingToConsole, fakedMove);
+	
+	assertEquals("You not winning was not declared properly", expected, baos.toString());
+    }
 }

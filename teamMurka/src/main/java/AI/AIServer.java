@@ -11,7 +11,9 @@ import java.util.Scanner;
 import java.util.*;
 
 public class AIServer extends ManualInputServer {
+
     //constructor
+
     public AIServer(int port, String name) {
         super(port, name);
     }
@@ -26,6 +28,7 @@ public class AIServer extends ManualInputServer {
             // choice 0 is to make a move            
             if (choice == 0) {
                 // a random place (row / column) to move to 
+
                 int moveRow = rand.nextInt(9);
                 int moveColumn = rand.nextInt(9);
                 Coord dest = new Coord(moveRow, moveColumn);
@@ -35,6 +38,7 @@ public class AIServer extends ManualInputServer {
                 if (board.isLegalMove(thisServersPlayerNumber-1, dest) == true) {
                     cout.print(moveWrapper("m " + moveRow + " " + moveColumn));
                     turnCount++;
+
                     return;
                 }
             }
@@ -46,17 +50,20 @@ public class AIServer extends ManualInputServer {
                 Coord pos = new Coord(wallRow, wallColumn);
                 Orientation ort1 = Orientation.HORIZ;
                 Orientation ort2 = Orientation.VERT;
+
                 //int orientWall = rand
                 Wall horiz = new Wall(pos, ort1);
                 Wall vert = new Wall(pos, ort2);
                 
                  
                 if (board.wallsRemaining(thisServersPlayerNumber-1) == 0) {
+
                     choice = 0; 
                     break;
                 } else {
                     // wallOrient is the orientation of wall verticle / horizontal
                     int wallOrient = rand.nextInt(2);
+
                     try {
                         if (wallOrient == 1) {
                             
@@ -72,6 +79,7 @@ public class AIServer extends ManualInputServer {
                                 turnCount++;
                                 return;
                             }
+
                         }
                     } catch (Exception e) {
                         
