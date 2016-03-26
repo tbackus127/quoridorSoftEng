@@ -228,9 +228,9 @@ public class ManualInputServer {
     public void winnerDeclared(PrintStream console, String message){
 	message = message.substring(7).replaceAll("\\s","");
 	if((int)message.charAt(0)-(int)'0' == thisServersPlayerNumber){
-	    console.print("Congratulations you have won the game!");
+	    console.print("Congratulations you have won the game!\n");
 	}else{
-	    
+	    console.print("Sorry you didn't win this time, better luck next time.\n");
 	}
     }
 }
