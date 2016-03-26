@@ -7,19 +7,34 @@ import com.tmquoridor.Board.*;
 
 public class QuorPanel extends JPanel {
     
+    /** Tile size in pixels */
     private static final int TILE_SIZE = 32;
+    
+    /** Wall size in pixels */
     private static final int WALL_SIZE = 8;
+    
+    /** How far the board starts drawing from the left */
     private static final int MARGIN_BOARD_LEFT = 120;
+    
+    /** How far the board starts drawing from the top */
     private static final int MARGIN_BOARD_TOP = 48;
+    
+    /** Pixels to shrink the pawn circle */
     private static final int PADDING_PAWN = 2;
     
+    // Various RGB colors for GUI components
     private static final Color COLOR_BG = new Color(180, 24, 24);
     private static final Color COLOR_TILE = new Color(24, 0, 0);
     private static final Color COLOR_WALL = new Color(255, 236, 160);
     private static final Color COLOR_PAWN = new Color(255, 236, 160);
     
+    /** Board to get info from */
     private final Board board;
     
+    /**
+     * Default constructor
+     * @param b the Board object to update from
+     */
     public QuorPanel(Board b) {
         super();
         board = b;
@@ -31,6 +46,10 @@ public class QuorPanel extends JPanel {
         
     }
     
+    /**
+     * Paints the panel
+     * @param g Graphics object
+     */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -38,22 +57,33 @@ public class QuorPanel extends JPanel {
         updateGUI(g);
     }
     
+    /**
+     * Gets the panel's preferred size (prevents swing from having a fit)
+     * @return Dimension(640x480)
+     */
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(640, 480);
     }
     
+    /**
+     * Summons a 100-foot tall unicorn covered in chainsaws
+     * @param g the Graphics object
+     */
     private void updateGUI(Graphics g) {
         paintGrid(g);
         paintPawns(g);
         paintWalls(g);
     }
     
+    /**
+     * Draws the tiles
+     * @param g the Graphics object
+     */
     private void paintGrid(Graphics g) {
         g.setColor(COLOR_TILE);
         
-        // Draw Tiles
-        // Rows
+        // Draw Tile rows
         for(int row = 0; row < 9; row++) {
             
             // Columns
@@ -65,6 +95,10 @@ public class QuorPanel extends JPanel {
         }
     }
     
+    /**
+     * Draws circles for the pawns' locations
+     * @param g the Graphics object
+     */
     private void paintPawns(Graphics g) {
         g.setColor(COLOR_PAWN);
         for(int i = 0; i < board.getNumOfPlayers(); i++) {
@@ -77,8 +111,13 @@ public class QuorPanel extends JPanel {
         }
     }
     
+    /**
+     * Draws thin rectangles between the grid tiles
+     * @param g the Graphics object
+     */
     private void paintWalls(Graphics g) {
         
+        //TODO: This
     }
     
 }
