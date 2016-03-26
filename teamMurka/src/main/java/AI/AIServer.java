@@ -18,6 +18,12 @@ public class AIServer extends ManualInputServer {
         super(port, name);
     }
     
+    //@Override
+    public static void mainTwo(int port, String name){
+        AIServer ai =  new AIServer(port, name);
+        ai.run();
+    }
+    
     // @override  
     public void sendMove(PrintStream cout) {
         Random rand = new Random(); 
