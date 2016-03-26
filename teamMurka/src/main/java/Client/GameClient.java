@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.*;
 
 import com.tmquoridor.Board.*;
+import com.tmquoridor.GUI.*;
 
 public class GameClient {
     
@@ -37,6 +38,9 @@ public class GameClient {
     /** Server name array */
     private String[] srvNames;
     
+    /** GUI */
+    private QuorGUI gui;
+    
     /**
      * Default constructor
      * @param args runtime arguments passed in
@@ -54,6 +58,7 @@ public class GameClient {
         if(handshake()) {
             sendStartMsgs();
             setupBoard();
+            gui = new QuorGUI(board);
             doGameLoop();
         }
         
