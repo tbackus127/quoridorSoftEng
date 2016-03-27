@@ -113,14 +113,16 @@ public class QuorPanel extends JPanel {
      * @param g the Graphics object
      */
     private void paintPawns(Graphics g) {
-        g.setColor(COLOR_PAWN);
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setColor(COLOR_PAWN);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         for(int i = 0; i < board.getNumOfPlayers(); i++) {
             Coord pPos = board.getPlayerPos(i);
             int px = pPos.getX();
             int py = pPos.getY();
             int gx = PADDING_PAWN + MARGIN_BOARD_LEFT + px * (TILE_SIZE + WALL_SIZE);
             int gy = PADDING_PAWN + MARGIN_BOARD_TOP + py * (TILE_SIZE + WALL_SIZE);
-            g.fillOval(gx, gy, TILE_SIZE - PADDING_PAWN * 2, TILE_SIZE - PADDING_PAWN * 2);
+            g2.fillOval(gx, gy, TILE_SIZE - PADDING_PAWN * 2, TILE_SIZE - PADDING_PAWN * 2);
         }
     }
     
