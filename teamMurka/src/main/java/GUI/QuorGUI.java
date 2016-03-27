@@ -20,7 +20,7 @@ public class QuorGUI {
      * Default constructor
      * @param b a reference to the Board to draw the info of
      */
-    public QuorGUI(Board b) {
+    public QuorGUI(Board b, String[] plNames) {
         
         // Do painting on the Event Dispatch Queue instead of the main thread
         SwingUtilities.invokeLater(new Runnable() {
@@ -35,7 +35,7 @@ public class QuorGUI {
                 frame.setLayout(new BorderLayout(0, 0));
                 
                 // Add the "canvas" and revalidate
-                panel = new QuorPanel(b);
+                panel = new QuorPanel(b, plNames);
                 frame.add(panel, BorderLayout.PAGE_START);
                 frame.validate();
                 

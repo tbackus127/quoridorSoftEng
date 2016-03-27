@@ -23,7 +23,7 @@ public class Board {
     };
     
     /** The number of players playing */
-    public final int numOfPlayers;
+    private final int numOfPlayers;
     
     /** ith index contains the ith player's position */
     private Coord[] playerPositions;

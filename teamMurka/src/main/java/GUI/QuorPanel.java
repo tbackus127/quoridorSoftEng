@@ -14,7 +14,7 @@ public class QuorPanel extends JPanel {
     private static final int WALL_SIZE = 8;
     
     /** How far the board starts drawing from the left */
-    private static final int MARGIN_BOARD_LEFT = 120;
+    private static final int MARGIN_BOARD_LEFT = 136;
     
     /** How far the board starts drawing from the top */
     private static final int MARGIN_BOARD_TOP = 48;
@@ -28,21 +28,33 @@ public class QuorPanel extends JPanel {
     private static final Color COLOR_WALL = new Color(255, 236, 160);
     private static final Color COLOR_PAWN = new Color(255, 236, 160);
     
+    /** Font for drawing information text */
+    private static final Font FONT_INFO = new Font("Serif", Font.PLAIN, 24);
+    
     /** Board to get info from */
     private final Board board;
+    
+    /** Player Names */
+    private final String[] playerNames;
     
     /**
      * Default constructor
      * @param b the Board object to update from
      */
-    public QuorPanel(Board b) {
+    public QuorPanel(Board b, String[] plNames) {
         super();
         board = b;
+        playerNames = plNames;
         setSize(QuorGUI.FRAME_WIDTH - 32, QuorGUI.FRAME_HEIGHT - 32);
         setLayout(new BorderLayout());
         setVisible(true);
         setBackground(COLOR_BG);
         System.err.println("Panel constructed.");
+        System.err.print("Players: ");
+        for(int i = 0; i < playerNames.length; i++) {
+            System.err.print(playerNames[i] + " ");
+        }
+        System.err.println();
         
     }
     
@@ -74,6 +86,7 @@ public class QuorPanel extends JPanel {
         paintGrid(g);
         paintPawns(g);
         paintWalls(g);
+        paintInfo(g);
     }
     
     /**
@@ -118,6 +131,20 @@ public class QuorPanel extends JPanel {
     private void paintWalls(Graphics g) {
         
         //TODO: This
+    }
+    
+    /**
+     * Updates the info for the various players
+     * @param g the Graphics object
+     */
+    private void paintInfo(Graphics g) {
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setFont(FONT_INFO);
+        
+        for(int i = 0; i < playerNames.length; i++) {
+            g2.drawString(playerNames[i], 10, 40 * (i+1));
+        }
     }
     
 }

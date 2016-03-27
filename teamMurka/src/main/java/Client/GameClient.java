@@ -58,7 +58,7 @@ public class GameClient {
         if(handshake()) {
             sendStartMsgs();
             setupBoard();
-            gui = new QuorGUI(board);
+            gui = new QuorGUI(board, srvNames);
             doGameLoop();
         }
         
