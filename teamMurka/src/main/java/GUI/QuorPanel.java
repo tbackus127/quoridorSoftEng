@@ -87,7 +87,7 @@ public class QuorPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        System.err.println("paint() called");
+        // System.err.println("paint() called");
         updateGUI(g);
     }
     
@@ -140,9 +140,13 @@ public class QuorPanel extends JPanel {
         // Enable antialiasing
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
-        for(int i = 0; i < board.getNumOfPlayers(); i++) {
+        for(int i = 0; i < board.getTotalPlayers(); i++) {
             g2.setColor(COLOR_PAWN);
 
+            // If the player has already been kicked, skip drawing them.
+            if(board.isPlayerKicked(i))
+                continue;
+            
             // Unpack player positions
             Coord pPos = board.getPlayerPos(i);
             int px = pPos.getX();
@@ -208,23 +212,33 @@ public class QuorPanel extends JPanel {
         
         for(int i = 0; i < playerNames.length; i++) {
             
-            // Draw labels
             g2.setFont(FONT_LABELS);
+            // Draw labels
             int labelx = (i % 2 == 0) ? (BOARD_SIZE * (i % 2)) : ((BOARD_SIZE + MARGIN_BOARD_LEFT) * (i % 2)) - 8;
             labelx += MARGIN_TEXT_LEFT;
             int labely = (i < 2) ? MARGIN_TEXT_TOP : MARGIN_TEXT_TOP << 2;
-            g2.drawString("Player " + (i+1), labelx, labely);
             
-            // Draw player names
-            g2.setFont(FONT_INFO);
-            int textx = labelx + MARGIN_TEXT_LEFT;
-            int texty = labely + MARGIN_TEXT_LINE;
-            g2.drawString("\"" + playerNames[i] + "\"", textx, texty);
+            // If the player ID is kicked
+            if(board.isPlayerKicked(i)) {
+                g2.drawString("#REKT", labelx, labely);
             
-            // Draw walls left
-            texty += MARGIN_TEXT_LINE;
-            g2.drawString("Walls: " + board.wallsRemaining(i), textx, texty);
+            // Still playing
+            } else {
+                
+                
+                g2.drawString("Player " + (i+1), labelx, labely);
+                
+                // Draw player names
+                g2.setFont(FONT_INFO);
+                int textx = labelx + MARGIN_TEXT_LEFT;
+                int texty = labely + MARGIN_TEXT_LINE;
+                g2.drawString("\"" + playerNames[i] + "\"", textx, texty);
+                
+                // Draw walls left
+                texty += MARGIN_TEXT_LINE;
+                g2.drawString("Walls: " + board.wallsRemaining(i), textx, texty);
             
+            }
         }
     }
     

@@ -163,6 +163,7 @@ public class GameClient {
             System.err.println("Socket closed");
         }
         socks[pid] = null;
+        gui.repaintGUI();
     }
     
     /**

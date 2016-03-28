@@ -67,6 +67,31 @@ public class Board {
     }
     
     /**
+     * Gets the player IDs that have been kicked
+     * @return the IDs of the kicked players as a HashSet of Integers
+     */
+    public HashSet<Integer> getKickedPlayers() {
+        return kickedPlayers;
+    }
+    
+    /**
+     * Tests whether or not a player has been kicked
+     * @param id the player ID to check
+     * @return true if the player has been kicked; false otherwise
+     */
+    public boolean isPlayerKicked(int id) {
+        return kickedPlayers.contains(id);
+    }
+    
+    /**
+     * Gets the number of players at the beginning of the match
+     * @return the number of players as an int.
+     */    
+    public int getTotalPlayers() {
+        return numOfPlayers;
+    }
+    
+    /**
      * Gets the number of players still playing
      * @return the number of players as an int.
      */
