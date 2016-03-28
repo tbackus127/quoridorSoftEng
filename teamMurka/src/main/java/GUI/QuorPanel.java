@@ -8,7 +8,7 @@ import com.tmquoridor.Board.*;
 public class QuorPanel extends JPanel {
     
     /** Tile size in pixels */
-    private static final int TILE_SIZE = 32;
+    private static final int TILE_SIZE = 33;
     
     /** Wall size in pixels */
     private static final int WALL_SIZE = 8;
@@ -34,11 +34,12 @@ public class QuorPanel extends JPanel {
     /** Pixels to shrink the pawn circle */
     private static final int PADDING_PAWN = 2;
     
-    /** Offset for Wall x placement */
-    private static final int OFFSET_WALL_X = 0;
+    /** Pixels to offset player number pawn label (x) */
+    private static final int MARGIN_PNUM_X = 11;
     
-    /** Offset for Wall y placement */
-    private static final int OFFSET_WALL_Y = 0;
+    /** Pixels to offset player number pawn label (y) */
+    private static final int MARGIN_PNUM_Y = 19;
+    
     
     // Various RGB colors for GUI components
     private static final Color COLOR_BG = new Color(180, 24, 24);
@@ -135,9 +136,14 @@ public class QuorPanel extends JPanel {
      */
     private void paintPawns(Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
-        g2.setColor(COLOR_PAWN);
+        
+        // Enable antialiasing
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
         for(int i = 0; i < board.getNumOfPlayers(); i++) {
+            g2.setColor(COLOR_PAWN);
+
+            // Unpack player positions
             Coord pPos = board.getPlayerPos(i);
             int px = pPos.getX();
             int py = pPos.getY();
@@ -147,6 +153,10 @@ public class QuorPanel extends JPanel {
             int gy = PADDING_PAWN + MARGIN_BOARD_TOP + py * (TILE_SIZE + WALL_SIZE);
             
             g2.fillOval(gx, gy, TILE_SIZE - PADDING_PAWN * 2, TILE_SIZE - PADDING_PAWN * 2);
+            
+            // Player numbers
+            g2.setColor(Color.BLACK);
+            g2.drawString("" + (i+1), gx + MARGIN_PNUM_X, gy + MARGIN_PNUM_Y);
         }
     }
     
