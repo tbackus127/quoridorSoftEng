@@ -2,6 +2,11 @@ package com.tmquoridor.Board;
 
 import java.util.HashMap;
 
+/**
+ * Enum for directions
+ * calling ort() will return the Directions respective Orientation
+ * calling toString() will return the String representation
+ */
 public enum Direction {
     NORTH {
         @Override
@@ -47,6 +52,11 @@ public enum Direction {
     
     public abstract Orientation ort();
     
+    /**
+     * Converts even numbers to HORIZ and odd to VERT
+     * @param d the number to convert
+     * @return Orientation.HORIZ if even, Orientation.VERT otherwise
+     */
     public static Orientation getOrientation(int d) {
         return (d % 2 == 0) ? Orientation.HORIZ : Orientation.VERT;
     }
