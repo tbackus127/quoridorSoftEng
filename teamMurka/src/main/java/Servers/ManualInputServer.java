@@ -160,14 +160,13 @@ public class ManualInputServer {
 	return "";
     }
     
-    public void sendMove(PrintStream cout){
-        System.out.println("NOOOOOO, WHY");
+    public void sendMove(PrintStream cout) throws Exception{
         Scanner console = new Scanner(System.in);
         sendMove(cout, console);
     }
     
     // 
-    public void sendMove(PrintStream cout, Scanner console){
+    public void sendMove(PrintStream cout, Scanner console) {
 	System.out.print("Enter \"m\" to move your peice, or \"w\" to place a wall: ");
 	String moveType = console.next();
 	if (moveType.equals("m")) {

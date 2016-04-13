@@ -109,6 +109,7 @@ public class GameClient {
                             continue;
                         }
                         board.movePlayer(i, mCoord);
+                        srvMove = srvMove.substring(7);
                         broadcastAll("ATARI" + " " + (i + 1) + " " + srvMove);
                         board.printBoard();
                         
@@ -124,6 +125,7 @@ public class GameClient {
                             continue;
                         }
                         board.placeWall(i, wCoord, wOrt);
+                        srvMove = srvMove.substring(7);
                         broadcastAll("ATARI" + (i + 1) + " " + srvMove);
                         board.printBoard();
                     
