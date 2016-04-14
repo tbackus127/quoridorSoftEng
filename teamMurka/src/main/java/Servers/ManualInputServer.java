@@ -203,7 +203,12 @@ public class ManualInputServer {
 	    }
 	    int column = (int)message.charAt(2)-(int)'0';
 	    int row = (int)message.charAt(4) - (int)'0';
-	    Coord coord = new Coord(column, row);
+	    Coord coord = null;
+	    if(){
+		coord = new Coord(column, row);
+	    } else {
+		coord = new Coord(column, row);
+	    }
 	    board.placeWall(playerNumber-1, coord, ort);
 	}
 	else if(message.startsWith("(")){

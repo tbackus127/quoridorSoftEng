@@ -1,7 +1,7 @@
 ## Quoridor - Team Murka
 
 To run 
-- open terminal in <project directory>
+- open terminal in <project directory>/build/classes/main 
 - enter java -cp build/libs/Quoridor-teamMurka-1.0.jar com.tmquoridor.Server.<>
 Possible arguments you can add to command line are:
     --port <Followed by any valid port number>

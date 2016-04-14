@@ -119,6 +119,12 @@ public class GameClient {
                         // Check move legality
                         Coord wCoord = extractCoord(srvMove);
                         Orientation wOrt = extractOrt(srvMove);
+                        if(wOrt == Orientation.HORIZ){
+                            wCoord = new Coord(wCoord.getX(), wCoord.getY() + 1);
+                        } else {
+			    
+                            wCoord = new Coord(wCoord.getX() + 1, wCoord.getY());
+                        }
                         if(!board.isLegalWall(i, new Wall(wCoord, wOrt))) {
                             System.err.println("Player " + (i+1) + " made illegal move!:\n    Illegal wall at " + wCoord.getX() + "," + wCoord.getY());
                             madeIllegalMove(i);
