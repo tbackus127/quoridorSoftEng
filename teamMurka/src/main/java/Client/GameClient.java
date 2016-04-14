@@ -17,7 +17,7 @@ public class GameClient {
     private static final String EOLN = "\r\n";
     
     /** Handshake response regex */
-    private static final String HANDSHAKE_RESP_REGEX = "IAM\\s+\\w+:\\w+\\s*";
+    private static final String HANDSHAKE_RESP_REGEX = "IAM\\s+\\w+\\s*";
     
     /** Move validation regex */
     private static final String MOVE_VAL_REGEX = "TESUJI\\s+\\(\\s*[0-8],\\s*[0-8]\\s*\\)\\s*\\n*";
@@ -304,7 +304,7 @@ public class GameClient {
         
         // If the server's response isn't in the form: "IAM <NAME>", return false
         if(!Pattern.matches(HANDSHAKE_RESP_REGEX, srvResp)) {
-            System.err.println("  Handshake response mismatch.");
+            System.err.println("  Handshake response mismatch:\n  \"" + srvResp + "\"");
             return null;
         }
         
