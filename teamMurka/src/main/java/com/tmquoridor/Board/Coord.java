@@ -1,11 +1,8 @@
+package com.tmquoridor.Board;
+
 /**
- * Coordinate Class
- * <p>
  * Contains a simple coordinate (x, y).
  */
-
-package com.tmquoridor.Board;
- 
 public class Coord {
     
     // X and Y parts of the coordinate
@@ -35,8 +32,9 @@ public class Coord {
      * Translates a Coord by Direction
      * @param dir the Direction to move
      * @return the resulting Coord (bounded if OoB) if the move would be made.
+     * @throws RuntimeException if the internal Direction processing returns a null pointer
      */
-    public Coord translate(Direction dir) throws Exception {
+    public Coord translate(Direction dir) throws RuntimeException {
         int x2 = this.x;
         int y2 = this.y;
         switch(dir) {
@@ -62,7 +60,7 @@ public class Coord {
             break;
             default:
                 System.err.println("Error while translating Coord");
-                throw new Exception("SOMETHING WENT HORRIBLY WRONG! (Coord 01)");
+                throw new RuntimeException("SOMETHING WENT HORRIBLY WRONG! (Coord 01)");
         }
         return new Coord(x2, y2);
     }

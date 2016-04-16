@@ -1,13 +1,10 @@
 package com.tmquoridor.Board;
 
-/**
- * MoveTrace Class
- * <p>
- * Contains the information for recursively finding legal moves.
- */
-
 import java.util.HashSet;
 
+/**
+ * Contains the information for recursively finding legal moves.
+ */
 public class MoveTrace {
     
     /** The players that have already been seen */

@@ -1,14 +1,13 @@
-/**
- * Board Class
- * <p>
- * This class contains all data for player positions and walls.
- */
-
 package com.tmquoridor.Board;
- 
+
+
 import java.util.HashSet;
 import java.util.HashMap;
+import java.util.ArrayList;
  
+/**
+ * Contains all data for player positions and walls.
+ */
 public class Board {
     
     /** Length and width of the board */
@@ -112,7 +111,7 @@ public class Board {
     /**
      * Converts a string to a Direction
      * @param s the string
-     * @return the Direction equivalent (Ex: "WEST" -> Direction.WEST)
+     * @return the Direction equivalent (Ex: "WEST" for Direction.WEST)
      */
     public Direction toDir(String s) {
         return dirMap.get(s);
@@ -121,10 +120,51 @@ public class Board {
     /**
      * Converts a string to an Orientation
      * @param s the string
-     * @return the Orientation equivalent (Ex: "HORIZ" -> Orientation.HORIZ)
+     * @return the Orientation equivalent (Ex: "HORIZ" for Orientation.HORIZ)
      */
     public Orientation toOrt(String s) {
         return ortMap.get(s);
+    }
+    
+    /**
+     * Gets the shortest path to a destination
+     * @param pid the player ID to use
+     * @param dest the Coord to path to
+     * @return an ArrayList of Coords that is the shortest path
+     */
+    public ArrayList<Coord> getShortestPath(int pid, Coord dest) {
+      // PathFinder finder = new PathFinder(pid);
+      // return finder.getShortestPath(this, dest);
+      return new ArrayList<Coord>();
+    }
+    
+    /**
+     * Performs a deep copy of this Board and returns it
+     * @return a copy of this Board object
+     */
+    public Board copyOf() {
+      Board b = new Board(numOfPlayers);
+      
+      // Player copy operations
+      for(int i = 0; i < numOfPlayers; i++) {
+        if(kickedPlayers.contains(i)) {
+          b.removePlayer(i);
+        } else {
+          Coord pos = getPlayerPos(i);
+          b.movePlayer(i, pos);
+        }
+      }
+      
+      // Wall copy operations
+      for(Wall w : getWalls()) {
+        b.placeWall(w);
+      }
+      
+      for(int i = 0; i < wallsLeft.length; i++) {
+        b.setWallsRemaining(i, wallsRemaining(i));
+      }
+      
+      return b;
     }
     
     /**
@@ -149,12 +189,12 @@ public class Board {
      * toString method
      * @return a String representation of the Board
      */
-    public String toString(){
-	String message = "";
-	message += ("\n:: BOARD ::\n");
+    public String toString() {
+        String message = "";
+        message += ("\n:: BOARD ::\n");
         for(int i = 0; i < numOfPlayers; i++) {
             if(playerPositions[i] != null) {
-                message += ("Player " + (i+1) + ": " + getPlayerPos(i)) + "\n";
+                message += ("Player " + (i + 1) + ": " + getPlayerPos(i)) + "\n";
                 // message += ("  Moves: " + getLegalMoves(i)) + "\n";
             }
         }
@@ -192,10 +232,12 @@ public class Board {
     
     /**
      * Checks if a wall is legal
+     * @param pid the player ID placing the wall
      * @param w the Wall to check
      * @return true if legal; false otherwise
+     * @throws RuntimeException if the internal Orientation model returns a null pointer
      */
-    public boolean isLegalWall(int pid, Wall w) throws Exception {
+    public boolean isLegalWall(int pid, Wall w) throws RuntimeException {
         
         if(wallsLeft[pid] <= 0)
             return false;
@@ -219,7 +261,7 @@ public class Board {
                     return false;
             break;
             default:
-                throw new Exception("SOMETHING WENT HORRIBLY WRONG!\nIn Board:isLegalWall00");
+                throw new RuntimeException("SOMETHING WENT HORRIBLY WRONG!\nIn Board:isLegalWall00");
         }
         
         // Break the walls into segments
@@ -518,6 +560,15 @@ public class Board {
      */
     public int wallsRemaining(int plNum){
         return wallsLeft[plNum];
+    }
+    
+    /**
+     * Sets the number of walls remaining for a player
+     * @param plNum the player number to edit
+     * @param n the new number of walls left for that player
+     */
+    public void setWallsRemaining(int plNum, int n) {
+      wallsLeft[plNum] = n;
     }
     
     private void buildMaps() {
