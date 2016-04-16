@@ -204,10 +204,10 @@ public class ManualInputServer {
 	    int column = (int)message.charAt(2)-(int)'0';
 	    int row = (int)message.charAt(4) - (int)'0';
 	    Coord coord = null;
-	    if(){
-		coord = new Coord(column, row);
+	    if(ort == Orientation.HORIZ){
+		coord = new Coord(column, row + 1);
 	    } else {
-		coord = new Coord(column, row);
+		coord = new Coord(column + 1, row);
 	    }
 	    board.placeWall(playerNumber-1, coord, ort);
 	}
