@@ -10,9 +10,6 @@ public class Coord {
     
     /** Y component of the Coord */
     private final int y;
-
-    /** Used for various computations */
-    private int mark;
     
     /**
      * Default constructor
@@ -22,7 +19,6 @@ public class Coord {
     public Coord(int x, int y) {
         this.x = x;
         this.y = y;
-        this.mark = -1;
     }
     
     /**
@@ -102,27 +98,19 @@ public class Coord {
     }
     
     /**
-     * Marks this Coord (for processing various things)
-     * @param n the mark ID to give it
-     */
-    public void setMark(int n) {
-      this.mark = n;
-    }
-    
-    /**
-     * Gets the mark of this Coord
-     * @return the mark ID
-     */
-    public int getMark() {
-      return this.mark;
-    }
-    
-    /**
      * toString() method
      * @return a string representation of the Coord object
      */
     @Override
     public String toString() {
-        return "(" + getX() + "," + getY() + ((mark >= 0) ? (":" + mark) : "") + ")";
+        return "(" + getX() + "," + getY() + ")";
+    }
+    
+    /**
+     * Returns the Coord number for calculation purposes
+     * @return the Coord ID (int)
+     */
+    public int id() {
+      return x * 9 + y;
     }
 }
