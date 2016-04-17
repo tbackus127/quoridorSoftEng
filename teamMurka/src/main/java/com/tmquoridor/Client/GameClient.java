@@ -370,7 +370,7 @@ public class GameClient {
     
     /**
      * Main method
-     * @param args the runtime arguments ("<machine>:<port>" pairs.)
+     * @param args the runtime arguments ("machine:port" pairs.)
      */
     public static void main(String[] args) {
         GameClient gc = new GameClient(args);

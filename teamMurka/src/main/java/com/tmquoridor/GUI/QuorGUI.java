@@ -19,6 +19,7 @@ public class QuorGUI {
     /**
      * Default constructor
      * @param b a reference to the Board to draw the info of
+     * @param plNames the names of the players playing
      */
     public QuorGUI(Board b, String[] plNames) {
         

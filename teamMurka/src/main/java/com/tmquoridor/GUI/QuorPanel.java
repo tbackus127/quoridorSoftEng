@@ -71,6 +71,7 @@ public class QuorPanel extends JPanel {
     /**
      * Default constructor
      * @param b the Board object to update from
+     * @param plNames the names of the players playing
      */
     public QuorPanel(Board b, String[] plNames) {
         super();
