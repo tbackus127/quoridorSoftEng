@@ -133,9 +133,8 @@ public class Board {
      * @return an ArrayList of Coords that is the shortest path
      */
     public ArrayList<Coord> getShortestPath(int pid, Coord dest) {
-      // PathFinder finder = new PathFinder(pid);
-      // return finder.getShortestPath(this, dest);
-      return new ArrayList<Coord>();
+      PathFinder finder = new PathFinder(pid, this);
+      return finder.getPath(dest);
     }
     
     /**

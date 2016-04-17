@@ -5,9 +5,15 @@ package com.tmquoridor.Board;
  */
 public class Coord {
     
-    // X and Y parts of the coordinate
-    private final int x, y;
+    /** X component of the Coord */
+    private final int x;
+    
+    /** Y component of the Coord */
+    private final int y;
 
+    /** Used for various computations */
+    private int mark;
+    
     /**
      * Default constructor
      * @param x the x component of the coordinate
@@ -16,6 +22,7 @@ public class Coord {
     public Coord(int x, int y) {
         this.x = x;
         this.y = y;
+        this.mark = -1;
     }
     
     /**
@@ -95,11 +102,27 @@ public class Coord {
     }
     
     /**
+     * Marks this Coord (for processing various things)
+     * @param n the mark ID to give it
+     */
+    public void setMark(int n) {
+      this.mark = n;
+    }
+    
+    /**
+     * Gets the mark of this Coord
+     * @return the mark ID
+     */
+    public int getMark() {
+      return this.mark;
+    }
+    
+    /**
      * toString() method
      * @return a string representation of the Coord object
      */
     @Override
     public String toString() {
-        return "(" + getX() + "," + getY() + ")";
+        return "(" + getX() + "," + getY() + ((mark >= 0) ? (":" + mark) : "") + ")";
     }
 }
