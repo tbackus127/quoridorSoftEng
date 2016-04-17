@@ -1,5 +1,6 @@
 package com.tmquoridor.GUI;
 
+import java.util.ArrayList;
 import java.awt.*;
 import javax.swing.*;
 
@@ -34,11 +35,18 @@ public class QuorPanel extends JPanel {
     /** Pixels to shrink the pawn circle */
     private static final int PADDING_PAWN = 2;
     
+    /** Pixels to shrink the pathing circle */
+    private static final int PADDING_PATH = 8;
+    
     /** Pixels to offset player number pawn label (x) */
     private static final int MARGIN_PNUM_X = 11;
     
     /** Pixels to offset player number pawn label (y) */
     private static final int MARGIN_PNUM_Y = 19;
+    
+    /** So path lines don't overlap, extra pixels to push lines to the side */
+    private static final int PATH_OFFSET = 8;
+    
     
     
     // Various RGB colors for GUI components
@@ -46,6 +54,7 @@ public class QuorPanel extends JPanel {
     private static final Color COLOR_TILE = new Color(24, 0, 0);
     private static final Color COLOR_WALL = new Color(255, 236, 160);
     private static final Color COLOR_PAWN = new Color(255, 236, 160);
+    private static final Color COLOR_PATH = new Color(0, 255, 0);
     
     /** Font for drawing information labels */
     private static final Font FONT_LABELS = new Font("Serif", Font.PLAIN, 24);
@@ -109,6 +118,7 @@ public class QuorPanel extends JPanel {
         paintPawns(g);
         paintWalls(g);
         paintInfo(g);
+        paintPaths(g);
     }
     
     /**
@@ -240,6 +250,26 @@ public class QuorPanel extends JPanel {
             
             }
         }
+    }
+    
+    /**
+     * Displays pathing info for players
+     * @param g the Graphics object
+     */
+    private void paintPaths(Graphics g) {
+      g.setColor(COLOR_PATH);
+      ArrayList<Coord> path = board.getShortestPath(0, new Coord(7, 8));
+      
+      // Only draw if the target is possible to move to
+      if(path != null) {
+        for(int i = 0; i < path.size(); i++) {
+          Coord curr = path.get(i);
+          int gx = PADDING_PATH + MARGIN_BOARD_LEFT + curr.getX() * (TILE_SIZE + WALL_SIZE);
+          int gy = PADDING_PATH + MARGIN_BOARD_TOP + curr.getY() * (TILE_SIZE + WALL_SIZE);
+          g.fillOval(gx, gy, TILE_SIZE - PADDING_PATH * 2, TILE_SIZE - PADDING_PATH * 2);
+        }
+        
+      }
     }
     
 }

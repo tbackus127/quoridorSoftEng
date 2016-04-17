@@ -39,7 +39,6 @@ public class PathFinder {
       if(marks.get(curr.id()) > currentMark)
         currentMark = marks.get(curr.id());
       System.err.println("Processing " + curr);
-      // curr.setMark(currentMark);
       marks.put(curr.id(), currentMark);
       board.movePlayer(pid, curr);
       seen.add(curr);
@@ -53,7 +52,6 @@ public class PathFinder {
       
       for(Coord lc : board.getLegalMoves(pid)) {
         if(!isVisited(seen, lc)) {
-          // lc.setMark(currentMark + 1);
           marks.put(lc.id(), currentMark + 1);
           System.err.println("  Unvisited coord: " + lc);
           queue.add(lc);
@@ -69,7 +67,7 @@ public class PathFinder {
       Coord[] temp = new Coord[currentMark];
       temp[temp.length - 1] = curr;
       
-      System.err.println("Initial array: " + Arrays.toString(temp));
+      // System.err.println("Initial array: " + Arrays.toString(temp));
       
       // Build helper array
       for(int i = currentMark - 2; i >= 0; i--) {
@@ -80,7 +78,7 @@ public class PathFinder {
           System.err.println("  Backtracing " + c);
           if(marks.containsKey(c.id())) {
             int cid = marks.get(c.id());
-            System.err.println("    CID=" + cid);
+            // System.err.println("    CID=" + cid);
             if(cid == i + 1) {
               System.err.println("    Path found: " + c);
               next = c;
@@ -92,7 +90,7 @@ public class PathFinder {
           }
 
         }
-        if(next == null) System.err.println("NEXT IS NULL");
+        // if(next == null) System.err.println("NEXT IS NULL");
         board.movePlayer(pid, next);
       }
       

@@ -130,7 +130,7 @@ public class Board {
      * Gets the shortest path to a destination
      * @param pid the player ID to use
      * @param dest the Coord to path to
-     * @return an ArrayList of Coords that is the shortest path
+     * @return an ArrayList of Coords that is the shortest path; null if it doesn't exist
      */
     public ArrayList<Coord> getShortestPath(int pid, Coord dest) {
       PathFinder finder = new PathFinder(pid, this);
