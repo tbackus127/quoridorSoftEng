@@ -47,6 +47,10 @@ public class QuorPanel extends JPanel {
     /** So path lines don't overlap, extra pixels to push lines to the side */
     private static final int PATH_OFFSET = 8;
     
+    /** Spacing for label X-Offset */
+    private static final int PADDING_LABEL = 8;
+
+    
     
     
     // Various RGB colors for GUI components
@@ -127,16 +131,27 @@ public class QuorPanel extends JPanel {
      * @param g the Graphics object
      */
     private void paintGrid(Graphics g) {
-        g.setColor(COLOR_TILE);
-        
+        Graphics2D g2 = (Graphics2D) g;
         // Draw Tile rows
         for(int row = 0; row < 9; row++) {
+            
+            g2.setColor(COLOR_PAWN);
+            int lrx = MARGIN_BOARD_LEFT - (TILE_SIZE / 2);
+            int lry = MARGIN_BOARD_TOP + (TILE_SIZE / 2) + row * (TILE_SIZE + WALL_SIZE);
+            g2.drawString("" + row, lrx, lry);
             
             // Columns
             for(int col = 0; col < 9; col++) {
                 int orgX = MARGIN_BOARD_LEFT + col * (TILE_SIZE + WALL_SIZE);
                 int orgY = MARGIN_BOARD_TOP + row * (TILE_SIZE + WALL_SIZE);
-                g.fillRect(orgX, orgY, TILE_SIZE, TILE_SIZE);
+                
+                int lcx = MARGIN_BOARD_LEFT + col * (TILE_SIZE + WALL_SIZE) + (TILE_SIZE / 2);
+                int lcy = MARGIN_BOARD_TOP - (TILE_SIZE / 2) + 8;
+                
+                g2.setColor(COLOR_PAWN);
+                g2.drawString("" + col, lcx, lcy);
+                g2.setColor(COLOR_TILE);
+                g2.fillRect(orgX, orgY, TILE_SIZE, TILE_SIZE);
             }
         }
     }
