@@ -36,7 +36,7 @@ public class QuorPanel extends JPanel {
     private static final int PADDING_PAWN = 2;
     
     /** Pixels to shrink the pathing circle */
-    private static final int PADDING_PATH = 8;
+    private static final int PADDING_PATH = 14;
     
     /** Pixels to offset player number pawn label (x) */
     private static final int MARGIN_PNUM_X = 11;
