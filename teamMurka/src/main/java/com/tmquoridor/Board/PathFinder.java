@@ -27,6 +27,10 @@ public class PathFinder {
     
     Coord initPos = board.getPlayerPos(pid);
     
+    // Player was kicked; stop updating
+    if(initPos == null)
+      return null;
+    
     queue.add(initPos);
     int currentMark = 0;
     marks.put(initPos.id(), 0);

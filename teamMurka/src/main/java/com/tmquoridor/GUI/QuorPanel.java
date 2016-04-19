@@ -276,6 +276,10 @@ public class QuorPanel extends JPanel {
       g.setColor(COLOR_PATH);
       ArrayList<Coord> path = board.getShortestPath(0, new Coord(7, 8));
       
+      // Don't paint if P1 was kicked
+      if(path == null)
+        return;
+      
       // Only draw if the target is possible to move to
       if(path != null) {
         for(int i = 0; i < path.size(); i++) {
