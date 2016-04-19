@@ -102,6 +102,7 @@ public class ManualInputServer {
                 
                 while(true) {
                     String clientMessage = cin.nextLine();
+                    System.err.println("Recieved: \"" + clientMessage + "\"");
                     if(clientMessage.startsWith("MYOUSHU")){
                         sendMove(cout);
                     }
@@ -125,6 +126,7 @@ public class ManualInputServer {
     // It gets passed a scanner on the client and a print stream to the client
     public void establishProtocol(Scanner cin, PrintStream cout) {
         String clientMessage = cin.nextLine();
+        System.err.println("Recieved: \"" + clientMessage + "\"");
         if(!clientMessage.equals("HELLO")){
             System.out.println("Incorrect contact protocol!");
             cin.close();
@@ -132,10 +134,13 @@ public class ManualInputServer {
             return;
         }
         cout.print("IAM " + name + "\r\n");
+        System.err.println("Sent: \"IAM " + name + "\"");
         clientMessage = cin.nextLine();
+        System.err.println("Recieved: \"" + clientMessage + "\"");
         String[] players = clientMessage.split(" ");
         thisServersPlayerNumber = Integer.parseInt(players[1]);
         playerCount = players.length - 2;
+        System.err.println("Player number: " + thisServersPlayerNumber);
         
         // Creates the board now
         board = new Board(playerCount);

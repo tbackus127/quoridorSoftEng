@@ -84,33 +84,36 @@ public class GameClient {
                 PrintStream cout = null;
                 Scanner cin = null;
                 
+                int pnum = translateSocket(i);
+                
                 // Skip over kicked players
-                if(socks[i] == null) continue;
+                if(socks[pnum] == null) continue;
                 
                 try {
                     
                     // Send GO (see what I did there?) message and await response.
-                    cout = new PrintStream(socks[i].getOutputStream());
-                    cin = new Scanner(socks[i].getInputStream());
+                    cout = new PrintStream(socks[pnum].getOutputStream());
+                    cin = new Scanner(socks[pnum].getInputStream());
                     
                     cout.print("MYOUSHU" + EOLN);
+                    System.err.println("Sent: MYOUSHU");
                     String srvMove = cin.nextLine();
-                    System.err.println("  Msg: \"" + srvMove + "\"");
+                    System.err.println("  Msg: " + srvMove);
                     
                     // If the server's move syntax is correct
                     if(Pattern.matches(MOVE_VAL_REGEX, srvMove)) {
                         
                         // Check move legality
                         Coord mCoord = extractCoord(srvMove);
-                        System.err.println("Coord: " + mCoord);
-                        if(!board.isLegalMove(i, mCoord)) {
-                            System.err.println("Player " + (i+1) + " made illegal move!:\n    Illegal destination: " + mCoord.getX() + "," + mCoord.getY());
-                            madeIllegalMove(i);
+                        // System.err.println("Coord: " + mCoord);
+                        if(!board.isLegalMove(pnum, mCoord)) {
+                            System.err.println("Player " + (pnum+1) + " made illegal move!:\n    Illegal destination: " + mCoord.getX() + "," + mCoord.getY());
+                            madeIllegalMove(pnum);
                             continue;
                         }
-                        board.movePlayer(i, mCoord);
+                        board.movePlayer(pnum, mCoord);
                         srvMove = srvMove.substring(7);
-                        broadcastAll("ATARI" + " " + (i + 1) + " " + srvMove);
+                        broadcastAll("ATARI" + " " + (pnum + 1) + " " + srvMove);
                         board.printBoard();
                         
                     // If the server's wall placement syntax is correct
@@ -125,20 +128,20 @@ public class GameClient {
 			    
                             wCoord = new Coord(wCoord.getX() + 1, wCoord.getY());
                         }
-                        if(!board.isLegalWall(i, new Wall(wCoord, wOrt))) {
-                            System.err.println("Player " + (i+1) + " made illegal move!:\n    Illegal wall at " + wCoord.getX() + "," + wCoord.getY());
-                            madeIllegalMove(i);
+                        if(!board.isLegalWall(pnum, new Wall(wCoord, wOrt))) {
+                            System.err.println("Player " + (pnum+1) + " made illegal move!:\n    Illegal wall at " + wCoord.getX() + "," + wCoord.getY());
+                            madeIllegalMove(pnum);
                             continue;
                         }
-                        board.placeWall(i, wCoord, wOrt);
+                        board.placeWall(pnum, wCoord, wOrt);
                         srvMove = srvMove.substring(7);
-                        broadcastAll("ATARI " + (i + 1) + " " + srvMove);
+                        broadcastAll("ATARI " + (pnum + 1) + " " + srvMove);
                         board.printBoard();
                     
                     // If it matches no valid syntax, it's illegal
                     } else {
                         System.err.println("  Matched no valid syntaxes.");
-                        madeIllegalMove(i);
+                        madeIllegalMove(pnum);
                         continue;
                     }
                     
@@ -300,7 +303,7 @@ public class GameClient {
                 
                 // Send and receive
                 cout.print("HELLO" + EOLN);
-                System.err.println("  Sent HELLO");
+                System.err.println("Sent \"HELLO\"");
                 srvResp = cin.nextLine();
                 System.err.println("Resp: " + srvResp);
             } catch (Exception e) {
@@ -310,7 +313,7 @@ public class GameClient {
         
         // If the server's response isn't in the form: "IAM <NAME>", return false
         if(!Pattern.matches(HANDSHAKE_RESP_REGEX, srvResp)) {
-            System.err.println("  Handshake response mismatch:\n  \"" + srvResp + "\"");
+            System.err.println("  !! Handshake response mismatch:\n  \"" + srvResp + "\"");
             return null;
         }
         
