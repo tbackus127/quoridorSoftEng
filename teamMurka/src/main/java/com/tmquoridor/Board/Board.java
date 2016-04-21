@@ -38,6 +38,7 @@ public class Board {
     
     private HashMap<String, Direction> dirMap;
     private HashMap<String, Orientation> ortMap;
+    private HashMap<Integer, ArrayList<Coord>> winningPos;
     
     /**
      * Default contructor
@@ -124,6 +125,24 @@ public class Board {
      */
     public Orientation toOrt(String s) {
         return ortMap.get(s);
+    }
+    
+    public ArrayList<Coord> getShortestPath(int pid){
+	ArrayList<Coord> path = null;
+	ArrayList<Coord> temp = null;
+	ArrayList<Coord> winPos = winningPos.get(pid);
+	for(Coord move : winPos){
+	    temp = getShortestPath(pid, move);
+	    if (temp != null){
+		if (path == null){
+		    path = temp;
+		}
+		else if (temp.size() < path.size()){
+		    path = temp;
+		}
+	    }
+	}
+	return path;
     }
     
     /**
@@ -593,5 +612,30 @@ public class Board {
         ortMap.put("HORIZ", Orientation.HORIZ);
         ortMap.put("vert", Orientation.VERT);
         ortMap.put("VERT", Orientation.VERT);
+	
+	winningPos = new HashMap<Integer, ArrayList<Coord>>();
+	ArrayList<Coord> list = new ArrayList<Coord>();
+	for(int i = 0; i <= 8; i++){
+	    list.add(new Coord(i,8));
+	}
+	winningPos.put(0,list);
+	
+	list = new ArrayList<Coord>();
+	for(int i = 0; i <= 8; i++){
+	    list.add(new Coord(i,0));
+	}
+	winningPos.put(1,list);
+	
+	list = new ArrayList<Coord>();
+	for(int i = 0; i <= 8; i++){
+	    list.add(new Coord(8,i));
+	}
+        winningPos.put(2,list);
+	
+	list = new ArrayList<Coord>();
+	for(int i = 0; i <= 8; i++){
+	    list.add(new Coord(0,i));
+	}
+	winningPos.put(3,list);
     }
 }

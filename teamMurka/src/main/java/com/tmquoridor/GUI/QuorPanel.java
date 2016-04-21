@@ -274,7 +274,7 @@ public class QuorPanel extends JPanel {
      */
     private void paintPaths(Graphics g) {
       g.setColor(COLOR_PATH);
-      ArrayList<Coord> path = board.getShortestPath(0, new Coord(7, 8));
+      ArrayList<Coord> path = board.getShortestPath(0);
       
       // Don't paint if P1 was kicked
       if(path == null)
