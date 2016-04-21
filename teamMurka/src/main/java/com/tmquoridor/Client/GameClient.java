@@ -125,7 +125,6 @@ public class GameClient {
                         if(wOrt == Orientation.HORIZ){
                             wCoord = new Coord(wCoord.getX(), wCoord.getY() + 1);
                         } else {
-			    
                             wCoord = new Coord(wCoord.getX() + 1, wCoord.getY());
                         }
                         if(!board.isLegalWall(pnum, new Wall(wCoord, wOrt))) {

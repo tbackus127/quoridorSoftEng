@@ -250,18 +250,13 @@ public class Board {
         int wy = wPos.getY();
         
         // Check board bounds (within 0-8)
-        switch(wOrt) {
-            case HORIZ:
-                if(wy <= 0 || wy >= 9) 
-                    return false;
-            break;
-            case VERT:
-                if(wx <= 0 || wx >= 9) 
-                    return false;
-            break;
-            default:
-                throw new RuntimeException("SOMETHING WENT HORRIBLY WRONG!\nIn Board:isLegalWall00");
-        }
+        if (wOrt == Orientation.HORIZ){
+	    if(wx <= -1 || wx >= 8 || wy <= 0 || wy >=9)
+		return false;
+	}else{
+	    if(wy <= -1 || wy >= 8 || wx <= 0 || wx >=9)
+		return false;
+	}
         
         // Break the walls into segments
         HashSet<Segment> segs = getSegments();
