@@ -20,7 +20,7 @@ public class RandomMoveServer extends ManualInputServer{
     public static void main(String[] args) {
 	// This sets the defaults
 	int port = DEFAULT_PORT_NUMBER;
-	String name = DEFAULT_NAME;
+	String name =  DEFAULT_NAME;
 	
 	int argNdx = 0;
 
