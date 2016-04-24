@@ -229,6 +229,8 @@ public class Board {
      */
     public int getWinner() {
         
+        if (numOfPlayers == 1)
+            return 0;
         // Go through each player
         for(int i = 0; i < numOfPlayers; i++) {
             if(kickedPlayers.contains(i)) continue;
@@ -256,6 +258,7 @@ public class Board {
      * @throws RuntimeException if the internal Orientation model returns a null pointer
      */
     public boolean isLegalWall(int pid, Wall w) throws RuntimeException {
+        
         
         if(wallsLeft[pid] <= 0)
             return false;
@@ -302,6 +305,10 @@ public class Board {
             // If the wall crosses another perpendicular to it, illegal (same midpoint, different orientations)
             if(s.isExt() && sPos.equals(wExtPos))
                 return false;
+            
+            // If the wall closes in a player 
+            if (getShortestPath(pid) == null)
+                return false; 
         }
         return true;
     }
