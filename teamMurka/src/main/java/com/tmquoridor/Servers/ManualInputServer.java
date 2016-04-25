@@ -169,7 +169,14 @@ public class ManualInputServer {
             return message + "\r\n";
         }
         else if(move.startsWith("v ") || move.startsWith("h ")) {
-            message += "[(" + splitMessage[1] + ", " + splitMessage[2] + ")";
+            int wx = Integer.parseInt(splitMessage[1]);
+            int wy = Integer.parseInt(splitMessage[2]);
+            if(splitMessage[0].charAt(0) == 'h') {
+              wy -= 1;
+            } else {
+              wx -= 1;
+            }
+            message += "[(" + (wx) + ", " + (wy) + ")";
             message += ", " + splitMessage[0] + "]";
             return message + "\r\n";
         }
@@ -215,13 +222,15 @@ public class ManualInputServer {
         // System.err.println("  upd1:" + message);
         if(message.startsWith("[")) {
             Orientation ort = null;
-            if(message.charAt(7) == 'h') {
-                ort = Orientation.HORIZ;
-            } else {
-                ort = Orientation.VERT;
-            }
             int column = message.charAt(2) - '0';
             int row = message.charAt(4) - '0';
+            if(message.charAt(7) == 'h') {
+                ort = Orientation.HORIZ;
+                row += 1;
+            } else {
+                ort = Orientation.VERT;
+                column += 1;
+            }
             Coord coord = new Coord(column, row);
             board.placeWall(playerNumber - 1, coord, ort);
         }
