@@ -116,7 +116,7 @@ public class AIServer extends ManualInputServer {
                         if (wallOrient == 1) {
 
                             if (board.isLegalWall(thisServersPlayerNumber-1, horiz) == true) {
-                                String move = moveWrapper("v" + wallRow + " " + wallColumn);
+                                String move = moveWrapper("v " + wallRow + " " + wallColumn);
                                 System.err.print("Sending " + move);
                                 cout.print(move);
                                 turnCount++;
@@ -125,7 +125,7 @@ public class AIServer extends ManualInputServer {
                         }
                         if (wallOrient == 2) {
                             if (board.isLegalWall(thisServersPlayerNumber-1, vert) == true) {
-                                String move = moveWrapper("h" + wallRow + " " + wallColumn);
+                                String move = moveWrapper("h " + wallRow + " " + wallColumn);
                                 System.err.print("Sending " + move);
                                 cout.print(move);
                                 turnCount++;

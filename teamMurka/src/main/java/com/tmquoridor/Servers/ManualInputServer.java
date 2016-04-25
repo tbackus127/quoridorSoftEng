@@ -69,7 +69,7 @@ public class ManualInputServer {
     
     // Lets them know if they put in an invalid argument
     private static void usage() {
-        System.err.print("usage: java BirthdayServer [options]\n" +
+        System.err.print("usage: java ManualInputServer [options]\n" +
             "       where options:\n" + "       --port port\n");
     }
     
@@ -120,6 +120,7 @@ public class ManualInputServer {
                     else if(clientMessage.startsWith("KIKASHI")){
                         winnerDeclared(System.out, clientMessage);
                     }
+                    Thread.sleep(1000);
                 }
             }
         } catch(NoSuchElementException ign) {
@@ -160,6 +161,7 @@ public class ManualInputServer {
      * for the protocol 
     */
     public String moveWrapper(String move) {
+        System.err.println("moveWrapper received:" + move);
         String message = "TESUJI ";
         String[] splitMessage = move.split(" ");
         if(move.startsWith("m ")){
@@ -247,11 +249,11 @@ public class ManualInputServer {
     }
     
     public void winnerDeclared(PrintStream console, String message){
-  message = message.substring(7).replaceAll("\\s","");
-  if((int)message.charAt(0)-(int)'0' == thisServersPlayerNumber){
-      console.print("Congratulations you have won the game!\n");
-  }else{
-      console.print("Sorry you didn't win this time, better luck next time.\n");
-  }
+        message = message.substring(7).replaceAll("\\s","");
+        if((int)message.charAt(0)-(int)'0' == thisServersPlayerNumber) {
+            console.print("Congratulations you have won the game!\n");
+        } else{
+            console.print("Sorry you didn't win this time, better luck next time.\n");
+        }
     }
 }
