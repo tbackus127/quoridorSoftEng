@@ -131,7 +131,6 @@ public class Board {
      * Gets the shortest path with a wall tested
      * @param pid the player ID to check
      * @param w the wall to check shortest path with (must be a legal wall)
-     * @throws IllegalArgumentException if w is not a legal Wall
      * @return the shortest path as an ArrayList of Coords
      */
     public ArrayList<Coord> getShortestPath(int pid, Wall w) {
