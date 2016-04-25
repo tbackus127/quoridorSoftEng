@@ -12,6 +12,8 @@ import java.util.*;
 
 public class AIServer extends ManualInputServer {
 
+    private static final double WALL_CHANCE = 0.3D;
+
     // Main that uses the command line arguments
     public static void main(String[] args) {
 
@@ -62,8 +64,54 @@ public class AIServer extends ManualInputServer {
         super(port, name);
     }
 
+    
+    public void sendMove(PrintStream cout) {
+      System.err.println("AI.sendMove()");
+      Random rand = new Random();
+      int pid = thisServersPlayerNumber - 1;
+      boolean noWallsLeft = (board.wallsRemaining(pid) <= 0);
+      
+      // Move
+      if(rand.nextDouble() > WALL_CHANCE || noWallsLeft) {
+        
+        HashSet<Coord> legalMoves = board.getLegalMoves(pid);
+        ArrayList<Coord> shortestPath = board.getShortestPath(pid);
+        
+        Coord nextStep = shortestPath.get(0);
+        int nx = nextStep.getX();
+        int ny = nextStep.getY();
+        String move = moveWrapper("m " + nx + " " + ny);
+        System.err.println("AI Sending:" + move);
+        cout.print(move);
+        
+      // Wall
+      } else {
+        
+        int wx = -1;
+        int wy = -1;
+        Wall w = null;
+        Orientation wOrt = null;
+        do {
+          wx = rand.nextInt(9);
+          wy = rand.nextInt(9);
+          wOrt = (rand.nextInt() % 2 == 0) ? Orientation.HORIZ : Orientation.VERT;
+          w = new Wall(new Coord(wx, wy), wOrt);
+          System.err.println("  Gen: " + w);
+          
+        } while(!board.isLegalWall(pid, w));
+        
+        String move = moveWrapper(wOrt.toString().toLowerCase() + " " + wx + " " + wy);
+        System.err.println("AI Sending:" + move);
+        cout.print(move);
+      }
+      try {
+        Thread.sleep(500);
+      } catch(InterruptedException ign) {}
+    }
+}
 
-    // @override
+
+/*
     public void sendMove(PrintStream cout) {
         System.err.println("AI.sendMove()");
         Random rand = new Random();
@@ -110,23 +158,23 @@ public class AIServer extends ManualInputServer {
                     break;
                 } else {
                     // wallOrient is the orientation of wall verticle / horizontal
-                    int wallOrient = rand.nextInt(2);
+                    int wallOrient = rand.nextInt() % 2;
 
                     try {
-                        if (wallOrient == 1) {
+                        if (wallOrient == 0) {
 
                             if (board.isLegalWall(thisServersPlayerNumber-1, horiz) == true) {
                                 String move = moveWrapper("v " + wallRow + " " + wallColumn);
-                                System.err.print("Sending " + move);
+                                System.err.println("Sending " + move);
                                 cout.print(move);
                                 turnCount++;
                                 return;
                             }
                         }
-                        if (wallOrient == 2) {
+                        if (wallOrient == 1) {
                             if (board.isLegalWall(thisServersPlayerNumber-1, vert) == true) {
                                 String move = moveWrapper("h " + wallRow + " " + wallColumn);
-                                System.err.print("Sending " + move);
+                                System.err.println("Sending " + move);
                                 cout.print(move);
                                 turnCount++;
                                 return;
@@ -141,7 +189,6 @@ public class AIServer extends ManualInputServer {
         }
     }
 }
-
 
 
            // if (splitter[0].equals("m") {
@@ -173,3 +220,5 @@ public class AIServer extends ManualInputServer {
   //}
 //}
 
+
+*/

@@ -110,6 +110,7 @@ public class ManualInputServer {
                     System.err.println("Recieved: \"" + clientMessage + "\"");
                     if(clientMessage.startsWith("MYOUSHU")){
                         sendMove(cout);
+                        Thread.sleep(1000);
                     }
                     else if(clientMessage.startsWith("ATARI")){
                         updateBoard(clientMessage);
@@ -120,7 +121,6 @@ public class ManualInputServer {
                     else if(clientMessage.startsWith("KIKASHI")){
                         winnerDeclared(System.out, clientMessage);
                     }
-                    Thread.sleep(1000);
                 }
             }
         } catch(NoSuchElementException ign) {
@@ -161,7 +161,7 @@ public class ManualInputServer {
      * for the protocol 
     */
     public String moveWrapper(String move) {
-        System.err.println("moveWrapper received:" + move);
+        // System.err.println("moveWrapper received:" + move);
         String message = "TESUJI ";
         String[] splitMessage = move.split(" ");
         if(move.startsWith("m ")){
@@ -205,34 +205,31 @@ public class ManualInputServer {
     }
     
     public void updateBoard(String message) {
+        // System.err.println("updateBoard():" + message);
         message = message.substring(6).replaceAll("\\s","");
-        int playerNumber = (int)message.charAt(0)-(int)'0';
+        // System.err.println("  upd0:" + message);
+        int playerNumber = message.charAt(0) - '0';
+        // System.err.println("  pid:" + playerNumber);
+        
         message = message.substring(1);
+        // System.err.println("  upd1:" + message);
         if(message.startsWith("[")) {
             Orientation ort = null;
-            if(message.charAt(8) == 'h') {
+            if(message.charAt(7) == 'h') {
                 ort = Orientation.HORIZ;
-            }
-            else{
+            } else {
                 ort = Orientation.VERT;
             }
-            int column = (int)message.charAt(2)-(int)'0';
-            int row = (int)message.charAt(4) - (int)'0';
-            Coord coord = null;
-            
-            // TODO: FIXME
-            if(true) {
-                coord = new Coord(column, row);
-            } else {
-                coord = new Coord(column, row);
-            }
+            int column = message.charAt(2) - '0';
+            int row = message.charAt(4) - '0';
+            Coord coord = new Coord(column, row);
             board.placeWall(playerNumber - 1, coord, ort);
         }
         else if(message.startsWith("(")){
-            int column = (int)message.charAt(1)-(int)'0';
-            int row = (int)message.charAt(3) - (int)'0';
+            int column = message.charAt(1) - '0';
+            int row = message.charAt(3) - '0';
             Coord coord = new Coord(column, row);
-            board.movePlayer(playerNumber-1, coord);
+            board.movePlayer(playerNumber - 1, coord);
         }
         
     }

@@ -145,6 +145,8 @@ public class Board {
      * @return the shortest path as an ArrayList of Coords
      */
     public ArrayList<Coord> getShortestPath(int pid) {
+        if(kickedPlayers.contains(pid) || pid < 0)
+          return null;
         ArrayList<Coord> path = null;
         ArrayList<Coord> temp = null;
         ArrayList<Coord> winPos = winningPos.get(pid);
@@ -246,6 +248,13 @@ public class Board {
      */
     public int getWinner() {
         
+        if(getNumOfPlayers() == 1) {
+          for(int i = 0; i < numOfPlayers; i++) {
+            if(!isPlayerKicked(i))
+              return i + 1;
+          }
+        }
+        
         // Go through each player
         for(int i = 0; i < numOfPlayers; i++) {
             if(kickedPlayers.contains(i)) continue;
@@ -286,13 +295,13 @@ public class Board {
         int wy = wPos.getY();
         
         // Check board bounds (within 0-8)
-        if (wOrt == Orientation.HORIZ){
-      if(wx <= -1 || wx >= 8 || wy <= 0 || wy >=9)
-    return false;
-  }else{
-      if(wy <= -1 || wy >= 8 || wx <= 0 || wx >=9)
-    return false;
-  }
+        if (wOrt == Orientation.HORIZ) {
+          if(wx <= -1 || wx >= 8 || wy <= 0 || wy >= 9)
+            return false;
+        } else {
+          if(wy <= -1 || wy >= 8 || wx <= 0 || wx >= 9)
+            return false;
+        }
         
         // Break the walls into segments
         HashSet<Segment> segs = getSegments();
@@ -488,6 +497,10 @@ public class Board {
      * @return the player ID found at the Coord c (-1 if no player)
      */
     public int getPlayerAtCoord(Coord c) {
+        if(c == null) {
+          System.err.println("!! getPlayerAtCoord(): c is null");
+          return -1;
+        }
         int cx = c.getX();
         int cy = c.getY();
         for(int i = 0; i < playerPositions.length; i++) {
@@ -523,7 +536,9 @@ public class Board {
                 c2 = curr.translate(dir);
             } catch (Exception e) {
                 System.err.println("!! TRANSLATION FAILED!");
-                c2 = curr;
+                e.printStackTrace();
+                // c2 = curr;
+                break;
             }
             int pid = getPlayerAtCoord(c2);
             
