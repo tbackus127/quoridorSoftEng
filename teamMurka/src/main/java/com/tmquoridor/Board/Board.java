@@ -127,22 +127,41 @@ public class Board {
         return ortMap.get(s);
     }
     
-    public ArrayList<Coord> getShortestPath(int pid){
-	ArrayList<Coord> path = null;
-	ArrayList<Coord> temp = null;
-	ArrayList<Coord> winPos = winningPos.get(pid);
-	for(Coord move : winPos){
-	    temp = getShortestPath(pid, move);
-	    if (temp != null){
-		if (path == null){
-		    path = temp;
-		}
-		else if (temp.size() < path.size()){
-		    path = temp;
-		}
-	    }
-	}
-	return path;
+    /**
+     * Gets the shortest path with a wall tested
+     * @param pid the player ID to check
+     * @param w the wall to check shortest path with (must be a legal wall)
+     * @throws IllegalArgumentException if w is not a legal Wall
+     * @return the shortest path as an ArrayList of Coords
+     */
+    public ArrayList<Coord> getShortestPath(int pid, Wall w) {
+        Board b = copyOf();
+        if(!b.isLegalWall(w))
+            throw new IllegalArgumentException("Tested wall is not legal!");
+        b.placeWall(w);
+        return b.getShortestPath(pid);
+    }
+    
+    /**
+     * Gets the shortest path for any player to win
+     * @param pid the player ID to check
+     * @return the shortest path as an ArrayList of Coords
+     */
+    public ArrayList<Coord> getShortestPath(int pid) {
+        ArrayList<Coord> path = null;
+        ArrayList<Coord> temp = null;
+        ArrayList<Coord> winPos = winningPos.get(pid);
+        for(Coord move : winPos) {
+            temp = getShortestPath(pid, move);
+            if (temp != null) {
+                if (path == null) {
+                    path = temp;
+                } else if (temp.size() < path.size()) {
+                    path = temp;
+                }
+            }
+        }
+        return path;
     }
     
     /**
@@ -178,6 +197,7 @@ public class Board {
         b.placeWall(w);
       }
       
+      // Walls remaining
       for(int i = 0; i < wallsLeft.length; i++) {
         b.setWallsRemaining(i, wallsRemaining(i));
       }
@@ -270,12 +290,12 @@ public class Board {
         
         // Check board bounds (within 0-8)
         if (wOrt == Orientation.HORIZ){
-	    if(wx <= -1 || wx >= 8 || wy <= 0 || wy >=9)
-		return false;
-	}else{
-	    if(wy <= -1 || wy >= 8 || wx <= 0 || wx >=9)
-		return false;
-	}
+      if(wx <= -1 || wx >= 8 || wy <= 0 || wy >=9)
+    return false;
+  }else{
+      if(wy <= -1 || wy >= 8 || wx <= 0 || wx >=9)
+    return false;
+  }
         
         // Break the walls into segments
         HashSet<Segment> segs = getSegments();
@@ -612,30 +632,30 @@ public class Board {
         ortMap.put("HORIZ", Orientation.HORIZ);
         ortMap.put("vert", Orientation.VERT);
         ortMap.put("VERT", Orientation.VERT);
-	
-	winningPos = new HashMap<Integer, ArrayList<Coord>>();
-	ArrayList<Coord> list = new ArrayList<Coord>();
-	for(int i = 0; i <= 8; i++){
-	    list.add(new Coord(i,8));
-	}
-	winningPos.put(0,list);
-	
-	list = new ArrayList<Coord>();
-	for(int i = 0; i <= 8; i++){
-	    list.add(new Coord(i,0));
-	}
-	winningPos.put(1,list);
-	
-	list = new ArrayList<Coord>();
-	for(int i = 0; i <= 8; i++){
-	    list.add(new Coord(8,i));
-	}
-        winningPos.put(2,list);
-	
-	list = new ArrayList<Coord>();
-	for(int i = 0; i <= 8; i++){
-	    list.add(new Coord(0,i));
-	}
-	winningPos.put(3,list);
+  
+        winningPos = new HashMap<Integer, ArrayList<Coord>>();
+        ArrayList<Coord> list = new ArrayList<Coord>();
+        for(int i = 0; i <= 8; i++){
+            list.add(new Coord(i,8));
+        }
+        winningPos.put(0,list);
+        
+        list = new ArrayList<Coord>();
+        for(int i = 0; i <= 8; i++){
+            list.add(new Coord(i,0));
+        }
+        winningPos.put(1,list);
+        
+        list = new ArrayList<Coord>();
+        for(int i = 0; i <= 8; i++){
+            list.add(new Coord(8,i));
+        }
+              winningPos.put(2,list);
+        
+        list = new ArrayList<Coord>();
+        for(int i = 0; i <= 8; i++){
+            list.add(new Coord(0,i));
+        }
+        winningPos.put(3,list);
     }
 }
