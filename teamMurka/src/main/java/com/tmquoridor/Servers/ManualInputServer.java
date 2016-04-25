@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import java.util.Scanner;
+import java.util.NoSuchElementException;
 import java.lang.String;
 
 public class ManualInputServer {
@@ -98,7 +99,11 @@ public class ManualInputServer {
                 Scanner cin = new Scanner(client.getInputStream());
                 PrintStream cout = new PrintStream(client.getOutputStream());
                 
+                Thread.sleep(100);
+                
                 establishProtocol(cin, cout);
+                
+                Thread.sleep(100);
                 
                 while(true) {
                     String clientMessage = cin.nextLine();
@@ -117,8 +122,10 @@ public class ManualInputServer {
                     }
                 }
             }
+        } catch(NoSuchElementException ign) {
+          // Ignored
         } catch(Exception e) {
-            
+            e.printStackTrace();
         }
     }
     
@@ -172,7 +179,6 @@ public class ManualInputServer {
         sendMove(cout, console);
     }
     
-    // 
     public void sendMove(PrintStream cout, Scanner console) {
         System.out.print("Enter \"m\" to move your peice, or \"w\" to place a wall: ");
         String moveType = console.next();

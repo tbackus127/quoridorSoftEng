@@ -56,6 +56,9 @@ public class GameClient {
         
         // If handshaking is successfull
         if(handshake()) {
+            try {
+              Thread.sleep(1000);
+            } catch(InterruptedException ign) {}
             sendStartMsgs();
             setupBoard();
             gui = new QuorGUI(board, srvNames);

@@ -82,7 +82,9 @@ public class AIServer extends ManualInputServer {
 
                 //}
                 if (board.isLegalMove(thisServersPlayerNumber-1, dest) == true) {
-                    cout.print(moveWrapper("m " + moveRow + " " + moveColumn));
+                    String move = moveWrapper("m " + moveRow + " " + moveColumn);
+                    System.err.print("Sending " + move);
+                    cout.print(move);
                     turnCount++;
 
                     return;
@@ -114,14 +116,18 @@ public class AIServer extends ManualInputServer {
                         if (wallOrient == 1) {
 
                             if (board.isLegalWall(thisServersPlayerNumber-1, horiz) == true) {
-                                cout.print(moveWrapper("v" + wallRow + " " + wallColumn));
+                                String move = moveWrapper("v" + wallRow + " " + wallColumn);
+                                System.err.print("Sending " + move);
+                                cout.print(move);
                                 turnCount++;
                                 return;
                             }
                         }
                         if (wallOrient == 2) {
                             if (board.isLegalWall(thisServersPlayerNumber-1, vert) == true) {
-                                cout.print(moveWrapper("h" + wallRow + " " + wallColumn));
+                                String move = moveWrapper("h" + wallRow + " " + wallColumn);
+                                System.err.print("Sending " + move);
+                                cout.print(move);
                                 turnCount++;
                                 return;
                             }
