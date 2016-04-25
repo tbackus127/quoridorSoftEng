@@ -136,8 +136,6 @@ public class Board {
      */
     public ArrayList<Coord> getShortestPath(int pid, Wall w) {
         Board b = copyOf();
-        if(!b.isLegalWall(w))
-            throw new IllegalArgumentException("Tested wall is not legal!");
         b.placeWall(w);
         return b.getShortestPath(pid);
     }
