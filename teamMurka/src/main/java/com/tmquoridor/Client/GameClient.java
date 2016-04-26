@@ -23,7 +23,7 @@ public class GameClient {
     private static final String MOVE_VAL_REGEX = "TESUJI\\s+\\(\\s*[0-8],\\s*[0-8]\\s*\\)\\s*\\n*";
     
     /** Wall validation regex */
-    private static final String WALL_VAL_REGEX = "TESUJI\\s+\\[\\s*\\(\\s*[0-8]\\s*,\\s*[0-8]\\s*\\)\\s*,\\s*[hv]\\s*\\]\\s*\\n*";
+    private static final String WALL_VAL_REGEX = "TESUJI\\s+\\[\\s*\\(\\s*[0-7]\\s*,\\s*[0-7]\\s*\\)\\s*,\\s*[hv]\\s*\\]\\s*\\n*";
     // This is only slightly obnoxious...
     
     /** The internal Board instance */
@@ -131,7 +131,7 @@ public class GameClient {
                         if(wOrt == Orientation.HORIZ){
                             wCoord = new Coord(wCoord.getX(), wCoord.getY() + 1);
                         } else {
-                            wCoord = new Coord(wCoord.getX() + 1, wCoord.getY());
+                            wCoord = new Coord(wCoord.getX() + 1, wCoord.getY()); // NOT DONE __________________
                         }
                         if(!board.isLegalWall(pnum, new Wall(wCoord, wOrt))) {
                             System.err.println("Player " + (pnum+1) + " made illegal move!:\n    Illegal wall at " + wCoord.getX() + "," + wCoord.getY());

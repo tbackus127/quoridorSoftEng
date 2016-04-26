@@ -171,11 +171,6 @@ public class ManualInputServer {
         else if(move.startsWith("v ") || move.startsWith("h ")) {
             int wx = Integer.parseInt(splitMessage[1]);
             int wy = Integer.parseInt(splitMessage[2]);
-            if(splitMessage[0].charAt(0) == 'h') {
-              wy -= 1;
-            } else {
-              wx -= 1;
-            }
             message += "[(" + (wx) + ", " + (wy) + ")";
             message += ", " + splitMessage[0] + "]";
             return message + "\r\n";
@@ -191,24 +186,26 @@ public class ManualInputServer {
     public void sendMove(PrintStream cout, Scanner console) {
         System.out.print("Enter \"m\" to move your peice, or \"w\" to place a wall: ");
         String moveType = console.next();
+	String unwrappedMessage = "";
         if (moveType.equals("m")) {
-            String unwrappedMessage = moveType + " ";
+            unwrappedMessage = moveType + " ";
             System.out.print("What column would you like to move to: ");
             unwrappedMessage += console.next() + " ";
             System.out.print("What row would you like to move to: ");
             unwrappedMessage += console.next();
-            cout.print(moveWrapper(unwrappedMessage));
         }
         else if(moveType.equals("w")){
             System.out.print("Enter \"h\" for a horizontal wall or \"v\" for" +
                                    " a vertical wall: ");
-            String unwrappedMessage = console.next() + " ";
+            unwrappedMessage = console.next() + " ";
             System.out.print("Enter the column: ");
             unwrappedMessage += console.next() + " ";
             System.out.print("Enter the row: ");
             unwrappedMessage += console.next();
-            cout.print(moveWrapper(unwrappedMessage));
         }
+        
+        System.out.println(moveWrapper(unwrappedMessage));
+        cout.print(moveWrapper(unwrappedMessage));
     }
     
     public void updateBoard(String message) {
