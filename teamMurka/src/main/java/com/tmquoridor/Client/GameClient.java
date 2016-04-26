@@ -23,7 +23,7 @@ public class GameClient {
     private static final String MOVE_VAL_REGEX = "TESUJI\\s+\\(\\s*[0-8],\\s*[0-8]\\s*\\)\\s*\\n*";
     
     /** Wall validation regex */
-    private static final String WALL_VAL_REGEX = "TESUJI\\s+\\[\\s*\\(\\s*[0-8]\\s*,\\s*[0-8]\\s*\\)\\s*,\\s*[hv]\\s*\\]\\s*\\n*";
+    private static final String WALL_VAL_REGEX = "TESUJI\\s+\\[\\s*\\(\\s*[0-7]\\s*,\\s*[0-7]\\s*\\)\\s*,\\s*[hv]\\s*\\]\\s*\\n*";
     // This is only slightly obnoxious...
     
     /** The internal Board instance */

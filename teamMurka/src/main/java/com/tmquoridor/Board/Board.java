@@ -349,6 +349,15 @@ public class Board {
             if(s.isExt() && sPos.equals(wExtPos))
                 return false;
         }
+        // Checks to make sure all players can still win the game
+        for(int i = 0; i < numOfPlayers; i++) {
+	    if(!isPlayerKicked(i)){
+		ArrayList<Coord> temp = getShortestPath(i, w);
+		if(temp == null) {
+		    return false;
+		}
+	    }
+	}
         return true;
     }
     
