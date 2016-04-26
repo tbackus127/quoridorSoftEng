@@ -53,6 +53,7 @@ public class QuorGUI {
      * Repaints the GUI, called in the client after a move is made.
      */
     public void repaintGUI() {
-        panel.repaint();
+        if(panel != null)
+          panel.repaint();
     }
 }
