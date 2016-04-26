@@ -134,7 +134,7 @@ public class GameClient {
                             wCoord = new Coord(wCoord.getX() + 1, wCoord.getY());
                         }
                         if(!board.isLegalWall(pnum, new Wall(wCoord, wOrt))) {
-                            System.err.println("Player " + (pnum+1) + " made illegal move!:\n    Illegal wall at " + wCoord.getX() + "," + wCoord.getY());
+                            System.err.println("Player " + (pnum + 1) + " made illegal move!:\n    Illegal wall at " + wCoord.getX() + "," + wCoord.getY());
                             madeIllegalMove(pnum);
                             continue;
                         }
