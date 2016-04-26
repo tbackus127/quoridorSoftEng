@@ -111,13 +111,13 @@ public class GameClient {
                         
                         // Check move legality
                         Coord mCoord = extractCoord(srvMove);
-                        // System.err.println("Coord: " + mCoord);
+                        // System.err.println("GameClient.Coord: " + mCoord);
                         if(!board.isLegalMove(pnum, mCoord)) {
                             System.err.println("Player " + (pnum+1) + " made illegal move!:\n    Illegal destination: " + mCoord.getX() + "," + mCoord.getY());
                             madeIllegalMove(pnum);
                             continue;
                         }
-                        board.movePlayer(pnum, mCoord);
+                        board.movePlayer(pnum, mCoord, "Client.move");
                         srvMove = srvMove.substring(7);
                         broadcastAll("ATARI" + " " + (pnum + 1) + " " + srvMove);
                         board.printBoard();

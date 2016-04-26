@@ -19,6 +19,7 @@ public class PathFinder {
     this.pid = pid;
     this.marks = new HashMap<Integer, Integer>();
     this.board = b.copyOf();
+    
   }
   
   public ArrayList<Coord> getPath(Coord dest) {
@@ -29,6 +30,10 @@ public class PathFinder {
     
     // Player was kicked; stop updating
     if(initPos == null)
+      return null;
+    
+    // We're at the destination already
+    if(initPos.equals(dest))
       return null;
     
     queue.add(initPos);
@@ -43,8 +48,10 @@ public class PathFinder {
       if(marks.get(curr.id()) > currentMark)
         currentMark = marks.get(curr.id());
       // System.err.println("Processing " + curr);
+      if(curr == null)
+        System.err.println("PathFinder.getPath(): curr is null");
       marks.put(curr.id(), currentMark);
-      board.movePlayer(pid, curr);
+      board.movePlayer(pid, curr, "PFinder.init");
       seen.add(curr);
       
       // If we've found the target
@@ -68,6 +75,7 @@ public class PathFinder {
     // If found, build the path and return it.
     if(found) {
       // System.err.println("\nBuilding path of length " + currentMark + "...");
+      // board.printBoard();
       Coord[] temp = new Coord[currentMark];
       temp[temp.length - 1] = curr;
       
@@ -78,6 +86,12 @@ public class PathFinder {
         Coord next = null;
         // System.err.println("Building for index " + i);
         HashSet<Coord> legalMoves = board.getLegalMoves(pid);
+        if(legalMoves.isEmpty()) {
+          // System.err.println("PathFinder: Legalmoves is empty!");
+          // System.err.println(board);
+          // board.printBoard();
+          // System.err.println("PID=" + pid);
+        }
         for(Coord c : legalMoves) {
           // System.err.println("  Backtracing " + c);
           if(marks.containsKey(c.id())) {
@@ -94,8 +108,8 @@ public class PathFinder {
           }
 
         }
-        // if(next == null) System.err.println("NEXT IS NULL");
-        board.movePlayer(pid, next);
+        // if(next == null) System.err.println("PathFinder:NEXT IS NULL");
+        board.movePlayer(pid, next, "PFind.found");
       }
       
       ArrayList<Coord> result = new ArrayList<Coord>();

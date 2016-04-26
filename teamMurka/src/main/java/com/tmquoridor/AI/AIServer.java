@@ -12,7 +12,7 @@ import java.util.*;
 
 public class AIServer extends ManualInputServer {
 
-    private static final double WALL_CHANCE = 0.3D;
+    private static final double WALL_CHANCE = 0.5D;
 
     // Main that uses the command line arguments
     public static void main(String[] args) {
@@ -74,8 +74,13 @@ public class AIServer extends ManualInputServer {
       // Move
       if(rand.nextDouble() > WALL_CHANCE || noWallsLeft) {
         
-        HashSet<Coord> legalMoves = board.getLegalMoves(pid);
-        ArrayList<Coord> shortestPath = board.getShortestPath(pid);
+        ArrayList<Coord> shortestPath = null;
+        try {
+          shortestPath = board.getShortestPath(pid);
+        } catch(NullPointerException e) {
+          e.printStackTrace();
+          System.exit(1);
+        }
         
         Coord nextStep = shortestPath.get(0);
         int nx = nextStep.getX();

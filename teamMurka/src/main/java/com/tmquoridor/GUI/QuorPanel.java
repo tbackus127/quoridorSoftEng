@@ -102,6 +102,8 @@ public class QuorPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         // System.err.println("paint() called");
+        if(board.wasWinner())
+          return;
         updateGUI(g);
     }
     
@@ -274,7 +276,14 @@ public class QuorPanel extends JPanel {
      */
     private void paintPaths(Graphics g) {
       g.setColor(COLOR_PATH);
-      ArrayList<Coord> path = board.getShortestPath(0);
+      
+      ArrayList<Coord> path = null;
+      try {
+        path = board.copyOf().getShortestPath(0);
+      } catch (NullPointerException e) {
+        // e.printStackTrace();
+      }
+       
       
       // Don't paint if P1 was kicked
       if(path == null)
