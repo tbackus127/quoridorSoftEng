@@ -31,7 +31,7 @@ public class DebugOut {
       
       // Delete previous file (only keep most recent copy)
       try {
-          this.file = new File(name);
+          this.file = new File(name + ".txt");
           if(this.file.exists()) {
               this.file.delete();
           }

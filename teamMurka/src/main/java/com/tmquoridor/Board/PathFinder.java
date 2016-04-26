@@ -8,6 +8,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 import com.tmquoridor.Board.*;
+import com.tmquoridor.Util.*;
 
 public class PathFinder {
   
@@ -15,11 +16,13 @@ public class PathFinder {
   private Board board;
   private HashMap<Integer, Integer> marks;
   
+  private DebugOut dout;
+  
   public PathFinder(int pid, Board b) {
     this.pid = pid;
     this.marks = new HashMap<Integer, Integer>();
     this.board = b.copyOf();
-    
+    this.dout = new DebugOut("PathFinder");
   }
   
   public ArrayList<Coord> getPath(Coord dest) {
