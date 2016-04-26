@@ -16,9 +16,6 @@ public class DebugOut {
   /** The file name, minus ".txt" */
   private String name;
   
-  /** Call signature, for finding out where the message came from*/
-  private String sig;
-  
   /** The file handle for this PrintStream */
   private File file;
   
@@ -29,9 +26,8 @@ public class DebugOut {
    * Default constructor
    * @param name the filename
    */
-  public DebugOut(String name, String sig) {
+  public DebugOut(String name) {
       this.name = name;
-      this.sig = sig;
       
       // Delete previous file (only keep most recent copy)
       try {
@@ -50,8 +46,9 @@ public class DebugOut {
   /**
    * Writes a timestamped message to the file
    * @param msg the String to write after the timestamp
+   * @param sig the call signature ("ClassName.methodName()" recommended; for tracing purposes)
    */
-  public void write(String msg) {
+  public void write(String sig, String msg) {
       this.fOut.println(getTimestamp() + "<" + sig + ">:" + msg);
   }
   
