@@ -31,7 +31,22 @@ public class DebugOut {
       
       // Delete previous file (only keep most recent copy)
       try {
-          this.file = new File(name + ".txt");
+          
+          File dbDir = new File("debug");
+          if(!dbDir.exists()) {
+              if(!dbDir.mkdir()) {
+                  System.err.println("DebugOut(): Failed to create debug directory!");
+              }
+          }
+          
+          // Clear all files in debug folder
+          File[] dbFiles = dbDir.listFiles();
+          for(File f : dbFiles) {
+            if(f.exists())
+              f.delete();
+          }
+          
+          this.file = new File(dbDir + "/" + name + ".txt");
           if(this.file.exists()) {
               this.file.delete();
           }
@@ -49,7 +64,7 @@ public class DebugOut {
    * @param sig the call signature ("ClassName.methodName()" recommended; for tracing purposes)
    */
   public void write(String sig, String msg) {
-      this.fOut.println(getTimestamp() + "<" + sig + ">:" + msg);
+      this.fOut.println(getTimestamp() + "@" + sig + ": " + msg);
   }
   
   /**
@@ -59,6 +74,6 @@ public class DebugOut {
   private static String getTimestamp() {
     Date date = new Date();
     String stamp = (new Timestamp(date.getTime())).toString();
-    return stamp.substring(11);
+    return stamp.substring(11, 19);
   }
 }

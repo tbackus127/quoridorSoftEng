@@ -22,7 +22,7 @@ public class PathFinder {
     this.pid = pid;
     this.marks = new HashMap<Integer, Integer>();
     this.board = b.copyOf();
-    this.dout = new DebugOut("PathFinder");
+    this.dout = new DebugOut("PathFinder_" + this.hashCode());
   }
   
   public ArrayList<Coord> getPath(Coord dest) {
@@ -50,16 +50,16 @@ public class PathFinder {
       curr = queue.remove();
       if(marks.get(curr.id()) > currentMark)
         currentMark = marks.get(curr.id());
-      // System.err.println("Processing " + curr);
+      dout.write("PathFinder.getPath", "Processing " + curr);
       if(curr == null)
-        System.err.println("PathFinder.getPath(): curr is null");
+        dout.write("PathFinder.getPath", "curr is null");
       marks.put(curr.id(), currentMark);
       board.movePlayer(pid, curr, "PFinder.init");
       seen.add(curr);
       
       // If we've found the target
       if(curr.equals(dest)) {
-        // System.err.println("FOUND");
+        dout.write("PathFinder.getPath", "FOUND");
         found = true;
         break;
       }
