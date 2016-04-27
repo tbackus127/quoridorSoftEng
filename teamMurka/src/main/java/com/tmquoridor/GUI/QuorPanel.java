@@ -36,7 +36,7 @@ public class QuorPanel extends JPanel {
     private static final int PADDING_PAWN = 2;
     
     /** Pixels to shrink the pathing circle */
-    private static final int PADDING_PATH = 14;
+    private static final int PADDING_PATH = 15;
     
     /** Pixels to offset player number pawn label (x) */
     private static final int MARGIN_PNUM_X = 11;
@@ -44,8 +44,8 @@ public class QuorPanel extends JPanel {
     /** Pixels to offset player number pawn label (y) */
     private static final int MARGIN_PNUM_Y = 19;
     
-    /** So path lines don't overlap, extra pixels to push lines to the side */
-    private static final int PATH_OFFSET = 8;
+    /** So path lines don't overlap, extra pixels to push points to the side */
+    private static final int PATH_OFFSET = 2;
     
     /** Spacing for label X-Offset */
     private static final int PADDING_LABEL = 8;
@@ -58,7 +58,12 @@ public class QuorPanel extends JPanel {
     private static final Color COLOR_TILE = new Color(24, 0, 0);
     private static final Color COLOR_WALL = new Color(255, 236, 160);
     private static final Color COLOR_PAWN = new Color(255, 236, 160);
-    private static final Color COLOR_PATH = new Color(0, 255, 0);
+    private static final Color COLOR_PATH[] = {
+                                            new Color(0, 255, 0),
+                                            new Color(255, 255, 0),
+                                            new Color(0, 255, 255),
+                                            new Color(255, 0, 255)
+    };
     
     /** Font for drawing information labels */
     private static final Font FONT_LABELS = new Font("Serif", Font.PLAIN, 24);
@@ -101,7 +106,6 @@ public class QuorPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // System.err.println("paint() called");
         if(board.wasWinner())
           return;
         updateGUI(g);
@@ -284,30 +288,56 @@ public class QuorPanel extends JPanel {
      * @param g the Graphics object
      */
     private void paintPaths(Graphics g) {
-      g.setColor(COLOR_PATH);
       
       ArrayList<Coord> path = null;
-      try {
-        path = board.copyOf().getShortestPath(0);
-      } catch (NullPointerException e) {
-        e.printStackTrace();
-      }
-       
       
-      // Don't paint if P1 was kicked
-      if(path == null)
-        return;
-      
-      // Only draw if the target is possible to move to
-      if(path != null) {
-        for(int i = 0; i < path.size(); i++) {
-          Coord curr = path.get(i);
-          int gx = PADDING_PATH + MARGIN_BOARD_LEFT + curr.getX() * (TILE_SIZE + WALL_SIZE);
-          int gy = PADDING_PATH + MARGIN_BOARD_TOP + curr.getY() * (TILE_SIZE + WALL_SIZE);
-          g.fillOval(gx, gy, TILE_SIZE - PADDING_PATH * 2, TILE_SIZE - PADDING_PATH * 2);
+      for(int pid = 0; pid < board.getTotalPlayers(); pid++) {
+        
+        g.setColor(COLOR_PATH[pid]);
+        if(board.isPlayerKicked(pid))
+          continue;
+        
+        try {
+          path = board.copyOf().getShortestPath(pid);
+        } catch (NullPointerException e) {
+          e.printStackTrace();
         }
         
+        
+        // Don't paint if player was kicked
+        if(path == null)
+          return;
+        
+        // Only draw if the target is possible to move to
+        if(path != null) {
+          for(int i = 0; i < path.size(); i++) {
+            Coord curr = path.get(i);
+            int gx = PADDING_PATH + MARGIN_BOARD_LEFT + curr.getX() * (TILE_SIZE + WALL_SIZE);
+            int gy = PADDING_PATH + MARGIN_BOARD_TOP + curr.getY() * (TILE_SIZE + WALL_SIZE);
+            switch(pid) {
+              case 1:
+                gx += PATH_OFFSET;
+                gy -= PATH_OFFSET;
+              break;
+              case 2:
+                gx -= PATH_OFFSET;
+                gy += PATH_OFFSET;
+              break;
+              case 3:
+                gx += PATH_OFFSET;
+                gy += PATH_OFFSET;
+              break;
+              default:
+                gx -= PATH_OFFSET;
+                gy -= PATH_OFFSET;
+            }
+            g.fillOval(gx, gy, TILE_SIZE - PADDING_PATH * 2, TILE_SIZE - PADDING_PATH * 2);
+          }
+          
+        }
       }
+      
+
     }
     
 }
