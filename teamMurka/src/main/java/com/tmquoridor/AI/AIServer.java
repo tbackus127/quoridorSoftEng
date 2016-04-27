@@ -47,7 +47,7 @@ public class AIServer extends ManualInputServer {
             ++argNdx;
         }
 
-      AIServer ai = new AIServer(port, name, intnlWalls);
+      AIServer ai = new AIServer(port, name);
       ai.run();
     }
 
@@ -67,6 +67,9 @@ public class AIServer extends ManualInputServer {
     
     public void sendMove(PrintStream cout) {
       System.err.println("AI.sendMove()");
+      try {
+        Thread.sleep(500);
+      } catch(InterruptedException ign) {}
       Random rand = new Random();
       int pid = thisServersPlayerNumber - 1;
       boolean noWallsLeft = (board.wallsRemaining(pid) <= 0);
@@ -109,9 +112,7 @@ public class AIServer extends ManualInputServer {
         System.err.println("AI Sending:" + move);
         cout.print(move);
       }
-      try {
-        Thread.sleep(500);
-      } catch(InterruptedException ign) {}
+      
     }
 }
 

@@ -157,8 +157,6 @@ public class GameClient {
                         gui.repaintGUI();
                         break;
                     }
-                    
-                    Thread.sleep(500);
                 } catch (Exception e) {
                     e.printStackTrace();
                     playing = false;

@@ -118,7 +118,6 @@ public class ManualInputServer {
                     System.err.println("Recieved: \"" + clientMessage + "\"");
                     if(clientMessage.startsWith("MYOUSHU")){
                         sendMove(cout);
-                        Thread.sleep(1000);
                     }
                     else if(clientMessage.startsWith("ATARI")){
                         updateBoard(clientMessage);
