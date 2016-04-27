@@ -18,11 +18,13 @@ public class RandomMoveServer extends ManualInputServer{
     
     // Main that uses the command line arguments
     public static void main(String[] args) {
-	// This sets the defaults
-	int port = DEFAULT_PORT_NUMBER;
-	String name =  DEFAULT_NAME;
-	
-	int argNdx = 0;
+          
+        // This sets the defaults
+        int port = DEFAULT_PORT_NUMBER;
+        String name = DEFAULT_NAME;
+	int delay = DEFAULT_DELAY;
+      
+        int argNdx = 0;
 
         // This runs through all of the command line arguments and applies the proper ones
         while (argNdx < args.length) {
@@ -30,14 +32,17 @@ public class RandomMoveServer extends ManualInputServer{
 
             if (curr.equals(ARG_PORT)) {
                 ++argNdx;
-
-		String numberStr = args[argNdx];
-		port = Integer.parseInt(numberStr);
-	    } else if(curr.equals(ARG_NAME)){
-		++argNdx;
+                port = Integer.parseInt(args[argNdx]);
 		
-		name = DEFAULT_PREFIX + args[argNdx];
-	    } else {
+            } else if(curr.equals(ARG_NAME)) {
+                ++argNdx;
+                name = DEFAULT_PREFIX + args[argNdx];
+		
+            } else if(curr.equals(ARG_DELAY)) {
+                ++argNdx;
+                delay = Integer.parseInt(args[argNdx]);
+		
+            } else {
 
                 // if there is an unknown parameter, give usage and quit
                 System.err.println("Unknown parameter \"" + curr + "\"");
@@ -45,11 +50,11 @@ public class RandomMoveServer extends ManualInputServer{
                 System.exit(1);
             }
 
-        ++argNdx;
+            ++argNdx;
         }
 
-	RandomMoveServer ms = new RandomMoveServer(port, name);
-	ms.run();
+        RandomMoveServer ms = new RandomMoveServer(port, name, delay);
+        ms.run();
     }
     
     // Lets them know if they put in an invalid argument
@@ -59,8 +64,8 @@ public class RandomMoveServer extends ManualInputServer{
     }
     
     // Constructor
-    public RandomMoveServer(int port, String name) {
-	super(port, name);
+    public RandomMoveServer(int port, String name, int delay) {
+	super(port, name, delay);
     }
     
     @Override
@@ -69,7 +74,7 @@ public class RandomMoveServer extends ManualInputServer{
 	String unwrappedMessage = "m ";
 	for(Coord move : legalMoves){
 	    unwrappedMessage += move.getX() + " " + move.getY();
-	    TimeUnit.SECONDS.sleep(1);
+	    TimeUnit.MILLISECONDS.sleep(delay);
 	    cout.print(moveWrapper(unwrappedMessage));
 	    return;
 	}

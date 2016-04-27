@@ -28,7 +28,7 @@ public class TestManualServer{
     public void testConstructor() throws Exception {        
         // String serverName = "America";
         int port = 1478;
-        ManualInputServer user = new ManualInputServer(port, "mur:America");
+        ManualInputServer user = new ManualInputServer(port, "mur:America", 250);
         assertNotNull("Nothing was constructed", user);
     }
     
@@ -42,7 +42,7 @@ public class TestManualServer{
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	PrintStream outGoingFromClient = new PrintStream(baos);
 	
-	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
+	ManualInputServer ms = new ManualInputServer(1478,"mur:America", 250);
 	ms.establishProtocol(incomingReader, outGoingFromClient);
 	
 	String messagesFromClient = baos.toString();
@@ -60,7 +60,7 @@ public class TestManualServer{
 	String expectedWallV = "TESUJI [(5, 6), v]\r\n";
 	String expectedWallH = "TESUJI [(5, 6), h]\r\n";
 	
-	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
+	ManualInputServer ms = new ManualInputServer(1478,"mur:America", 250);
 	
 	assertEquals("The move wrapper did not wrap the move Properly",expectedMove,ms.moveWrapper(move));
 	assertEquals("The move wrapper did not wrap the wall placement Properly",
@@ -80,7 +80,7 @@ public class TestManualServer{
 	
 	String expected = "TESUJI (5, 6)\r\n";
 	
-	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
+	ManualInputServer ms = new ManualInputServer(1478,"mur:America", 250);
 	ms.sendMove(outGoingFromClient, fakeConsole);
 	
 	assertEquals("The move did not format correctly", expected, baos.toString());
@@ -109,7 +109,7 @@ public class TestManualServer{
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	PrintStream outGoingFromClient = new PrintStream(baos);
 	
-	ManualInputServer ms = new ManualInputServer(1478, "mur:America");
+	ManualInputServer ms = new ManualInputServer(1478,"mur:America", 250);
 	ms.establishProtocol(incomingReader, outGoingFromClient);
 	ms.updateBoard(fakedMove);
 	
@@ -133,7 +133,7 @@ public class TestManualServer{
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	PrintStream outGoingFromClient = new PrintStream(baos);
 	
-	ManualInputServer ms = new ManualInputServer(1478, "mur:America");
+	ManualInputServer ms = new ManualInputServer(1478,"mur:America", 250);
 	ms.establishProtocol(incomingReader, outGoingFromClient);
 	
 	ms.removePlayer(fakedMove);
@@ -151,7 +151,7 @@ public class TestManualServer{
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	PrintStream outGoingToConsole = new PrintStream(baos);
 	
-	ManualInputServer ms = new ManualInputServer(1478, "mur:America");
+	ManualInputServer ms = new ManualInputServer(1478,"mur:America", 250);
 	ms.establishProtocol(incomingReader, outGoingToConsole);
 	
 	baos = new ByteArrayOutputStream();

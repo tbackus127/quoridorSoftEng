@@ -16,10 +16,12 @@ public class ManualInputServer {
     public final static int DEFAULT_PORT_NUMBER = 1478;
     public final static String DEFAULT_NAME = "mur:America";
     public final static String DEFAULT_PREFIX = "mur:";
+    public final static int DEFAULT_DELAY = 250;
     
     
     public final static String ARG_PORT = "--port";
     public final static String ARG_NAME = "--name";
+    public final static String ARG_DELAY = "--delay";
     
     public final static String eoln = "\r\n";
     
@@ -28,6 +30,7 @@ public class ManualInputServer {
     private int playerCount;
     protected Board board;
     protected int thisServersPlayerNumber;
+    protected int delay;
     
     // Main that uses the command line arguments
     public static void main(String[] args) {
@@ -35,6 +38,7 @@ public class ManualInputServer {
         // This sets the defaults
         int port = DEFAULT_PORT_NUMBER;
         String name = DEFAULT_NAME;
+	int delay = DEFAULT_DELAY;
       
         int argNdx = 0;
 
@@ -49,8 +53,12 @@ public class ManualInputServer {
                 port = Integer.parseInt(numberStr);
             } else if(curr.equals(ARG_NAME)) {
                 ++argNdx;
-            
                 name = DEFAULT_PREFIX + args[argNdx];
+		
+            } else if(curr.equals(ARG_DELAY)) {
+                ++argNdx;
+                delay = Integer.parseInt(args[argNdx]);
+		
             } else {
 
                 // if there is an unknown parameter, give usage and quit
@@ -62,7 +70,7 @@ public class ManualInputServer {
             ++argNdx;
         }
 
-        ManualInputServer ms = new ManualInputServer(port, name);
+        ManualInputServer ms = new ManualInputServer(port, name, delay);
         ms.run();
     }
     
@@ -74,9 +82,10 @@ public class ManualInputServer {
     }
     
     // Constructor
-    public ManualInputServer(int initPort, String initName){
+    public ManualInputServer(int initPort, String initName, int initDelay){
         port = initPort;
         name = initName;
+	delay = initDelay;
     }
     
     public void run() {
