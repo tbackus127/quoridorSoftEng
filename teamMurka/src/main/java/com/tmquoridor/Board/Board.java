@@ -192,12 +192,12 @@ public class Board {
       // Player copy operations
       for(int i = 0; i < numOfPlayers; i++) {
         if(kickedPlayers.contains(i)) {
-          System.err.println("  Skipped kicked player " + i);
+          // System.err.println("  Skipped kicked player " + i);
           b.removePlayer(i);
         } else {
           Coord pos = getPlayerPos(i);
-          b.movePlayer(i, pos, "copyOf");
-          System.err.println("  Copying Player " + i + " at " + pos + " -> " + b.getPlayerPos(i));
+          b.movePlayer(i, pos);
+          // System.err.println("  Copying Player " + i + " at " + pos + " -> " + b.getPlayerPos(i));
         }
       }
       
@@ -591,6 +591,21 @@ public class Board {
             }
             int pid = getPlayerAtCoord(c2);
             
+            // If it's not blocked
+            if(!isBlocked(curr, dir)) {
+              
+                // If there's a player present
+                if(pid >= 0 && !mt.isSeen(pid)) {
+                    mt.addPlayer(pid);
+                    mt.add(getLegalMoves(mt, c2));
+                } else {
+                  mt.addMove(c2);
+                }
+              
+            }
+            
+/*            
+            
             // If there is a player in this direction
             if(pid >= 0) {
                 
@@ -604,6 +619,9 @@ public class Board {
             } else if(!isBlocked(curr, dir)) {
                 mt.addMove(c2);
             }
+*/
+            
+            
         }
         return mt;
     }

@@ -13,6 +13,9 @@ import java.sql.Timestamp;
  */
 public class DebugOut {
   
+  /** Set to true to enable debug output */
+  private static final boolean ENABLED = false;
+  
   /** The file name, minus ".txt" */
   private String name;
   
@@ -29,32 +32,36 @@ public class DebugOut {
   public DebugOut(String name) {
       this.name = name;
       
-      // Delete previous file (only keep most recent copy)
-      try {
-          
-          File dbDir = new File("debug");
-          if(!dbDir.exists()) {
-              if(!dbDir.mkdir()) {
-                  System.err.println("DebugOut(): Failed to create debug directory!");
-              }
-          }
-          
-          // Clear all files in debug folder
-          File[] dbFiles = dbDir.listFiles();
-          for(File f : dbFiles) {
-            if(f.exists())
-              f.delete();
-          }
-          
-          this.file = new File(dbDir + "/" + name + ".txt");
-          if(this.file.exists()) {
-              this.file.delete();
-          }
+      if(ENABLED) {
         
-          this.fOut = new PrintStream(this.file);
-      } catch (IOException ie) {
-          System.err.println("DebugOut: Error while creating file " + name + ".txt");
-          ie.printStackTrace();
+        // Delete previous file (only keep most recent copy)
+        try {
+            
+            File dbDir = new File("debug");
+            if(!dbDir.exists()) {
+                if(!dbDir.mkdir()) {
+                    System.err.println("DebugOut(): Failed to create debug directory!");
+                }
+            }
+            
+            // Clear all files in debug folder
+            File[] dbFiles = dbDir.listFiles();
+            for(File f : dbFiles) {
+              if(f.exists())
+                f.delete();
+            }
+            
+            this.file = new File(dbDir + "/" + name + ".txt");
+            if(this.file.exists()) {
+                this.file.delete();
+            }
+          
+            this.fOut = new PrintStream(this.file);
+        } catch (IOException ie) {
+            System.err.println("DebugOut: Error while creating file " + name + ".txt");
+            ie.printStackTrace();
+        }
+        
       }
   }
   
@@ -64,7 +71,8 @@ public class DebugOut {
    * @param sig the call signature ("ClassName.methodName()" recommended; for tracing purposes)
    */
   public void write(String sig, String msg) {
-      this.fOut.println(getTimestamp() + "@" + sig + ": " + msg);
+      if(ENABLED)
+        this.fOut.println(getTimestamp() + "@" + sig + ": " + msg);
   }
   
   /**

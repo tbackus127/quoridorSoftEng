@@ -235,7 +235,7 @@ public class ManualInputServer {
             int column = message.charAt(1) - '0';
             int row = message.charAt(3) - '0';
             Coord coord = new Coord(column, row);
-            board.movePlayer(playerNumber - 1, coord, "MISrv.update");
+            board.movePlayer(playerNumber - 1, coord);
         }
         
     }

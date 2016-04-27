@@ -117,7 +117,7 @@ public class GameClient {
                             madeIllegalMove(pnum);
                             continue;
                         }
-                        board.movePlayer(pnum, mCoord, "Client.move");
+                        board.movePlayer(pnum, mCoord);
                         srvMove = srvMove.substring(7);
                         broadcastAll("ATARI" + " " + (pnum + 1) + " " + srvMove);
                         board.printBoard();
