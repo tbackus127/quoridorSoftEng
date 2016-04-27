@@ -23,17 +23,20 @@ public class RandomMoveServer extends ManualInputServer{
         int port = DEFAULT_PORT_NUMBER;
         String name = DEFAULT_NAME;
 	int delay = DEFAULT_DELAY;
-      
+	boolean intnlWalls = false;
+        
         int argNdx = 0;
 
+        System.err.println("argl=" + args.length);
         // This runs through all of the command line arguments and applies the proper ones
         while (argNdx < args.length) {
             String curr = args[argNdx];
 
             if (curr.equals(ARG_PORT)) {
                 ++argNdx;
-                port = Integer.parseInt(args[argNdx]);
-		
+
+                String numberStr = args[argNdx];
+                port = Integer.parseInt(numberStr);
             } else if(curr.equals(ARG_NAME)) {
                 ++argNdx;
                 name = DEFAULT_PREFIX + args[argNdx];
@@ -41,7 +44,10 @@ public class RandomMoveServer extends ManualInputServer{
             } else if(curr.equals(ARG_DELAY)) {
                 ++argNdx;
                 delay = Integer.parseInt(args[argNdx]);
-		
+                
+            } else if(curr.equals(ARG_INTNL_WALL)) {
+                intnlWalls = true;
+              
             } else {
 
                 // if there is an unknown parameter, give usage and quit
@@ -65,7 +71,7 @@ public class RandomMoveServer extends ManualInputServer{
     
     // Constructor
     public RandomMoveServer(int port, String name, int delay) {
-	super(port, name, delay);
+	super(port, name, delay, false);
     }
     
     @Override

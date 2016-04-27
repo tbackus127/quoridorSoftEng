@@ -22,6 +22,7 @@ public class ManualInputServer {
     public final static String ARG_PORT = "--port";
     public final static String ARG_NAME = "--name";
     public final static String ARG_DELAY = "--delay";
+    public final static String ARG_INTNL_WALL = "--intwalls";
     
     public final static String eoln = "\r\n";
     
@@ -31,6 +32,7 @@ public class ManualInputServer {
     protected Board board;
     protected int thisServersPlayerNumber;
     protected int delay;
+    protected boolean useInternalWallPos;
     
     // Main that uses the command line arguments
     public static void main(String[] args) {
@@ -39,9 +41,11 @@ public class ManualInputServer {
         int port = DEFAULT_PORT_NUMBER;
         String name = DEFAULT_NAME;
 	int delay = DEFAULT_DELAY;
-      
+	boolean intnlWalls = false;
+        
         int argNdx = 0;
 
+        System.err.println("argl=" + args.length);
         // This runs through all of the command line arguments and applies the proper ones
         while (argNdx < args.length) {
             String curr = args[argNdx];
@@ -58,7 +62,10 @@ public class ManualInputServer {
             } else if(curr.equals(ARG_DELAY)) {
                 ++argNdx;
                 delay = Integer.parseInt(args[argNdx]);
-		
+                
+            } else if(curr.equals(ARG_INTNL_WALL)) {
+                intnlWalls = true;
+              
             } else {
 
                 // if there is an unknown parameter, give usage and quit
@@ -70,7 +77,8 @@ public class ManualInputServer {
             ++argNdx;
         }
 
-        ManualInputServer ms = new ManualInputServer(port, name, delay);
+
+        ManualInputServer ms = new ManualInputServer(port, name, delay, intnlWalls);
         ms.run();
     }
     
@@ -82,10 +90,11 @@ public class ManualInputServer {
     }
     
     // Constructor
-    public ManualInputServer(int initPort, String initName, int initDelay){
+    public ManualInputServer(int initPort, String initName, int initDelay, boolean intWalls){
         port = initPort;
         name = initName;
-	delay = initDelay;
+        useInternalWallPos = intWalls;
+        delay = initDelay;
     }
     
     public void run() {
@@ -119,7 +128,6 @@ public class ManualInputServer {
                     System.err.println("Recieved: \"" + clientMessage + "\"");
                     if(clientMessage.startsWith("MYOUSHU")){
                         sendMove(cout);
-                        Thread.sleep(1000);
                     }
                     else if(clientMessage.startsWith("ATARI")){
                         updateBoard(clientMessage);
@@ -180,7 +188,18 @@ public class ManualInputServer {
         else if(move.startsWith("v ") || move.startsWith("h ")) {
             int wx = Integer.parseInt(splitMessage[1]);
             int wy = Integer.parseInt(splitMessage[2]);
-            message += "[(" + (wx) + ", " + (wy) + ")";
+            
+            if(this.useInternalWallPos) {
+                if(splitMessage[0].charAt(0) == 'h') {
+                  wy -= 1;
+                } else {
+                  wx -= 1;
+                }
+                message += "[(" + (wx) + ", " + (wy) + ")";
+            } else {
+                message += "[(" + (wx) + ", " + (wy) + ")";
+            }
+            
             message += ", " + splitMessage[0] + "]";
             return message + "\r\n";
         }
