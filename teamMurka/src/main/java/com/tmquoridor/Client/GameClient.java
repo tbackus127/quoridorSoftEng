@@ -166,6 +166,7 @@ public class GameClient {
                 gui.repaintGUI();
             }
         }
+        gui.repaintGUI();
         
     }
     

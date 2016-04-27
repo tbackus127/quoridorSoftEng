@@ -121,11 +121,20 @@ public class QuorPanel extends JPanel {
      * @param g the Graphics object
      */
     private void updateGUI(Graphics g) {
-        paintGrid(g);
-        paintPawns(g);
-        paintWalls(g);
-        paintInfo(g);
-        paintPaths(g);
+        if(board != null) {
+          paintGrid(g);
+          paintPawns(g);
+          paintWalls(g);
+          paintInfo(g);
+          
+          if(!board.wasWinner())
+            paintPaths(g);
+          else
+            System.err.println("Game is over");
+          
+        } else {
+          System.err.println("Board is null.");
+        }
     }
     
     /**
@@ -281,7 +290,7 @@ public class QuorPanel extends JPanel {
       try {
         path = board.copyOf().getShortestPath(0);
       } catch (NullPointerException e) {
-        // e.printStackTrace();
+        e.printStackTrace();
       }
        
       

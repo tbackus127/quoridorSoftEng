@@ -55,5 +55,7 @@ public class QuorGUI {
     public void repaintGUI() {
         if(panel != null)
           panel.repaint();
+        else
+          System.err.println("Panel is null!");
     }
 }

@@ -60,7 +60,7 @@ public class RandomMoveServer extends ManualInputServer{
     
     // Constructor
     public RandomMoveServer(int port, String name) {
-	super(port, name);
+	super(port, name, false);
     }
     
     @Override

@@ -47,7 +47,7 @@ public class AIServer extends ManualInputServer {
             ++argNdx;
         }
 
-      AIServer ai = new AIServer(port, name);
+      AIServer ai = new AIServer(port, name, intnlWalls);
       ai.run();
     }
 
@@ -59,9 +59,9 @@ public class AIServer extends ManualInputServer {
     }
 
     //constructor
-
+    // Uses internal wall placement (W:[(4,7),V] would place a wall on the LEFT of (4,7)
     public AIServer(int port, String name) {
-        super(port, name);
+        super(port, name, true);
     }
 
     

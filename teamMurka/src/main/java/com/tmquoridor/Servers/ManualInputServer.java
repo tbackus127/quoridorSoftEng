@@ -20,6 +20,7 @@ public class ManualInputServer {
     
     public final static String ARG_PORT = "--port";
     public final static String ARG_NAME = "--name";
+    public final static String ARG_INTNL_WALL = "--intwalls";
     
     public final static String eoln = "\r\n";
     
@@ -28,6 +29,7 @@ public class ManualInputServer {
     private int playerCount;
     protected Board board;
     protected int thisServersPlayerNumber;
+    protected boolean useInternalWallPos;
     
     // Main that uses the command line arguments
     public static void main(String[] args) {
@@ -35,9 +37,10 @@ public class ManualInputServer {
         // This sets the defaults
         int port = DEFAULT_PORT_NUMBER;
         String name = DEFAULT_NAME;
-      
         int argNdx = 0;
+        boolean intnlWalls = false;
 
+        System.err.println("argl=" + args.length);
         // This runs through all of the command line arguments and applies the proper ones
         while (argNdx < args.length) {
             String curr = args[argNdx];
@@ -51,6 +54,10 @@ public class ManualInputServer {
                 ++argNdx;
             
                 name = DEFAULT_PREFIX + args[argNdx];
+                
+            } else if(curr.equals(ARG_INTNL_WALL)) {
+                intnlWalls = true;
+              
             } else {
 
                 // if there is an unknown parameter, give usage and quit
@@ -62,7 +69,7 @@ public class ManualInputServer {
             ++argNdx;
         }
 
-        ManualInputServer ms = new ManualInputServer(port, name);
+        ManualInputServer ms = new ManualInputServer(port, name, intnlWalls);
         ms.run();
     }
     
@@ -74,9 +81,10 @@ public class ManualInputServer {
     }
     
     // Constructor
-    public ManualInputServer(int initPort, String initName){
+    public ManualInputServer(int initPort, String initName, boolean intWalls){
         port = initPort;
         name = initName;
+        useInternalWallPos = intWalls;
     }
     
     public void run() {
@@ -171,7 +179,18 @@ public class ManualInputServer {
         else if(move.startsWith("v ") || move.startsWith("h ")) {
             int wx = Integer.parseInt(splitMessage[1]);
             int wy = Integer.parseInt(splitMessage[2]);
-            message += "[(" + (wx) + ", " + (wy) + ")";
+            
+            if(this.useInternalWallPos) {
+                if(splitMessage[0].charAt(0) == 'h') {
+                  wy -= 1;
+                } else {
+                  wx -= 1;
+                }
+                message += "[(" + (wx) + ", " + (wy) + ")";
+            } else {
+                message += "[(" + (wx) + ", " + (wy) + ")";
+            }
+            
             message += ", " + splitMessage[0] + "]";
             return message + "\r\n";
         }
