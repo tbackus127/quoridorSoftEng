@@ -67,5 +67,8 @@ public class TylersAIServer extends ManualInputServer{
         super(port, name, 250, false);
     }
     
-    
+    public void updateBoard(String message){
+	super.updateBoard(message);
+	
+    }
 }
