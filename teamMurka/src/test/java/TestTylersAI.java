@@ -27,7 +27,7 @@ public class TestTylersAI{
     @Test
     public void testConstructor(){
 	int port = 1478;
-        TylersAIServer user = new TylersAIServer(port, "mur:America");
+        TylersAIServer user = new TylersAIServer(port, "mur:America", 10);
         assertNotNull("Nothing was constructed", user);
     }
 }
