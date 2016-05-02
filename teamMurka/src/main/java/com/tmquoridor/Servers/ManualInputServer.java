@@ -40,8 +40,8 @@ public class ManualInputServer {
         // This sets the defaults
         int port = DEFAULT_PORT_NUMBER;
         String name = DEFAULT_NAME;
-	int delay = DEFAULT_DELAY;
-	boolean intnlWalls = false;
+        int delay = DEFAULT_DELAY;
+        boolean intnlWalls = false;
         
         int argNdx = 0;
 
@@ -58,7 +58,7 @@ public class ManualInputServer {
             } else if(curr.equals(ARG_NAME)) {
                 ++argNdx;
                 name = DEFAULT_PREFIX + args[argNdx];
-		
+    
             } else if(curr.equals(ARG_DELAY)) {
                 ++argNdx;
                 delay = Integer.parseInt(args[argNdx]);
@@ -126,16 +126,16 @@ public class ManualInputServer {
                 while(true) {
                     String clientMessage = cin.nextLine();
                     System.err.println("Recieved: \"" + clientMessage + "\"");
-                    if(clientMessage.startsWith("MYOUSHU")){
+                    if(clientMessage.startsWith("MYOUSHU")) {
                         sendMove(cout);
                     }
-                    else if(clientMessage.startsWith("ATARI")){
+                    else if(clientMessage.startsWith("ATARI")) {
                         updateBoard(clientMessage);
                     }
                     else if(clientMessage.startsWith("GOTE")) {
                         removePlayer(clientMessage);
                     }
-                    else if(clientMessage.startsWith("KIKASHI")){
+                    else if(clientMessage.startsWith("KIKASHI")) {
                         winnerDeclared(System.out, clientMessage);
                     }
                 }
@@ -214,7 +214,7 @@ public class ManualInputServer {
     public void sendMove(PrintStream cout, Scanner console) {
         System.out.print("Enter \"m\" to move your peice, or \"w\" to place a wall: ");
         String moveType = console.next();
-	String unwrappedMessage = "";
+        String unwrappedMessage = "";
         if (moveType.equals("m")) {
             unwrappedMessage = moveType + " ";
             System.out.print("What column would you like to move to: ");
@@ -268,18 +268,16 @@ public class ManualInputServer {
         
     }
     
-    //
     public Board getBoard(){
         return board;
     }
     
-    // 
     public void removePlayer(String message){
         message = message.substring(5).replaceAll("\\s","");
         board.removePlayer((int)message.charAt(0)-(int)'0'-1);
     }
     
-    public void winnerDeclared(PrintStream console, String message){
+    public void winnerDeclared(PrintStream console, String message) {
         message = message.substring(7).replaceAll("\\s","");
         if((int)message.charAt(0)-(int)'0' == thisServersPlayerNumber) {
             console.print("Congratulations you have won the game!\n");

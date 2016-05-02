@@ -132,6 +132,19 @@ public class Board {
     }
     
     /**
+     * Gets all walls that would block a player's path
+     * @param pid the player ID to run against
+     * @param path the path returned from getShortestPath()
+     */
+    public HashSet<Wall> getBlockingWalls(int pid, ArrayList<Coord> path) {
+      HashSet<Wall> result = new HashSet<Wall>();
+      
+      // For testing
+      result.add(new Wall(new Coord(0,0), Orientation.VERT));
+      return result;
+    }
+    
+    /**
      * Gets the shortest path with a wall tested
      * @param pid the player ID to check
      * @param w the wall to check shortest path with (must be a legal wall)

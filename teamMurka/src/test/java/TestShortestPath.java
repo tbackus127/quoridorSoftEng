@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -35,7 +36,7 @@ public class TestShortestPath {
           b.placeWall(testWalls[i]);
         }
         
-        // Get the shortest path to (7, 8) (will ALWAYS be 17 in length.
+        // Get the shortest path to (7, 8) (will ALWAYS be 17 in length).
         ArrayList<Coord> path = b.getShortestPath(0, new Coord(7, 8));
         
         // Debug info
@@ -48,5 +49,64 @@ public class TestShortestPath {
         assertNotNull(b);
         assertNotNull(path);
         assertEquals("Path size is not the shortest it can be!" ,path.size(), 17);
+    }
+    
+    // Tests blocking walls for given path
+    @Test
+    public void testBlockingWalls() {
+      Board b = new Board(4);
+      
+      // Setup player positions
+      Coord[] plPos = {
+        new Coord(3,2),
+        new Coord(5,5),
+        new Coord(4,2),
+        new Coord(5,6)
+      };
+      
+      for(int i = 0; i < plPos.length; i++)
+        b.movePlayer(i, plPos[i]);
+        
+      // Setup walls
+      Wall[] walls = {
+        new Wall(new Coord(4,2), Orientation.HORIZ),
+        new Wall(new Coord(0,3), Orientation.HORIZ),
+        new Wall(new Coord(2,3), Orientation.HORIZ),
+        new Wall(new Coord(4,3), Orientation.VERT),
+        new Wall(new Coord(5,3), Orientation.HORIZ),
+        new Wall(new Coord(7,3), Orientation.HORIZ),
+        new Wall(new Coord(3,4), Orientation.VERT),
+        new Wall(new Coord(0,6), Orientation.HORIZ),
+        new Wall(new Coord(3,6), Orientation.HORIZ),
+        new Wall(new Coord(7,6), Orientation.HORIZ),
+        new Wall(new Coord(2,8), Orientation.HORIZ),
+        new Wall(new Coord(4,8), Orientation.HORIZ),
+        new Wall(new Coord(6,8), Orientation.HORIZ)
+      };
+      
+      for(int i = 0; i < walls.length; i++) {
+        b.placeWall(walls[i]);
+      }
+      
+      // Blocking walls
+      Wall[] expectedWalls = {
+        new Wall(new Coord(5,3), Orientation.VERT),
+        new Wall(new Coord(5,4), Orientation.VERT),
+        new Wall(new Coord(4,5), Orientation.HORIZ),
+        new Wall(new Coord(5,5), Orientation.HORIZ),
+        new Wall(new Coord(5,6), Orientation.HORIZ),
+        new Wall(new Coord(5,7), Orientation.HORIZ),
+        new Wall(new Coord(6,6), Orientation.VERT),
+        new Wall(new Coord(4,7), Orientation.HORIZ),
+        new Wall(new Coord(7,6), Orientation.VERT),
+        new Wall(new Coord(8,6), Orientation.VERT),
+        new Wall(new Coord(8,7), Orientation.VERT)
+      };
+      
+      ArrayList<Coord> path = b.getShortestPath(0);
+      HashSet<Wall> result = b.getBlockingWalls(0, path);
+      
+      assertNotNull(path);
+      assertNotNull(result);
     }
 }
