@@ -112,6 +112,8 @@ public class TestBoard {
     
     @Test
     public void testMoveLegality() {
+        
+        // Setup
         Board b = new Board(4);
         b.movePlayer(0, new Coord(2, 2));
         b.movePlayer(1, new Coord(2, 1));
@@ -124,11 +126,14 @@ public class TestBoard {
         b.placeWall(new Coord(1, 3), Orientation.VERT);
         
         HashSet<Coord> hslm = b.getLegalMoves(0);
+        
+        // DEBUG
         System.err.println("\n\n  hslm size=" + hslm.size());
         for(Coord c : hslm) {
             System.err.println(c);
         }
         
+        // Expected
         Coord[] resCoords = {
             new Coord(3, 1),
             new Coord(1, 0),
@@ -137,6 +142,7 @@ public class TestBoard {
             new Coord(2, 3)
         };
         
+        // Match
         for(int i = 0; i < resCoords.length; i++) {
             Coord r = resCoords[i];
             boolean found = false;
