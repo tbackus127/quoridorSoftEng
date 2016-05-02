@@ -146,7 +146,17 @@ public class Board {
       
       
       // For testing
-      result.add(new Wall(new Coord(0,0), Orientation.VERT));
+      result.add(new Wall(new Coord(5,3), Orientation.VERT));
+      result.add(new Wall(new Coord(5,4), Orientation.VERT));
+      result.add(new Wall(new Coord(4,5), Orientation.HORIZ));
+      result.add(new Wall(new Coord(5,5), Orientation.HORIZ));
+      result.add(new Wall(new Coord(5,6), Orientation.HORIZ));
+      result.add(new Wall(new Coord(5,7), Orientation.HORIZ));
+      result.add(new Wall(new Coord(6,6), Orientation.VERT));
+      result.add(new Wall(new Coord(4,7), Orientation.HORIZ));
+      result.add(new Wall(new Coord(7,6), Orientation.VERT));
+      result.add(new Wall(new Coord(8,6), Orientation.VERT));
+      result.add(new Wall(new Coord(8,7), Orientation.VERT));
       return result;
     }
     

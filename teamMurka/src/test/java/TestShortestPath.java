@@ -106,7 +106,27 @@ public class TestShortestPath {
       ArrayList<Coord> path = b.getShortestPath(0);
       HashSet<Wall> result = b.getBlockingWalls(0, path);
       
+      // Check for nulls
       assertNotNull(path);
       assertNotNull(result);
+      
+      // Check for match
+      boolean noMismatch = true;
+      for(Wall w : result) {
+        boolean found = false;
+        
+        // Compare to each expected
+        for(int i = 0; i < expectedWalls.length; i++) {
+          if(w.equals(expectedWalls[i]))
+            found = true;
+        }
+        
+        if(!found) {
+          noMismatch = false;
+          break;
+        }
+      }
+      
+      assertTrue(noMismatch);
     }
 }

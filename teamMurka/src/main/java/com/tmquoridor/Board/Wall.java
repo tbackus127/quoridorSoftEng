@@ -45,6 +45,21 @@ public class Wall {
     }
     
     /**
+     * Check if a wall equals this one
+     * @param other the other wall to compare to
+     * @return true if they are equal; false if not
+     */
+    public boolean equals(Wall other) {
+      Coord oc = other.getPos();
+      Coord tc = this.getPos();
+      
+      if(!tc.equals(oc))
+        return false;
+      
+      return (other.getOrt() == this.getOrt()) ? true : false;
+    }
+    
+    /**
      * Gets the position of the Wall
      * @return a Coord for the Wall's position
      */
