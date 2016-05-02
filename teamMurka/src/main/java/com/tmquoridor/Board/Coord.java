@@ -32,6 +32,37 @@ public class Coord {
     }
     
     /**
+     * Gets the direction moved from a source to a destination Coord.
+     * @param src the Coord to test from
+     * @param dest the Coord to test to
+     * @return a Direction moved; null if diagonal or if src == dest
+     */
+    public Direction getDirMoved(Coord src, Coord dest) {
+        
+        // Unpack
+        int sx = src.getX();
+        int sy = src.getY();
+        int dx = src.getX();
+        int dy = src.getY();
+        
+        // If same column
+        if(sx == dx) {
+        
+            if(sy < dy) return Direction.SOUTH;
+            if(sy > dy) return Direction.NORTH;
+        
+        // If same row
+        } else if(sy == dy) {
+         
+            if(sx < dx) return Direction.EAST;
+            if(sx > dx) return Direction.WEST;
+        }
+        
+        // Diagonal or same coord
+        return null;
+    }
+    
+    /**
      * Translates a Coord by Direction
      * @param dir the Direction to move
      * @return the resulting Coord (bounded if OoB) if the move would be made.

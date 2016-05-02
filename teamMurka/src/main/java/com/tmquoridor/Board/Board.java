@@ -139,6 +139,12 @@ public class Board {
     public HashSet<Wall> getBlockingWalls(int pid, ArrayList<Coord> path) {
       HashSet<Wall> result = new HashSet<Wall>();
       
+      if(path.size() <= 0)
+        return null;
+      
+      Coord curr = path.get(0);
+      
+      
       // For testing
       result.add(new Wall(new Coord(0,0), Orientation.VERT));
       return result;
