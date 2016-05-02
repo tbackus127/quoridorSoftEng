@@ -4,6 +4,8 @@ package com.tmquoridor.Board;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.ArrayList;
+
+import com.tmquoridor.Util.*;
  
 /**
  * Contains all data for player positions and walls.
@@ -135,28 +137,103 @@ public class Board {
      * Gets all walls that would block a player's path
      * @param pid the player ID to run against
      * @param path the path returned from getShortestPath()
+     * @return a HashSet of Walls; null if path is empty
      */
     public HashSet<Wall> getBlockingWalls(int pid, ArrayList<Coord> path) {
+      
+      DebugOut db = new DebugOut("BlockingWallsTest");
       HashSet<Wall> result = new HashSet<Wall>();
       
       if(path.size() <= 0)
         return null;
       
-      Coord curr = path.get(0);
+      Coord curr = getPlayerPos(pid);
+      db.write("gbw", "Origin:" + curr.toString());
+      for(Coord c : path) {
+        db.write("gbw", "" + curr + " -> " + c);
+        
+        Direction d = Coord.getDirMoved(curr, c);
+        db.write("gbw", "d=" + d);
+        
+        // TODO: Process diagonals
+        if(d == null) {
+          curr = c;
+          continue;
+        }
+        
+        Orientation mOrt = d.ort();
+        db.write("gbw", "mOrt=" + mOrt.toString());
+        Orientation wOrt = mOrt.neg();
+        db.write("gbw", "wOrt=" + wOrt.toString());
+        
+        // Build theoretical wall 1
+        int w1x = curr.getX();
+        int w1y = curr.getY();
+        switch(d) {
+          case EAST:
+            w1x += 1;
+          case SOUTH:
+            w1y += 1;
+        }
+        
+        Wall w1 = new Wall(new Coord(w1x, w1y), wOrt);
+        db.write("gbw", "w1=" + w1.toString());
+        
+        // Test if a player can place a wall at w1
+        boolean canPlace = false;
+        for(int i = 0; i < numOfPlayers && !canPlace; i++) {
+          if(isPlayerKicked(i) || pid == i)
+            continue;
+          
+          // If any player could place it, add it
+          if(isLegalWall(i, w1)) {
+            result.add(w1);
+            canPlace = true;
+          }
+        }
+        
+        // Second potential blocking wall
+        int w2x = w1x;
+        int w2y = w1y;
+        switch(wOrt) {
+          case VERT:
+            w2y -= 1;
+          case HORIZ:
+            w2x -= 1;
+        }
+        
+        Wall w2 = new Wall(new Coord(w2x, w2y), wOrt);
+        db.write("gbw", "w2=" + w2.toString());
+        
+        // Test if a player can place a wall at w2
+        canPlace = false;
+        for(int i = 0; i < numOfPlayers && !canPlace; i++) {
+          if(isPlayerKicked(i) || pid == i)
+            continue;
+          
+          // If any player could place it, add it
+          if(isLegalWall(i, w2)) {
+            result.add(w2);
+            canPlace = true;
+          }
+        }
+        
+        curr = c;
+      }
       
       
       // For testing
-      result.add(new Wall(new Coord(5,3), Orientation.VERT));
-      result.add(new Wall(new Coord(5,4), Orientation.VERT));
-      result.add(new Wall(new Coord(4,5), Orientation.HORIZ));
-      result.add(new Wall(new Coord(5,5), Orientation.HORIZ));
-      result.add(new Wall(new Coord(5,6), Orientation.HORIZ));
-      result.add(new Wall(new Coord(5,7), Orientation.HORIZ));
-      result.add(new Wall(new Coord(6,6), Orientation.VERT));
-      result.add(new Wall(new Coord(4,7), Orientation.HORIZ));
-      result.add(new Wall(new Coord(7,6), Orientation.VERT));
-      result.add(new Wall(new Coord(8,6), Orientation.VERT));
-      result.add(new Wall(new Coord(8,7), Orientation.VERT));
+      // result.add(new Wall(new Coord(5,3), Orientation.VERT));
+      // result.add(new Wall(new Coord(5,4), Orientation.VERT));
+      // result.add(new Wall(new Coord(4,5), Orientation.HORIZ));
+      // result.add(new Wall(new Coord(5,5), Orientation.HORIZ));
+      // result.add(new Wall(new Coord(5,6), Orientation.HORIZ));
+      // result.add(new Wall(new Coord(5,7), Orientation.HORIZ));
+      // result.add(new Wall(new Coord(6,6), Orientation.VERT));
+      // result.add(new Wall(new Coord(4,7), Orientation.HORIZ));
+      // result.add(new Wall(new Coord(7,6), Orientation.VERT));
+      // result.add(new Wall(new Coord(8,6), Orientation.VERT));
+      // result.add(new Wall(new Coord(8,7), Orientation.VERT));
       return result;
     }
     

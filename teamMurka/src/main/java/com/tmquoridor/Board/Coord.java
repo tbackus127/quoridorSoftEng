@@ -42,8 +42,8 @@ public class Coord {
         // Unpack
         int sx = src.getX();
         int sy = src.getY();
-        int dx = src.getX();
-        int dy = src.getY();
+        int dx = dest.getX();
+        int dy = dest.getY();
         
         // If same column
         if(sx == dx) {
