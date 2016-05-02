@@ -37,7 +37,7 @@ public class Coord {
      * @param dest the Coord to test to
      * @return a Direction moved; null if diagonal or if src == dest
      */
-    public Direction getDirMoved(Coord src, Coord dest) {
+    public static Direction getDirMoved(Coord src, Coord dest) {
         
         // Unpack
         int sx = src.getX();
