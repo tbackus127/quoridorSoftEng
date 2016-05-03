@@ -57,8 +57,8 @@ public class TestManualServer{
 	String wallv = "v 5 6";
 	String wallh = "h 5 6";
 	String expectedMove = "TESUJI (5, 6)\r\n";
-	String expectedWallV = "TESUJI [(5, 6), v]\r\n";
-	String expectedWallH = "TESUJI [(5, 6), h]\r\n";
+	String expectedWallV = "TESUJI [(4, 6), v]\r\n";
+	String expectedWallH = "TESUJI [(5, 5), h]\r\n";
 	
 	ManualInputServer ms = new ManualInputServer(1478,"mur:America");
 	
@@ -92,7 +92,7 @@ public class TestManualServer{
 	baos = new ByteArrayOutputStream();
 	outGoingFromClient = new PrintStream(baos);
 	
-	expected = "TESUJI [(5, 6), h]\r\n";
+	expected = "TESUJI [(5, 5), h]\r\n";
 	
 	ms.sendMove(outGoingFromClient, fakeConsole);
 	

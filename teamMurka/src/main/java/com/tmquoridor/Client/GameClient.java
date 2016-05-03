@@ -41,6 +41,9 @@ public class GameClient {
     /** GUI */
     private QuorGUI gui;
     
+    /** Playing flag */
+    private boolean playing = false;
+    
     /**
      * Default constructor
      * @param args runtime arguments passed in
@@ -56,6 +59,9 @@ public class GameClient {
         
         // If handshaking is successfull
         if(handshake()) {
+            try {
+              Thread.sleep(1000);
+            } catch(InterruptedException ign) {}
             sendStartMsgs();
             setupBoard();
             gui = new QuorGUI(board, srvNames);
@@ -78,7 +84,7 @@ public class GameClient {
     private void doGameLoop() {
         System.err.println("Entering game loop...");
         board.printBoard();
-        boolean playing = true;
+        playing = true;
         while(playing) {
             for(int i = 0; i < socks.length; i++) {
                 PrintStream cout = null;
@@ -148,8 +154,11 @@ public class GameClient {
                     if(board.getWinner() > 0) {
                         broadcastAll("KIKASHI " + board.getWinner());
                         playing = false;
+                        gui.repaintGUI();
+                        break;
                     }
                     
+                    Thread.sleep(500);
                 } catch (Exception e) {
                     e.printStackTrace();
                     playing = false;
@@ -173,6 +182,11 @@ public class GameClient {
             System.err.println("Socket closed");
         }
         socks[pid] = null;
+        int winID = board.getWinner();
+        if(winID > 0) {
+          broadcastAll("KIKASHI " + winID);
+          playing = false;
+        }
         gui.repaintGUI();
     }
     

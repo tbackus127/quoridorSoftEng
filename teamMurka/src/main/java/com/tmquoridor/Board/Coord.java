@@ -38,6 +38,8 @@ public class Coord {
      * @throws RuntimeException if the internal Direction processing returns a null pointer
      */
     public Coord translate(Direction dir) throws RuntimeException {
+        if(dir == null)
+          System.err.println("!! Coord.translate(): dir is null!");
         int x2 = this.x;
         int y2 = this.y;
         switch(dir) {

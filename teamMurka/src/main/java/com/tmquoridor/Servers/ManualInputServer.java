@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import java.util.Scanner;
+import java.util.NoSuchElementException;
 import java.lang.String;
 
 public class ManualInputServer {
@@ -68,7 +69,7 @@ public class ManualInputServer {
     
     // Lets them know if they put in an invalid argument
     private static void usage() {
-        System.err.print("usage: java BirthdayServer [options]\n" +
+        System.err.print("usage: java ManualInputServer [options]\n" +
             "       where options:\n" + "       --port port\n");
     }
     
@@ -98,13 +99,18 @@ public class ManualInputServer {
                 Scanner cin = new Scanner(client.getInputStream());
                 PrintStream cout = new PrintStream(client.getOutputStream());
                 
+                Thread.sleep(100);
+                
                 establishProtocol(cin, cout);
+                
+                Thread.sleep(100);
                 
                 while(true) {
                     String clientMessage = cin.nextLine();
                     System.err.println("Recieved: \"" + clientMessage + "\"");
                     if(clientMessage.startsWith("MYOUSHU")){
                         sendMove(cout);
+                        Thread.sleep(1000);
                     }
                     else if(clientMessage.startsWith("ATARI")){
                         updateBoard(clientMessage);
@@ -117,8 +123,10 @@ public class ManualInputServer {
                     }
                 }
             }
+        } catch(NoSuchElementException ign) {
+          // Ignored
         } catch(Exception e) {
-            
+            e.printStackTrace();
         }
     }
     
@@ -153,6 +161,7 @@ public class ManualInputServer {
      * for the protocol 
     */
     public String moveWrapper(String move) {
+        // System.err.println("moveWrapper received:" + move);
         String message = "TESUJI ";
         String[] splitMessage = move.split(" ");
         if(move.startsWith("m ")){
@@ -160,7 +169,14 @@ public class ManualInputServer {
             return message + "\r\n";
         }
         else if(move.startsWith("v ") || move.startsWith("h ")) {
-            message += "[(" + splitMessage[1] + ", " + splitMessage[2] + ")";
+            int wx = Integer.parseInt(splitMessage[1]);
+            int wy = Integer.parseInt(splitMessage[2]);
+            if(splitMessage[0].charAt(0) == 'h') {
+              wy -= 1;
+            } else {
+              wx -= 1;
+            }
+            message += "[(" + (wx) + ", " + (wy) + ")";
             message += ", " + splitMessage[0] + "]";
             return message + "\r\n";
         }
@@ -172,7 +188,6 @@ public class ManualInputServer {
         sendMove(cout, console);
     }
     
-    // 
     public void sendMove(PrintStream cout, Scanner console) {
         System.out.print("Enter \"m\" to move your peice, or \"w\" to place a wall: ");
         String moveType = console.next();
@@ -197,34 +212,33 @@ public class ManualInputServer {
     }
     
     public void updateBoard(String message) {
+        // System.err.println("updateBoard():" + message);
         message = message.substring(6).replaceAll("\\s","");
-        int playerNumber = (int)message.charAt(0)-(int)'0';
+        // System.err.println("  upd0:" + message);
+        int playerNumber = message.charAt(0) - '0';
+        // System.err.println("  pid:" + playerNumber);
+        
         message = message.substring(1);
+        // System.err.println("  upd1:" + message);
         if(message.startsWith("[")) {
             Orientation ort = null;
-            if(message.charAt(8) == 'h') {
+            int column = message.charAt(2) - '0';
+            int row = message.charAt(4) - '0';
+            if(message.charAt(7) == 'h') {
                 ort = Orientation.HORIZ;
-            }
-            else{
-                ort = Orientation.VERT;
-            }
-            int column = (int)message.charAt(2)-(int)'0';
-            int row = (int)message.charAt(4) - (int)'0';
-            Coord coord = null;
-            
-            // TODO: FIXME
-            if(true) {
-                coord = new Coord(column, row);
+                row += 1;
             } else {
-                coord = new Coord(column, row);
+                ort = Orientation.VERT;
+                column += 1;
             }
+            Coord coord = new Coord(column, row);
             board.placeWall(playerNumber - 1, coord, ort);
         }
         else if(message.startsWith("(")){
-            int column = (int)message.charAt(1)-(int)'0';
-            int row = (int)message.charAt(3) - (int)'0';
+            int column = message.charAt(1) - '0';
+            int row = message.charAt(3) - '0';
             Coord coord = new Coord(column, row);
-            board.movePlayer(playerNumber-1, coord);
+            board.movePlayer(playerNumber - 1, coord);
         }
         
     }
@@ -241,11 +255,11 @@ public class ManualInputServer {
     }
     
     public void winnerDeclared(PrintStream console, String message){
-  message = message.substring(7).replaceAll("\\s","");
-  if((int)message.charAt(0)-(int)'0' == thisServersPlayerNumber){
-      console.print("Congratulations you have won the game!\n");
-  }else{
-      console.print("Sorry you didn't win this time, better luck next time.\n");
-  }
+        message = message.substring(7).replaceAll("\\s","");
+        if((int)message.charAt(0)-(int)'0' == thisServersPlayerNumber) {
+            console.print("Congratulations you have won the game!\n");
+        } else{
+            console.print("Sorry you didn't win this time, better luck next time.\n");
+        }
     }
 }

@@ -127,22 +127,40 @@ public class Board {
         return ortMap.get(s);
     }
     
-    public ArrayList<Coord> getShortestPath(int pid){
-	ArrayList<Coord> path = null;
-	ArrayList<Coord> temp = null;
-	ArrayList<Coord> winPos = winningPos.get(pid);
-	for(Coord move : winPos){
-	    temp = getShortestPath(pid, move);
-	    if (temp != null){
-		if (path == null){
-		    path = temp;
-		}
-		else if (temp.size() < path.size()){
-		    path = temp;
-		}
-	    }
-	}
-	return path;
+    /**
+     * Gets the shortest path with a wall tested
+     * @param pid the player ID to check
+     * @param w the wall to check shortest path with (must be a legal wall)
+     * @return the shortest path as an ArrayList of Coords
+     */
+    public ArrayList<Coord> getShortestPath(int pid, Wall w) {
+        Board b = copyOf();
+        b.placeWall(w);
+        return b.getShortestPath(pid);
+    }
+    
+    /**
+     * Gets the shortest path for any player to win
+     * @param pid the player ID to check
+     * @return the shortest path as an ArrayList of Coords
+     */
+    public ArrayList<Coord> getShortestPath(int pid) {
+        if(kickedPlayers.contains(pid) || pid < 0)
+          return null;
+        ArrayList<Coord> path = null;
+        ArrayList<Coord> temp = null;
+        ArrayList<Coord> winPos = winningPos.get(pid);
+        for(Coord move : winPos) {
+            temp = getShortestPath(pid, move);
+            if (temp != null) {
+                if (path == null) {
+                    path = temp;
+                } else if (temp.size() < path.size()) {
+                    path = temp;
+                }
+            }
+        }
+        return path;
     }
     
     /**
@@ -178,6 +196,7 @@ public class Board {
         b.placeWall(w);
       }
       
+      // Walls remaining
       for(int i = 0; i < wallsLeft.length; i++) {
         b.setWallsRemaining(i, wallsRemaining(i));
       }
@@ -228,9 +247,14 @@ public class Board {
      * @return 0 if no winner; returns the PID of the winner otherwise.
      */
     public int getWinner() {
-        
-        if (numOfPlayers == 1)
-            return 0;
+
+        if(getNumOfPlayers() == 1) {
+          for(int i = 0; i < numOfPlayers; i++) {
+            if(!isPlayerKicked(i))
+              return i + 1;
+          }
+        }
+
         // Go through each player
         for(int i = 0; i < numOfPlayers; i++) {
             if(kickedPlayers.contains(i)) continue;
@@ -272,13 +296,13 @@ public class Board {
         int wy = wPos.getY();
         
         // Check board bounds (within 0-8)
-        if (wOrt == Orientation.HORIZ){
-	    if(wx <= -1 || wx >= 8 || wy <= 0 || wy >=9)
-		return false;
-	}else{
-	    if(wy <= -1 || wy >= 8 || wx <= 0 || wx >=9)
-		return false;
-	}
+        if (wOrt == Orientation.HORIZ) {
+          if(wx <= -1 || wx >= 8 || wy <= 0 || wy >= 9)
+            return false;
+        } else {
+          if(wy <= -1 || wy >= 8 || wx <= 0 || wx >= 9)
+            return false;
+        }
         
         // Break the walls into segments
         HashSet<Segment> segs = getSegments();
@@ -478,6 +502,10 @@ public class Board {
      * @return the player ID found at the Coord c (-1 if no player)
      */
     public int getPlayerAtCoord(Coord c) {
+        if(c == null) {
+          System.err.println("!! getPlayerAtCoord(): c is null");
+          return -1;
+        }
         int cx = c.getX();
         int cy = c.getY();
         for(int i = 0; i < playerPositions.length; i++) {
@@ -513,7 +541,9 @@ public class Board {
                 c2 = curr.translate(dir);
             } catch (Exception e) {
                 System.err.println("!! TRANSLATION FAILED!");
-                c2 = curr;
+                e.printStackTrace();
+                // c2 = curr;
+                break;
             }
             int pid = getPlayerAtCoord(c2);
             
@@ -619,30 +649,30 @@ public class Board {
         ortMap.put("HORIZ", Orientation.HORIZ);
         ortMap.put("vert", Orientation.VERT);
         ortMap.put("VERT", Orientation.VERT);
-	
-	winningPos = new HashMap<Integer, ArrayList<Coord>>();
-	ArrayList<Coord> list = new ArrayList<Coord>();
-	for(int i = 0; i <= 8; i++){
-	    list.add(new Coord(i,8));
-	}
-	winningPos.put(0,list);
-	
-	list = new ArrayList<Coord>();
-	for(int i = 0; i <= 8; i++){
-	    list.add(new Coord(i,0));
-	}
-	winningPos.put(1,list);
-	
-	list = new ArrayList<Coord>();
-	for(int i = 0; i <= 8; i++){
-	    list.add(new Coord(8,i));
-	}
-        winningPos.put(2,list);
-	
-	list = new ArrayList<Coord>();
-	for(int i = 0; i <= 8; i++){
-	    list.add(new Coord(0,i));
-	}
-	winningPos.put(3,list);
+  
+        winningPos = new HashMap<Integer, ArrayList<Coord>>();
+        ArrayList<Coord> list = new ArrayList<Coord>();
+        for(int i = 0; i <= 8; i++){
+            list.add(new Coord(i,8));
+        }
+        winningPos.put(0,list);
+        
+        list = new ArrayList<Coord>();
+        for(int i = 0; i <= 8; i++){
+            list.add(new Coord(i,0));
+        }
+        winningPos.put(1,list);
+        
+        list = new ArrayList<Coord>();
+        for(int i = 0; i <= 8; i++){
+            list.add(new Coord(8,i));
+        }
+              winningPos.put(2,list);
+        
+        list = new ArrayList<Coord>();
+        for(int i = 0; i <= 8; i++){
+            list.add(new Coord(0,i));
+        }
+        winningPos.put(3,list);
     }
 }
