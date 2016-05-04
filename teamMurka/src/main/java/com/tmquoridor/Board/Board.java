@@ -4,6 +4,8 @@ package com.tmquoridor.Board;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.ArrayList;
+
+import com.tmquoridor.Util.*;
  
 /**
  * Contains all data for player positions and walls.
@@ -36,6 +38,9 @@ public class Board {
     /** Contains how many walls each player has left */
     private int[] wallsLeft;
     
+    /** If the game has a winner yet */
+    private boolean hasWinner;
+    
     private HashMap<String, Direction> dirMap;
     private HashMap<String, Orientation> ortMap;
     private HashMap<Integer, ArrayList<Coord>> winningPos;
@@ -59,6 +64,7 @@ public class Board {
             playerPositions[i] = startPos[i];
         placedWalls = new HashSet<Wall>();
         kickedPlayers = new HashSet<Integer>();
+        hasWinner = false;
         buildMaps();
         wallsLeft = new int[numOfPlayers];
         for(int i = 0; i < wallsLeft.length; i++) {
@@ -128,6 +134,110 @@ public class Board {
     }
     
     /**
+     * Gets all walls that would block a player's path
+     * @param pid the player ID to run against
+     * @param path the path returned from getShortestPath()
+     * @return a HashSet of Walls; null if path is empty
+     */
+    public HashSet<Wall> getBlockingWalls(int pid, ArrayList<Coord> path) {
+      
+      DebugOut db = new DebugOut("BlockingWallsTest");
+      HashSet<Wall> result = new HashSet<Wall>();
+      
+      if(path.size() <= 0)
+        return null;
+      
+      Coord curr = getPlayerPos(pid);
+      db.write("gbw", "Origin:" + curr.toString());
+      for(Coord c : path) {
+        db.write("gbw", "" + curr + " -> " + c);
+        
+        Direction d = Coord.getDirMoved(curr, c);
+        db.write("gbw", "d=" + d);
+        
+        // TODO: Process diagonals
+        if(d == null) {
+          curr = c;
+          continue;
+        }
+        
+        Orientation mOrt = d.ort();
+        db.write("gbw", "mOrt=" + mOrt.toString());
+        Orientation wOrt = mOrt.neg();
+        db.write("gbw", "wOrt=" + wOrt.toString());
+        
+        // Build theoretical wall 1
+        int w1x = curr.getX();
+        int w1y = curr.getY();
+        switch(d) {
+          case EAST:
+            w1x += 1;
+          case SOUTH:
+            w1y += 1;
+        }
+        
+        Wall w1 = new Wall(new Coord(w1x, w1y), wOrt);
+        db.write("gbw", "w1=" + w1.toString());
+        
+        // Test if a player can place a wall at w1
+        boolean canPlace = false;
+        for(int i = 0; i < numOfPlayers && !canPlace; i++) {
+          if(isPlayerKicked(i) || pid == i)
+            continue;
+          
+          // If any player could place it, add it
+          if(isLegalWall(i, w1)) {
+            result.add(w1);
+            canPlace = true;
+          }
+        }
+        
+        // Second potential blocking wall
+        int w2x = w1x;
+        int w2y = w1y;
+        switch(wOrt) {
+          case VERT:
+            w2y -= 1;
+          case HORIZ:
+            w2x -= 1;
+        }
+        
+        Wall w2 = new Wall(new Coord(w2x, w2y), wOrt);
+        db.write("gbw", "w2=" + w2.toString());
+        
+        // Test if a player can place a wall at w2
+        canPlace = false;
+        for(int i = 0; i < numOfPlayers && !canPlace; i++) {
+          if(isPlayerKicked(i) || pid == i)
+            continue;
+          
+          // If any player could place it, add it
+          if(isLegalWall(i, w2)) {
+            result.add(w2);
+            canPlace = true;
+          }
+        }
+        
+        curr = c;
+      }
+      
+      
+      // For testing
+      // result.add(new Wall(new Coord(5,3), Orientation.VERT));
+      // result.add(new Wall(new Coord(5,4), Orientation.VERT));
+      // result.add(new Wall(new Coord(4,5), Orientation.HORIZ));
+      // result.add(new Wall(new Coord(5,5), Orientation.HORIZ));
+      // result.add(new Wall(new Coord(5,6), Orientation.HORIZ));
+      // result.add(new Wall(new Coord(5,7), Orientation.HORIZ));
+      // result.add(new Wall(new Coord(6,6), Orientation.VERT));
+      // result.add(new Wall(new Coord(4,7), Orientation.HORIZ));
+      // result.add(new Wall(new Coord(7,6), Orientation.VERT));
+      // result.add(new Wall(new Coord(8,6), Orientation.VERT));
+      // result.add(new Wall(new Coord(8,7), Orientation.VERT));
+      return result;
+    }
+    
+    /**
      * Gets the shortest path with a wall tested
      * @param pid the player ID to check
      * @param w the wall to check shortest path with (must be a legal wall)
@@ -145,8 +255,10 @@ public class Board {
      * @return the shortest path as an ArrayList of Coords
      */
     public ArrayList<Coord> getShortestPath(int pid) {
-        if(kickedPlayers.contains(pid) || pid < 0)
+        if(kickedPlayers.contains(pid) || pid < 0) {
+          System.err.println("Tried to get kicked or unknown player's path: PID=" + pid);
           return null;
+        }
         ArrayList<Coord> path = null;
         ArrayList<Coord> temp = null;
         ArrayList<Coord> winPos = winningPos.get(pid);
@@ -179,15 +291,19 @@ public class Board {
      * @return a copy of this Board object
      */
     public Board copyOf() {
+      
+      // System.err.println("Board.copyOf()");
       Board b = new Board(numOfPlayers);
       
       // Player copy operations
       for(int i = 0; i < numOfPlayers; i++) {
         if(kickedPlayers.contains(i)) {
+          // System.err.println("  Skipped kicked player " + i);
           b.removePlayer(i);
         } else {
           Coord pos = getPlayerPos(i);
           b.movePlayer(i, pos);
+          // System.err.println("  Copying Player " + i + " at " + pos + " -> " + b.getPlayerPos(i));
         }
       }
       
@@ -250,8 +366,10 @@ public class Board {
 
         if(getNumOfPlayers() == 1) {
           for(int i = 0; i < numOfPlayers; i++) {
-            if(!isPlayerKicked(i))
+            if(!isPlayerKicked(i)) {
+              hasWinner = true;
               return i + 1;
+            }
           }
         }
 
@@ -272,6 +390,14 @@ public class Board {
         }
         
         return 0;
+    }
+    
+    /**
+     * Needed by the GUI to stop painting
+     * @return if there was a winner
+     */
+    public boolean wasWinner() {
+      return hasWinner;
     }
     
     /**
@@ -334,6 +460,16 @@ public class Board {
             if (getShortestPath(pid) == null)
                 return false; 
         }
+        
+        // Checks to make sure all players can still win the game
+        for(int i = 0; i < numOfPlayers; i++) {
+            if(!isPlayerKicked(i)) {
+                ArrayList<Coord> temp = getShortestPath(i, w);
+                if(temp == null) {
+                    return false;
+                }
+            }
+        }
         return true;
     }
     
@@ -366,6 +502,8 @@ public class Board {
         MoveTrace mt = new MoveTrace();
         mt.addPlayer(pid);
         Coord c = getPlayerPos(pid);
+        if(c == null)
+          System.err.println("getLegalMoves(int):c is null! PID=" + pid);
         return getLegalMoves(mt, c).getMoves();
     }
     
@@ -433,11 +571,21 @@ public class Board {
      * @param dest the destination Coordinate
      */
     public void movePlayer(int plNum, Coord dest) {
+        if(dest == null) {
+          System.err.println("movePlayer(): dest == null!");
+          return;
+        }
         if(kickedPlayers.contains(plNum)) {
             System.err.println("Tried to move a player that was kicked!");
             return;
         }
         playerPositions[plNum] = dest;
+    }
+    
+    // DEBUG
+    public void movePlayer(int pid, Coord c, String callFrom) {
+      System.out.println("Called from " + callFrom + ":");
+      movePlayer(pid, c);
     }
     
     /**
@@ -467,7 +615,11 @@ public class Board {
      * @param w the Wall to place on the board.
      */
     public void placeWall(Wall w) {
-        placedWalls.add(w);
+        Coord c = w.getPos();
+        int x = c.getX();
+        int y = c.getY();
+        Orientation ort = w.getOrt();
+        placedWalls.add(new Wall(new Coord(x, y), ort));
     }
     
     /**
@@ -534,18 +686,36 @@ public class Board {
      */
     private MoveTrace getLegalMoves(MoveTrace mt, Coord curr) {
         
+        // if(curr == null)
+          // System.err.println("getLegalMoves(MoveTrace, Coord): curr == null!");
+        
         // For all four directions
         for(Direction dir : Direction.values()) {
             Coord c2 = null;
             try {
                 c2 = curr.translate(dir);
             } catch (Exception e) {
-                System.err.println("!! TRANSLATION FAILED!");
-                e.printStackTrace();
+                // System.err.println("!! TRANSLATION FAILED!");
+                // e.printStackTrace();
                 // c2 = curr;
                 break;
             }
             int pid = getPlayerAtCoord(c2);
+            
+            // If it's not blocked
+            if(!isBlocked(curr, dir)) {
+              
+                // If there's a player present
+                if(pid >= 0 && !mt.isSeen(pid)) {
+                    mt.addPlayer(pid);
+                    mt.add(getLegalMoves(mt, c2));
+                } else {
+                  mt.addMove(c2);
+                }
+              
+            }
+            
+/*            
             
             // If there is a player in this direction
             if(pid >= 0) {
@@ -560,6 +730,9 @@ public class Board {
             } else if(!isBlocked(curr, dir)) {
                 mt.addMove(c2);
             }
+*/
+            
+            
         }
         return mt;
     }

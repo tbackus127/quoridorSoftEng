@@ -12,15 +12,16 @@ import java.util.*;
 
 public class AIServer extends ManualInputServer {
 
-    private static final double WALL_CHANCE = 0.3D;
+    private static final double WALL_CHANCE = 0.5D;
 
     // Main that uses the command line arguments
     public static void main(String[] args) {
-
+          
         // This sets the defaults
         int port = DEFAULT_PORT_NUMBER;
         String name = DEFAULT_NAME;
-
+	int delay = DEFAULT_DELAY;
+      
         int argNdx = 0;
 
         // This runs through all of the command line arguments and applies the proper ones
@@ -32,10 +33,14 @@ public class AIServer extends ManualInputServer {
 
                 String numberStr = args[argNdx];
                 port = Integer.parseInt(numberStr);
-            } else if(curr.equals(ARG_NAME)){
+            } else if(curr.equals(ARG_NAME)) {
                 ++argNdx;
-
                 name = DEFAULT_PREFIX + args[argNdx];
+		
+            } else if(curr.equals(ARG_DELAY)) {
+                ++argNdx;
+                delay = Integer.parseInt(args[argNdx]);
+		
             } else {
 
                 // if there is an unknown parameter, give usage and quit
@@ -47,8 +52,8 @@ public class AIServer extends ManualInputServer {
             ++argNdx;
         }
 
-      AIServer ai = new AIServer(port, name);
-      ai.run();
+        AIServer ms = new AIServer(port, name, delay);
+        ms.run();
     }
 
 
@@ -59,14 +64,17 @@ public class AIServer extends ManualInputServer {
     }
 
     //constructor
-
-    public AIServer(int port, String name) {
-        super(port, name);
+    // Uses internal wall placement (W:[(4,7),V] would place a wall on the LEFT of (4,7)
+    public AIServer(int port, String name, int delay) {
+        super(port, name, delay, true);
     }
 
     
     public void sendMove(PrintStream cout) {
       System.err.println("AI.sendMove()");
+      try {
+        Thread.sleep(500);
+      } catch(InterruptedException ign) {}
       Random rand = new Random();
       int pid = thisServersPlayerNumber - 1;
       boolean noWallsLeft = (board.wallsRemaining(pid) <= 0);
@@ -74,8 +82,13 @@ public class AIServer extends ManualInputServer {
       // Move
       if(rand.nextDouble() > WALL_CHANCE || noWallsLeft) {
         
-        HashSet<Coord> legalMoves = board.getLegalMoves(pid);
-        ArrayList<Coord> shortestPath = board.getShortestPath(pid);
+        ArrayList<Coord> shortestPath = null;
+        try {
+          shortestPath = board.getShortestPath(pid);
+        } catch(NullPointerException e) {
+          e.printStackTrace();
+          System.exit(1);
+        }
         
         Coord nextStep = shortestPath.get(0);
         int nx = nextStep.getX();
@@ -104,9 +117,7 @@ public class AIServer extends ManualInputServer {
         System.err.println("AI Sending:" + move);
         cout.print(move);
       }
-      try {
-        Thread.sleep(500);
-      } catch(InterruptedException ign) {}
+      
     }
 }
 

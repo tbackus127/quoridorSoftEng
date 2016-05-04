@@ -16,10 +16,13 @@ public class ManualInputServer {
     public final static int DEFAULT_PORT_NUMBER = 1478;
     public final static String DEFAULT_NAME = "mur:America";
     public final static String DEFAULT_PREFIX = "mur:";
+    public final static int DEFAULT_DELAY = 250;
     
     
     public final static String ARG_PORT = "--port";
     public final static String ARG_NAME = "--name";
+    public final static String ARG_DELAY = "--delay";
+    public final static String ARG_INTNL_WALL = "--intwalls";
     
     public final static String eoln = "\r\n";
     
@@ -28,6 +31,8 @@ public class ManualInputServer {
     private int playerCount;
     protected Board board;
     protected int thisServersPlayerNumber;
+    protected int delay;
+    protected boolean useInternalWallPos;
     
     // Main that uses the command line arguments
     public static void main(String[] args) {
@@ -35,9 +40,12 @@ public class ManualInputServer {
         // This sets the defaults
         int port = DEFAULT_PORT_NUMBER;
         String name = DEFAULT_NAME;
-      
+        int delay = DEFAULT_DELAY;
+        boolean intnlWalls = false;
+        
         int argNdx = 0;
 
+        System.err.println("argl=" + args.length);
         // This runs through all of the command line arguments and applies the proper ones
         while (argNdx < args.length) {
             String curr = args[argNdx];
@@ -49,8 +57,15 @@ public class ManualInputServer {
                 port = Integer.parseInt(numberStr);
             } else if(curr.equals(ARG_NAME)) {
                 ++argNdx;
-            
                 name = DEFAULT_PREFIX + args[argNdx];
+    
+            } else if(curr.equals(ARG_DELAY)) {
+                ++argNdx;
+                delay = Integer.parseInt(args[argNdx]);
+                
+            } else if(curr.equals(ARG_INTNL_WALL)) {
+                intnlWalls = true;
+              
             } else {
 
                 // if there is an unknown parameter, give usage and quit
@@ -62,7 +77,8 @@ public class ManualInputServer {
             ++argNdx;
         }
 
-        ManualInputServer ms = new ManualInputServer(port, name);
+
+        ManualInputServer ms = new ManualInputServer(port, name, delay, intnlWalls);
         ms.run();
     }
     
@@ -74,9 +90,11 @@ public class ManualInputServer {
     }
     
     // Constructor
-    public ManualInputServer(int initPort, String initName){
+    public ManualInputServer(int initPort, String initName, int initDelay, boolean intWalls){
         port = initPort;
         name = initName;
+        useInternalWallPos = intWalls;
+        delay = initDelay;
     }
     
     public void run() {
@@ -108,17 +126,16 @@ public class ManualInputServer {
                 while(true) {
                     String clientMessage = cin.nextLine();
                     System.err.println("Recieved: \"" + clientMessage + "\"");
-                    if(clientMessage.startsWith("MYOUSHU")){
+                    if(clientMessage.startsWith("MYOUSHU")) {
                         sendMove(cout);
-                        Thread.sleep(1000);
                     }
-                    else if(clientMessage.startsWith("ATARI")){
+                    else if(clientMessage.startsWith("ATARI")) {
                         updateBoard(clientMessage);
                     }
                     else if(clientMessage.startsWith("GOTE")) {
                         removePlayer(clientMessage);
                     }
-                    else if(clientMessage.startsWith("KIKASHI")){
+                    else if(clientMessage.startsWith("KIKASHI")) {
                         winnerDeclared(System.out, clientMessage);
                     }
                 }
@@ -171,12 +188,18 @@ public class ManualInputServer {
         else if(move.startsWith("v ") || move.startsWith("h ")) {
             int wx = Integer.parseInt(splitMessage[1]);
             int wy = Integer.parseInt(splitMessage[2]);
-            if(splitMessage[0].charAt(0) == 'h') {
-              wy -= 1;
+            
+            if(this.useInternalWallPos) {
+                if(splitMessage[0].charAt(0) == 'h') {
+                  wy -= 1;
+                } else {
+                  wx -= 1;
+                }
+                message += "[(" + (wx) + ", " + (wy) + ")";
             } else {
-              wx -= 1;
+                message += "[(" + (wx) + ", " + (wy) + ")";
             }
-            message += "[(" + (wx) + ", " + (wy) + ")";
+            
             message += ", " + splitMessage[0] + "]";
             return message + "\r\n";
         }
@@ -191,24 +214,26 @@ public class ManualInputServer {
     public void sendMove(PrintStream cout, Scanner console) {
         System.out.print("Enter \"m\" to move your peice, or \"w\" to place a wall: ");
         String moveType = console.next();
+        String unwrappedMessage = "";
         if (moveType.equals("m")) {
-            String unwrappedMessage = moveType + " ";
+            unwrappedMessage = moveType + " ";
             System.out.print("What column would you like to move to: ");
             unwrappedMessage += console.next() + " ";
             System.out.print("What row would you like to move to: ");
             unwrappedMessage += console.next();
-            cout.print(moveWrapper(unwrappedMessage));
         }
         else if(moveType.equals("w")){
             System.out.print("Enter \"h\" for a horizontal wall or \"v\" for" +
                                    " a vertical wall: ");
-            String unwrappedMessage = console.next() + " ";
+            unwrappedMessage = console.next() + " ";
             System.out.print("Enter the column: ");
             unwrappedMessage += console.next() + " ";
             System.out.print("Enter the row: ");
             unwrappedMessage += console.next();
-            cout.print(moveWrapper(unwrappedMessage));
         }
+        
+        System.out.println(moveWrapper(unwrappedMessage));
+        cout.print(moveWrapper(unwrappedMessage));
     }
     
     public void updateBoard(String message) {
@@ -243,18 +268,16 @@ public class ManualInputServer {
         
     }
     
-    //
     public Board getBoard(){
         return board;
     }
     
-    // 
     public void removePlayer(String message){
         message = message.substring(5).replaceAll("\\s","");
         board.removePlayer((int)message.charAt(0)-(int)'0'-1);
     }
     
-    public void winnerDeclared(PrintStream console, String message){
+    public void winnerDeclared(PrintStream console, String message) {
         message = message.substring(7).replaceAll("\\s","");
         if((int)message.charAt(0)-(int)'0' == thisServersPlayerNumber) {
             console.print("Congratulations you have won the game!\n");
