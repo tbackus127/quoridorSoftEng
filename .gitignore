@@ -4,5 +4,6 @@ teamMurka/build/**
 teamMurka/debug/**
 teamMurka/.gradle/**
 **.java~
+**.sh~
 **.kate-swp
 **.gradle~
