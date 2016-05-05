@@ -1,3 +1,4 @@
 com.tmquoridor.Board
 com.tmquoridor.Client
 com.tmquoridor.GUI
+com.tmquoridor.Util
