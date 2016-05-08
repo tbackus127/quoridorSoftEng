@@ -33,7 +33,7 @@ public class PathFinder {
         this.pid = pid;
         this.marks = new HashMap<Integer, Integer>();
         this.board = b.copyOf();
-        this.dout = new DebugOut("PathFinder_" + this.hashCode());
+        this.dout = new DebugOut("PathFinder_" + this.hashCode(), false);
     }
   
     /**

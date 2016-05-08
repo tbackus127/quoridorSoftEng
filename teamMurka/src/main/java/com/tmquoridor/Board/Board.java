@@ -141,7 +141,8 @@ public class Board {
      */
     public HashSet<Wall> getBlockingWalls(int pid, ArrayList<Coord> path) {
       
-      DebugOut db = new DebugOut("BlockingWallsTest");
+      DebugOut db = new DebugOut("BlockingWallsTest", false);
+      
       HashSet<Wall> result = new HashSet<Wall>();
       
       if(path.size() <= 0)
@@ -169,11 +170,19 @@ public class Board {
         // Build theoretical wall 1
         int w1x = curr.getX();
         int w1y = curr.getY();
-        switch(d) {
-          case EAST:
-            w1x += 1;
-          case SOUTH:
-            w1y += 1;
+        
+        // inb4 "You shouldn't use labeled blocks!"
+        // But switch statements look so much nicer than ifs...
+        wallSwitch1:{
+          
+          // If we're moving east or south, increment x or y respectively
+          switch(d) {
+            case EAST:
+              w1x += 1;
+            break wallSwitch1;
+            case SOUTH:
+              w1y += 1;
+          }
         }
         
         Wall w1 = new Wall(new Coord(w1x, w1y), wOrt);
@@ -187,6 +196,7 @@ public class Board {
           
           // If any player could place it, add it
           if(isLegalWall(i, w1)) {
+            db.write("gbw", "  Blocking wall: " + w1);
             result.add(w1);
             canPlace = true;
           }
@@ -195,13 +205,17 @@ public class Board {
         // Second potential blocking wall
         int w2x = w1x;
         int w2y = w1y;
-        switch(wOrt) {
-          case VERT:
-            w2y -= 1;
-          case HORIZ:
-            w2x -= 1;
-        }
         
+        // If wall 1 was vertical, move up in Y; if horizontal, move left in X
+        wallSwitch2:{
+          switch(wOrt) {
+            case VERT:
+              w2y -= 1;
+            break wallSwitch2;
+            case HORIZ:
+              w2x -= 1;
+          }
+        }
         Wall w2 = new Wall(new Coord(w2x, w2y), wOrt);
         db.write("gbw", "w2=" + w2.toString());
         
@@ -214,26 +228,15 @@ public class Board {
           // If any player could place it, add it
           if(isLegalWall(i, w2)) {
             result.add(w2);
+            db.write("gbw", "  Blocking wall: " + w2);
             canPlace = true;
           }
         }
         
+        // Set current to the one we've processed
         curr = c;
       }
       
-      
-      // For testing
-      // result.add(new Wall(new Coord(5,3), Orientation.VERT));
-      // result.add(new Wall(new Coord(5,4), Orientation.VERT));
-      // result.add(new Wall(new Coord(4,5), Orientation.HORIZ));
-      // result.add(new Wall(new Coord(5,5), Orientation.HORIZ));
-      // result.add(new Wall(new Coord(5,6), Orientation.HORIZ));
-      // result.add(new Wall(new Coord(5,7), Orientation.HORIZ));
-      // result.add(new Wall(new Coord(6,6), Orientation.VERT));
-      // result.add(new Wall(new Coord(4,7), Orientation.HORIZ));
-      // result.add(new Wall(new Coord(7,6), Orientation.VERT));
-      // result.add(new Wall(new Coord(8,6), Orientation.VERT));
-      // result.add(new Wall(new Coord(8,7), Orientation.VERT));
       return result;
     }
     

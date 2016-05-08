@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 public class DebugOut {
   
   /** Set to true to enable debug output */
-  private static final boolean ENABLED = false;
+  private static final boolean ENABLED = true;
   
   /** The file name, minus ".txt" */
   private String name;
@@ -25,14 +25,18 @@ public class DebugOut {
   /** The PrintStream used for writing the file */
   private PrintStream fOut;
   
+  /** Disable output for this particular instance */
+  private boolean isEnabled;
+  
   /**
    * Default constructor
    * @param name the filename
    */
-  public DebugOut(String name) {
+  public DebugOut(String name, boolean en) {
       this.name = name;
+      this.isEnabled = en;
       
-      if(ENABLED) {
+      if(ENABLED && this.isEnabled) {
         
         // Delete previous file (only keep most recent copy)
         try {
@@ -71,8 +75,16 @@ public class DebugOut {
    * @param sig the call signature ("ClassName.methodName()" recommended; for tracing purposes)
    */
   public void write(String sig, String msg) {
-      if(ENABLED)
-        this.fOut.println(getTimestamp() + "@" + sig + ": " + msg);
+      if(ENABLED && this.isEnabled)
+          this.fOut.println(getTimestamp() + "@" + sig + ": " + msg);
+  }
+  
+  /**
+   * Enables or disables debugging output for this particular instance
+   * @param val what to set the isEnabled flag to
+   */
+  public void setEnabled(boolean val) {
+      this.isEnabled = val;
   }
   
   /**
