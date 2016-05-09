@@ -115,7 +115,7 @@ public class AIServer extends ManualInputServer {
           if(theoreticalPath.size() - currPathLength >= wallCounterThreshold && theoreticalPath.size() > worstPathLength) {
             
             // If the anti-Wall is legal
-            if(board.isLegalWall(pid, worstWall.getAntiWall())) {
+            if(board.isLegalWall(pid, w.getAntiWall())) {
               worstWall = w;
               worstPathLength = theoreticalPath.size();
             }
@@ -189,7 +189,7 @@ public class AIServer extends ManualInputServer {
       }
       
       System.err.println("    Sending \"" + move + "\"");
-      cout.println(move);
+      cout.print(move);
     }
 }
 

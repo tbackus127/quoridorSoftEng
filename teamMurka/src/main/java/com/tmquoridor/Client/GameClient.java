@@ -159,7 +159,7 @@ public class GameClient {
                         // Check move legality
                         Coord wCoord = extractCoord(srvMove);
                         Orientation wOrt = extractOrt(srvMove);
-                        if(wOrt == Orientation.HORIZ){
+                        if(wOrt == Orientation.HORIZ) {
                             wCoord = new Coord(wCoord.getX(), wCoord.getY() + 1);
                         } else {
                             wCoord = new Coord(wCoord.getX() + 1, wCoord.getY());
