@@ -442,11 +442,15 @@ public class Board {
         
         // Check board bounds (within 0-8)
         if (wOrt == Orientation.HORIZ) {
-          if(wx <= -1 || wx >= 8 || wy <= 0 || wy >= 9)
+          if(wx <= -1 || wx >= 8 || wy <= 0 || wy >= 9) {
+            System.err.println("Illegal wall " + wx + "," + wy + ". Out of bounds.");
             return false;
+          }
         } else {
-          if(wy <= -1 || wy >= 8 || wx <= 0 || wx >= 9)
+          if(wy <= -1 || wy >= 8 || wx <= 0 || wx >= 9) {
+            System.err.println("Illegal wall " + wx + "," + wy + ". Out of bounds.");
             return false;
+          }
         }
         
         // Break the walls into segments
@@ -460,24 +464,32 @@ public class Board {
             Orientation sOrt = s.getOrt();
             
             // If it overlaps with the wall we're placing's first segment, illegal
-            if(sPos.equals(wPos) && sOrt == wOrt)
+            if(sPos.equals(wPos) && sOrt == wOrt) {
+                System.err.println("Illegal Wall " + wPos + ". First segment overlap.");
                 return false;
+            }
             
             // Get the wall we're placing's extension (second segment)
             Segment wExt = w.getSegment(1);
             Coord wExtPos = wExt.getPos();
             
             // If it overlaps with any segment, illegal
-            if(sPos.equals(wExtPos) && sOrt == wOrt)
+            if(sPos.equals(wExtPos) && sOrt == wOrt) {
+                System.err.println("Illegal wall " + sPos + ". 2nd segment overlap.");
                 return false;
+            }
             
             // If the wall crosses another perpendicular to it, illegal (same midpoint, different orientations)
-            if(s.isExt() && sPos.equals(wExtPos))
+            if(s.isExt() && sPos.equals(wExtPos)) {
+                System.err.println("Illegal wall -- wall crossing error.");
                 return false;
+            }
             
             // If the wall closes in a player 
-            if (getShortestPath(pid) == null)
-                return false; 
+            // if (getShortestPath(pid) == null) {
+                // System.err.println("Segment would block off a player!");
+                // return false; 
+            // }
         }
         
         // Checks to make sure all players can still win the game
@@ -697,7 +709,7 @@ public class Board {
         return placedWalls;
     }
     
-        /**
+    /**
      * Legal moves helper method.
      * @param mt the MoveTrace so far
      * @param curr the current Coord we're checking

@@ -53,7 +53,7 @@ public class PathFinder {
     
         // We're at the destination already
         if(initPos.equals(dest)) {
-            dout.write("PathFinder.getPath", "At destination.");
+            // dout.write("PathFinder.getPath", "At destination.");
             return null;
         }
     
@@ -61,7 +61,7 @@ public class PathFinder {
         queue.add(initPos);
         int currentMark = 0;
         marks.put(initPos.id(), 0);
-        dout.write("PathFinder.getPath", "Marked " + initPos + " with 0");
+        // dout.write("PathFinder.getPath", "Marked " + initPos + " with 0");
         boolean found = false;
         Coord curr = null;
         
@@ -70,25 +70,25 @@ public class PathFinder {
       
             // Get the current position and add to visited
             curr = queue.remove();
-            dout.write("PathFinder.getPath", "Processing " + curr + ":" + marks.get(curr.id()));
+            // dout.write("PathFinder.getPath", "Processing " + curr + ":" + marks.get(curr.id()));
             if(marks.get(curr.id()) > currentMark) {
                 currentMark = marks.get(curr.id());
-                dout.write("PathFinder.getPath", "Update mark to " + currentMark);
+                // dout.write("PathFinder.getPath", "Update mark to " + currentMark);
             }
             
             // If something goes horribly wrong, log it
-            if(curr == null)
-                dout.write("PathFinder.getPath", "curr is null");
+            // if(curr == null)
+                // dout.write("PathFinder.getPath", "curr is null");
               
             // Mark the current Coord
             marks.put(curr.id(), currentMark);
             board.movePlayer(pid, curr);
-            dout.write("PathFinder.getPath", "Moved player to " + board.getPlayerPos(pid));
+            // dout.write("PathFinder.getPath", "Moved player to " + board.getPlayerPos(pid));
             seen.add(curr);
       
             // If we've found the target
             if(curr.equals(dest)) {
-                dout.write("PathFinder.getPath", "FOUND");
+                // dout.write("PathFinder.getPath", "FOUND");
                 found = true;
                 break;
             }
@@ -99,60 +99,60 @@ public class PathFinder {
                     marks.put(lc.id(), currentMark + 1);
                     queue.add(lc);
                     seen.add(lc);
-                    dout.write("PathFinder.addToQ", "Added " + lc + ":" + marks.get(lc.id()) + " to queue.");
-                } else 
-                    dout.write("PathFinder.addToQ", "No unvisited Coords for " + lc + ":" + marks.get(lc.id()));   
+                    // dout.write("PathFinder.addToQ", "Added " + lc + ":" + marks.get(lc.id()) + " to queue.");
+                } //else 
+                    // dout.write("PathFinder.addToQ", "No unvisited Coords for " + lc + ":" + marks.get(lc.id()));   
             }
         }
     
         // If found, build the path and return it.
         if(found) {
-            dout.write("PathFinder.found", "Building path of length " + currentMark + "...");
+            // dout.write("PathFinder.found", "Building path of length " + currentMark + "...");
             Coord[] temp = new Coord[currentMark];
             temp[temp.length - 1] = curr;
       
             // Build helper array
             for(int i = currentMark - 2; i >= 0; i--) {
                 Coord next = null;
-                dout.write("PathFinder.found", "Building for index " + i);
+                // dout.write("PathFinder.found", "Building for index " + i);
                 HashSet<Coord> legalMoves = board.getLegalMoves(pid);
-                if(legalMoves.isEmpty()) {
-                    dout.write("PathFinder.found", "PathFinder: Legalmoves is empty!");
-                    dout.write("PathFinder.found", board.toString());
-                    dout.write("PathFinder.found", "For PID=" + pid);
-                }
+                // if(legalMoves.isEmpty()) {
+                    // dout.write("PathFinder.found", "PathFinder: Legalmoves is empty!");
+                    // dout.write("PathFinder.found", board.toString());
+                    // dout.write("PathFinder.found", "For PID=" + pid);
+                // }
                 
                 // Backtrace from all legal moves
                 for(Coord c : legalMoves) {
-                    dout.write("PathFinder.found", "  Backtracing " + c);
+                    // dout.write("PathFinder.found", "  Backtracing " + c);
                     if(marks.containsKey(c.id())) {
                         int cid = marks.get(c.id());
-                        dout.write("PathFinder.found", "    CID=" + cid);
+                        // dout.write("PathFinder.found", "    CID=" + cid);
             
                         // Found a return path
                         if(cid == i + 1) {
-                            dout.write("PathFinder.found", "    Path found: " + c);
+                            // dout.write("PathFinder.found", "    Path found: " + c);
                             next = c;
                             temp[i] = c;
                             break;
               
                             // This is not a return path
-                        } else
-                            dout.write("PathFinder.found", "    " + c + " is not a return path");
-                    } else
-                        dout.write("PathFinder.found", "    No data for " + c);
+                        } // else
+                            // dout.write("PathFinder.found", "    " + c + " is not a return path");
+                    } // else
+                        // dout.write("PathFinder.found", "    No data for " + c);
 
                 }
                 
                 // Log horrible stuff
-                if(next == null)
-                    dout.write("PathFinder.found", "NEXT IS NULL");
+                // if(next == null)
+                    // dout.write("PathFinder.found", "NEXT IS NULL");
                 
                 // Found a backtrace-able Coord
-                else {
+                // else {
                     board.movePlayer(pid, next);
-                    dout.write("PathFinder.found", "Moving to next Coord @ " + board.getPlayerPos(pid));
-                }
+                    // dout.write("PathFinder.found", "Moving to next Coord @ " + board.getPlayerPos(pid));
+                // }
             }
       
             // Copy to temp array for more efficient reversing
@@ -163,8 +163,8 @@ public class PathFinder {
             return result;
       
         // Processed all of queue; if not found, there is no path.
-        } else
-            dout.write("PathFinder.end", "No path found for " + initPos);
+        } //else
+            // dout.write("PathFinder.end", "No path found for " + initPos);
     
         return null;
     }
