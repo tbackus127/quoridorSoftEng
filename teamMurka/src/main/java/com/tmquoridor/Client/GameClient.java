@@ -112,6 +112,7 @@ public class GameClient {
         playing = true;
         while(playing) {
             for(int i = 0; i < socks.length; i++) {
+                long sleepTime = 500L;
                 PrintStream cout = null;
                 Scanner cin = null;
                 
@@ -126,9 +127,14 @@ public class GameClient {
                     cout = new PrintStream(socks[pnum].getOutputStream());
                     cin = new Scanner(socks[pnum].getInputStream());
                     
+                    
                     cout.print("MYOUSHU" + EOLN);
                     System.err.println("Sent: MYOUSHU");
+                    long dStart = System.currentTimeMillis();
                     String srvMove = cin.nextLine();
+                    long dEnd = System.currentTimeMillis();
+                    long deltaTime = dEnd - dStart;
+                    sleepTime = this.clientDelay - deltaTime;
                     System.err.println("  Msg: " + srvMove);
                     
                     // If the server's move syntax is correct
@@ -186,11 +192,19 @@ public class GameClient {
                     e.printStackTrace();
                     playing = false;
                 }
+                
                 gui.repaintGUI();
+                
+                // Sleep for the difference in deltaTime and the preferred time per move
+                if(sleepTime > 0L) {
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch(InterruptedException ignored) {}
+                }
             }
+            
         }
         gui.repaintGUI();
-        
     }
     
     /**
