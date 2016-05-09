@@ -44,11 +44,36 @@ public class GameClient {
     /** Playing flag */
     private boolean playing = false;
     
+    /** The shortest time we're willing to wait (in ms) between sending 妙手's */
+    private long clientDelay = 1000L;
+    
     /**
      * Default constructor
-     * @param args runtime arguments passed in
+     * @param rawArgs runtime arguments passed in
      */
-    public GameClient(String[] args) {
+    public GameClient(String[] rawArgs) {
+        
+        // Setup temporary array for handshaking args
+        
+        int argc = rawArgs.length;
+        for(int i = 0; i < rawArgs.length; i++) {
+          String s = rawArgs[i];
+          if(s.equals("--delay")) {
+            this.clientDelay = Long.parseLong(rawArgs[++i]);
+            argc -= 2;
+          }
+        }
+        
+        // Copy each arg from rawArgs to args (what we're handshaking with)
+        String[] args = new String[argc];
+        int argidx = 0;
+        for(int i = 0; i < rawArgs.length; i++) {
+          String s = rawArgs[i];
+          
+          // If it's a valid handshaking arg, copy it to args
+          if(s.contains(":"))
+            args[argidx++] = s;
+        }
         
         // Set sockets.
         try {
@@ -388,6 +413,7 @@ public class GameClient {
      * @param args the runtime arguments ("machine:port" pairs.)
      */
     public static void main(String[] args) {
+        
         GameClient gc = new GameClient(args);
     }
 }

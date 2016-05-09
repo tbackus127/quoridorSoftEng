@@ -14,8 +14,8 @@ public class TylersAIServer extends ManualInputServer{
         // This sets the defaults
         int port = DEFAULT_PORT_NUMBER;
         String name = DEFAULT_NAME;
-	int delay = DEFAULT_DELAY;
-	boolean intnlWalls = false;
+        int delay = DEFAULT_DELAY;
+        boolean intnlWalls = false;
         
         int argNdx = 0;
 
