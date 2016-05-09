@@ -7,12 +7,15 @@ import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import java.util.Scanner;
 import java.util.*;
 
 public class AIServer extends ManualInputServer {
 
-    private static final double WALL_CHANCE = 0.5D;
+    /** How many more moves the opponent has before they win before we start preventing them */
+    private int attackThreshold = 5;
+    
+    /** How much of a difference a wall would have to make to have us counter it */
+    private int wallCounterThreshold = 5;
 
     // Main that uses the command line arguments
     public static void main(String[] args) {
@@ -20,7 +23,7 @@ public class AIServer extends ManualInputServer {
         // This sets the defaults
         int port = DEFAULT_PORT_NUMBER;
         String name = DEFAULT_NAME;
-	int delay = DEFAULT_DELAY;
+        int delay = DEFAULT_DELAY;
       
         int argNdx = 0;
 
@@ -36,11 +39,11 @@ public class AIServer extends ManualInputServer {
             } else if(curr.equals(ARG_NAME)) {
                 ++argNdx;
                 name = DEFAULT_PREFIX + args[argNdx];
-		
+    
             } else if(curr.equals(ARG_DELAY)) {
                 ++argNdx;
                 delay = Integer.parseInt(args[argNdx]);
-		
+    
             } else {
 
                 // if there is an unknown parameter, give usage and quit
@@ -71,165 +74,129 @@ public class AIServer extends ManualInputServer {
 
     
     public void sendMove(PrintStream cout) {
-      System.err.println("AI.sendMove()");
-      try {
-        Thread.sleep(500);
-      } catch(InterruptedException ign) {}
+      System.err.println("Generating move...");
       Random rand = new Random();
       int pid = thisServersPlayerNumber - 1;
       boolean noWallsLeft = (board.wallsRemaining(pid) <= 0);
+      String move = "";
       
-      // Move
-      if(rand.nextDouble() > WALL_CHANCE || noWallsLeft) {
-        
-        ArrayList<Coord> shortestPath = null;
-        try {
-          shortestPath = board.getShortestPath(pid);
-        } catch(NullPointerException e) {
-          e.printStackTrace();
-          System.exit(1);
-        }
-        
-        Coord nextStep = shortestPath.get(0);
-        int nx = nextStep.getX();
-        int ny = nextStep.getY();
-        String move = moveWrapper("m " + nx + " " + ny);
-        System.err.println("AI Sending:" + move);
-        cout.print(move);
-        
-      // Wall
-      } else {
-        
-        int wx = -1;
-        int wy = -1;
-        Wall w = null;
-        Orientation wOrt = null;
-        do {
-          wx = rand.nextInt(9);
-          wy = rand.nextInt(9);
-          wOrt = (rand.nextInt() % 2 == 0) ? Orientation.HORIZ : Orientation.VERT;
-          w = new Wall(new Coord(wx, wy), wOrt);
-          System.err.println("  Gen: " + w);
+      // Get all players' shortest paths
+      ArrayList<ArrayList<Coord>> paths = new ArrayList<ArrayList<Coord>>();
+      int pidWithShortestPath = -1;
+      int pathSizeOfLeader = 9001;
+      for(int i = 0; i < board.getTotalPlayers(); i++) {
+        if(!board.isPlayerKicked(pid)) {
+          paths.add(board.getShortestPath(i));
           
-        } while(!board.isLegalWall(pid, w));
-        
-        String move = moveWrapper(wOrt.toString().toLowerCase() + " " + wx + " " + wy);
-        System.err.println("AI Sending:" + move);
-        cout.print(move);
+          // Store PID with shortest path
+          if(paths.get(i).size() < pathSizeOfLeader) {
+            pidWithShortestPath = i;
+            pathSizeOfLeader = paths.get(i).size();
+          }
+        }
       }
       
-    }
-}
-
-
-/*
-    public void sendMove(PrintStream cout) {
-        System.err.println("AI.sendMove()");
-        Random rand = new Random();
-        int choice = rand.nextInt(2);
-        int turnCount = 0;
-
-        while (true) {
-            // choice 0 is to make a move
-            if (choice == 0) {
-                // a random place (row / column) to move to
-
-                int moveRow = rand.nextInt(9);
-                int moveColumn = rand.nextInt(9);
-                Coord dest = new Coord(moveRow, moveColumn);
-                //if (turnCount == 0) {
-
-                //}
-                if (board.isLegalMove(thisServersPlayerNumber-1, dest) == true) {
-                    String move = moveWrapper("m " + moveRow + " " + moveColumn);
-                    System.err.print("Sending " + move);
-                    cout.print(move);
-                    turnCount++;
-
-                    return;
-                }
+      HashSet<Wall> blockingWalls = board.getBlockingWalls(pidWithShortestPath, paths.get(pidWithShortestPath));
+      ArrayList<Coord> currPath = paths.get(pidWithShortestPath);
+      int currPathLength = currPath.size();
+      
+      // If we have the shortest path
+      if(pidWithShortestPath == pid) {
+        
+        System.err.println("  We have the shortest path.");
+        
+        // Go through the set of potential walls that could screw us over
+        Wall worstWall = null;
+        int worstPathLength = currPathLength;
+        for(Wall w : blockingWalls) {
+          ArrayList<Coord> theoreticalPath = board.getShortestPath(pid, w);
+          
+          // If this wall would REALLY screw us over, keep track of it
+          if(theoreticalPath.size() - currPathLength >= wallCounterThreshold && theoreticalPath.size() > worstPathLength) {
+            
+            // If the anti-Wall is legal
+            if(board.isLegalWall(pid, worstWall.getAntiWall())) {
+              worstWall = w;
+              worstPathLength = theoreticalPath.size();
             }
-            // choice 1 is to place a wall
-            if (choice == 1) {
-                // a random for the posible placements for a wall
-                int wallRow = rand.nextInt(8);
-                int wallColumn = rand.nextInt(8);
-                Coord pos = new Coord(wallRow, wallColumn);
-                Orientation ort1 = Orientation.HORIZ;
-                Orientation ort2 = Orientation.VERT;
-
-                //int orientWall = rand
-                Wall horiz = new Wall(pos, ort1);
-                Wall vert = new Wall(pos, ort2);
-
-
-                if (board.wallsRemaining(thisServersPlayerNumber-1) == 0) {
-
-                    choice = 0;
-                    break;
-                } else {
-                    // wallOrient is the orientation of wall verticle / horizontal
-                    int wallOrient = rand.nextInt() % 2;
-
-                    try {
-                        if (wallOrient == 0) {
-
-                            if (board.isLegalWall(thisServersPlayerNumber-1, horiz) == true) {
-                                String move = moveWrapper("v " + wallRow + " " + wallColumn);
-                                System.err.println("Sending " + move);
-                                cout.print(move);
-                                turnCount++;
-                                return;
-                            }
-                        }
-                        if (wallOrient == 1) {
-                            if (board.isLegalWall(thisServersPlayerNumber-1, vert) == true) {
-                                String move = moveWrapper("h " + wallRow + " " + wallColumn);
-                                System.err.println("Sending " + move);
-                                cout.print(move);
-                                turnCount++;
-                                return;
-                            }
-
-                        }
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
+          }
         }
+        
+        // If we've decided we need to place an anti-wall
+        if(worstWall != null) {
+          
+          // Get the worst Wall's anti-wall and place it
+          Wall antiWall = worstWall.getAntiWall();
+          Coord wPos = antiWall.getPos();
+          System.err.println("    Using anti-wall: " + antiWall);
+          move = moveWrapper(antiWall.getOrt().toString() + " " + wPos.getX() + " " + wPos.getY());
+        
+        // If any potential walls aren't that big of a deal, or we can't place any anti-wall
+        } else {
+        
+          // Continue along our path
+          Coord next = paths.get(pid).get(0);
+          System.err.println("    Continuing along path " + next);
+          move = moveWrapper("m " + next.getX() + " " + next.getY());
+        
+        }
+        
+      // If an opponent has the shortest path
+      } else {
+        
+        System.err.println("Opponent with PID=" + pidWithShortestPath + " has the shortest path.");
+        
+        // If the opponent is close enough to bother blocking them off
+        if(currPathLength <= attackThreshold) {
+          System.err.println("Opponent is close to winning!");
+        
+          Wall bestWall = null;
+          int bestWallPathLength = currPathLength;
+          
+          // Find the wall that would do the most damage
+          for(Wall w : blockingWalls) {
+            ArrayList<Coord> theoreticalPath = board.getShortestPath(pidWithShortestPath, w);
+          
+            // If this wall is better, track it as the best
+            if(theoreticalPath.size() > bestWallPathLength) {
+              System.err.println("  Found new best wall: " + w);
+              bestWall = w;
+              bestWallPathLength = theoreticalPath.size();
+            }
+          }
+        
+          // If we found a good wall to place
+          if(bestWall != null) {
+            Coord wPos = bestWall.getPos();
+            move = moveWrapper(bestWall.getOrt().toString() + " " + wPos.getX() + " " + wPos.getY());
+            
+          // Otherwise, continue
+          } else {
+            Coord next = paths.get(pid).get(0);
+            System.err.println("    Continuing along path " + next);
+            move = moveWrapper("m " + next.getX() + " " + next.getY());
+          }
+          
+          
+        // If the opponent is still far away
+        } else {
+          
+          // Continue along our path
+          Coord next = paths.get(pid).get(0);
+          System.err.println("    Continuing along path " + next);
+          move = moveWrapper("m " + next.getX() + " " + next.getY());
+        }
+      }
+      
+      System.err.println("    Sending \"" + move + "\"");
+      cout.println(move);
     }
 }
 
 
-           // if (splitter[0].equals("m") {
-              // turn off switch at current position
-              // move pawn to the disired coordinate
-              // update board
-              // if the player 1 gets to row 0 player one wins game
-              // if the player 2 gets to row 9 player one wins game
-              // if the player 3 gets to column 9 player one wins game
-              // if the player 4 gets to column 0 player one wins game
-
-           // }
-            //if (splitter[0].equals("v") {
-              // if there still remains a path across after wall is placed
-              // place verticle wall at chosen coordinate
-              // update board
-          //  }
-          //  if (splitter[0].equals("h") {
-              // if there still remains a path across after wall is placed
-              // place horizontal wall at chosen coordinate
-              // update board
-
-  //public void thinker(code) {
-    // Should we always make the same first move
-    // (A wall one space to the right and forward from the opponent)
-    // *Should we develop something to guard against that move*
-    // if there is a possible move to increase the oponents shortest path
-    // choose the move that will increase their path by the most
-  //}
-//}
 
 
-*/
+
+
+
+

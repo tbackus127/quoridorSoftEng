@@ -180,6 +180,7 @@ public class ManualInputServer {
     public String moveWrapper(String move) {
         // System.err.println("moveWrapper received:" + move);
         String message = "TESUJI ";
+        move = move.toLowerCase();
         String[] splitMessage = move.split(" ");
         if(move.startsWith("m ")){
             message += "(" + splitMessage[1] + ", " + splitMessage[2] + ")";

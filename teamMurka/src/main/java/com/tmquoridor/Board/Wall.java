@@ -76,6 +76,26 @@ public class Wall {
     }
     
     /**
+     * Gets the wall perpendicular to this wall (forms a + if both were to be placed).
+     * For example, (0,3):H would return (1,2):V.
+     * @return a Wall that is this wall when rotated 90 degrees from its center point
+     */
+    public Wall getAntiWall() {
+      int wx = pos.getX();
+      int wy = pos.getY();
+      switch(ort) {
+        case HORIZ:
+          wx++;
+          wy--;
+        break;
+        default:
+          wx--;
+          wy++;
+      }
+      return new Wall(new Coord(wx, wy), ort.neg());
+    }
+    
+    /**
      * toString() method
      * @return a String representation of the Wall.
      */

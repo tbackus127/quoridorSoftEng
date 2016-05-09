@@ -20,10 +20,10 @@ public class GameClient {
     private static final String HANDSHAKE_RESP_REGEX = "IAM\\s+\\w*:*\\w+\\s*";
     
     /** Move validation regex */
-    private static final String MOVE_VAL_REGEX = "TESUJI\\s+\\(\\s*[0-8],\\s*[0-8]\\s*\\)\\s*\\n*";
+    private static final String MOVE_VAL_REGEX = "TESUJI\\s+\\(\\s*[0-8],\\s*[0-8]\\s*\\)\\s*";
     
     /** Wall validation regex */
-    private static final String WALL_VAL_REGEX = "TESUJI\\s+\\[\\s*\\(\\s*[0-7]\\s*,\\s*[0-7]\\s*\\)\\s*,\\s*[hv]\\s*\\]\\s*\\n*";
+    private static final String WALL_VAL_REGEX = "TESUJI\\s+\\[\\s*\\(\\s*[0-7]\\s*,\\s*[0-7]\\s*\\)\\s*,\\s*[hvHV]\\s*\\]\\s*";
     // This is only slightly obnoxious...
     
     /** The internal Board instance */

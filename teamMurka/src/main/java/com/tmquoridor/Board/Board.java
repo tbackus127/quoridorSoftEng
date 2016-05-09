@@ -134,6 +134,22 @@ public class Board {
     }
     
     /**
+     * Tests if any opponent could place a given wall
+     * @param pid Our player ID (not opponent's)
+     * @param w the wall to test
+     * @return true if placeable; false if not
+     */
+    public boolean couldOpponentPlaceWall(int pid, Wall w) {
+      for(int i = 0; i < numOfPlayers; i++) {
+        if(kickedPlayers.contains(pid) || pid == i) continue;
+        if(isLegalWall(i, w)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    /**
      * Gets all walls that would block a player's path
      * @param pid the player ID to run against
      * @param path the path returned from getShortestPath()
@@ -416,7 +432,7 @@ public class Board {
         if(wallsLeft[pid] <= 0)
             return false;
         
-        System.err.println("w: " + w);
+        // System.err.println("w: " + w);
         
         // Get the wall we're placing's data
         Coord wPos = w.getPos();
