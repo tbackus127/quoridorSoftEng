@@ -299,7 +299,7 @@ public class QuorPanel extends JPanel {
             // Draw labels
             int labelx = (i % 2 == 0) ? (BOARD_SIZE * (i % 2)) : ((BOARD_SIZE + MARGIN_BOARD_LEFT) * (i % 2)) - 8;
             labelx += MARGIN_TEXT_LEFT;
-            int labely = (i < 2) ? MARGIN_TEXT_TOP : MARGIN_TEXT_TOP << 2;
+            int labely = (i < 2) ? MARGIN_TEXT_TOP : (MARGIN_TEXT_TOP << 1) + 26;
             
             // If the player ID is kicked
             if(board.isPlayerKicked(i)) {
