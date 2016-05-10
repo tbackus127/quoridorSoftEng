@@ -105,40 +105,52 @@ public class AIServer extends ManualInputServer {
         
         System.err.println("  We have the shortest path.");
         
-        // Go through the set of potential walls that could screw us over
-        Wall worstWall = null;
-        int worstPathLength = currPathLength;
-        for(Wall w : blockingWalls) {
-          ArrayList<Coord> theoreticalPath = board.getShortestPath(pid, w);
+        // If we have walls to place
+        if(!noWallsLeft) {
           
-          // If this wall would REALLY screw us over, keep track of it
-          if(theoreticalPath.size() - currPathLength >= wallCounterThreshold && theoreticalPath.size() > worstPathLength) {
+          // Go through the set of potential walls that could screw us over
+          Wall worstWall = null;
+          int worstPathLength = currPathLength;
+          for(Wall w : blockingWalls) {
+            ArrayList<Coord> theoreticalPath = board.getShortestPath(pid, w);
             
-            // If the anti-Wall is legal
-            if(board.isLegalWall(pid, w.getAntiWall())) {
-              worstWall = w;
-              worstPathLength = theoreticalPath.size();
+            // If this wall would REALLY screw us over, keep track of it
+            if(theoreticalPath.size() - currPathLength >= wallCounterThreshold && theoreticalPath.size() > worstPathLength) {
+              
+              // If the anti-Wall is legal
+              if(board.isLegalWall(pid, w.getAntiWall())) {
+                worstWall = w;
+                worstPathLength = theoreticalPath.size();
+              }
             }
           }
-        }
-        
-        // If we've decided we need to place an anti-wall
-        if(worstWall != null) {
           
-          // Get the worst Wall's anti-wall and place it
-          Wall antiWall = worstWall.getAntiWall();
-          Coord wPos = antiWall.getPos();
-          System.err.println("    Using anti-wall: " + antiWall);
-          move = moveWrapper(antiWall.getOrt().toString() + " " + wPos.getX() + " " + wPos.getY());
+          // If we've decided we need to place an anti-wall
+          if(worstWall != null) {
+            
+            // Get the worst Wall's anti-wall and place it
+            Wall antiWall = worstWall.getAntiWall();
+            Coord wPos = antiWall.getPos();
+            System.err.println("    Using anti-wall: " + antiWall);
+            move = moveWrapper(antiWall.getOrt().toString() + " " + wPos.getX() + " " + wPos.getY());
+          
+          // If any potential walls aren't that big of a deal, or we can't place any anti-wall
+          } else {
+          
+            // Continue along our path
+            Coord next = paths.get(pid).get(0);
+            System.err.println("    Continuing along path " + next);
+            move = moveWrapper("m " + next.getX() + " " + next.getY());
         
-        // If any potential walls aren't that big of a deal, or we can't place any anti-wall
+          }
+          
+        // If we've ran out of walls
         } else {
-        
+          
           // Continue along our path
           Coord next = paths.get(pid).get(0);
           System.err.println("    Continuing along path " + next);
           move = moveWrapper("m " + next.getX() + " " + next.getY());
-        
         }
         
       // If an opponent has the shortest path
@@ -146,39 +158,51 @@ public class AIServer extends ManualInputServer {
         
         System.err.println("Opponent with PID=" + pidWithShortestPath + " has the shortest path.");
         
-        // If the opponent is close enough to bother blocking them off
-        if(currPathLength <= attackThreshold) {
-          System.err.println("Opponent is close to winning!");
-        
-          Wall bestWall = null;
-          int bestWallPathLength = currPathLength;
+        // If we have walls to spare
+        if(!noWallsLeft) {
+                  
+          // If the opponent is close enough to bother blocking them off
+          if(currPathLength <= attackThreshold) {
+            System.err.println("Opponent is close to winning!");
           
-          // Find the wall that would do the most damage
-          for(Wall w : blockingWalls) {
-            ArrayList<Coord> theoreticalPath = board.getShortestPath(pidWithShortestPath, w);
-          
-            // If this wall is better, track it as the best
-            if(theoreticalPath.size() > bestWallPathLength) {
-              System.err.println("  Found new best wall: " + w);
-              bestWall = w;
-              bestWallPathLength = theoreticalPath.size();
-            }
-          }
-        
-          // If we found a good wall to place
-          if(bestWall != null) {
-            Coord wPos = bestWall.getPos();
-            move = moveWrapper(bestWall.getOrt().toString() + " " + wPos.getX() + " " + wPos.getY());
+            Wall bestWall = null;
+            int bestWallPathLength = currPathLength;
             
-          // Otherwise, continue
+            // Find the wall that would do the most damage
+            for(Wall w : blockingWalls) {
+              ArrayList<Coord> theoreticalPath = board.getShortestPath(pidWithShortestPath, w);
+            
+              // If this wall is better, track it as the best
+              if(theoreticalPath.size() > bestWallPathLength) {
+                System.err.println("  Found new best wall: " + w);
+                bestWall = w;
+                bestWallPathLength = theoreticalPath.size();
+              }
+            }
+          
+            // If we found a good wall to place
+            if(bestWall != null) {
+              Coord wPos = bestWall.getPos();
+              move = moveWrapper(bestWall.getOrt().toString() + " " + wPos.getX() + " " + wPos.getY());
+              
+            // Otherwise, continue
+            } else {
+              Coord next = paths.get(pid).get(0);
+              System.err.println("    Continuing along path " + next);
+              move = moveWrapper("m " + next.getX() + " " + next.getY());
+            }
+            
+            
+          // If the opponent is still far away
           } else {
+            
+            // Continue along our path
             Coord next = paths.get(pid).get(0);
             System.err.println("    Continuing along path " + next);
             move = moveWrapper("m " + next.getX() + " " + next.getY());
           }
-          
-          
-        // If the opponent is still far away
+        
+        // If we're out of walls
         } else {
           
           // Continue along our path
