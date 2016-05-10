@@ -1,8 +1,15 @@
 package com.tmquoridor.GUI;
 
 import java.util.ArrayList;
+
+import java.io.File;
+import java.io.PrintStream;
+import java.io.IOException;
+
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import javax.swing.*;
+import javax.imageio.ImageIO;
 
 import com.tmquoridor.Board.*;
 
@@ -18,19 +25,19 @@ public class QuorPanel extends JPanel {
     private static final int BOARD_SIZE = (TILE_SIZE + WALL_SIZE) * 9;
     
     /** How far the board starts drawing from the left */
-    private static final int MARGIN_BOARD_LEFT = 136;
+    private static final int MARGIN_BOARD_LEFT = 142;
     
     /** How far the board starts drawing from the top */
-    private static final int MARGIN_BOARD_TOP = 48;
+    private static final int MARGIN_BOARD_TOP = 72;
     
     /** How far the info text is indented from the left */
-    private static final int MARGIN_TEXT_LEFT = 4;
+    private static final int MARGIN_TEXT_LEFT = 10;
     
     /** How far the player info is indented from the top */
-    private static final int MARGIN_TEXT_TOP = 64;
+    private static final int MARGIN_TEXT_TOP = 138;
     
     /** How far down the next line of info is */
-    private static final int MARGIN_TEXT_LINE = 16;
+    private static final int MARGIN_TEXT_LINE = 24;
     
     /** Pixels to shrink the pawn circle */
     private static final int PADDING_PAWN = 2;
@@ -50,9 +57,6 @@ public class QuorPanel extends JPanel {
     /** Spacing for label X-Offset */
     private static final int PADDING_LABEL = 8;
 
-    
-    
-    
     // Various RGB colors for GUI components
     private static final Color COLOR_BG = new Color(180, 24, 24);
     private static final Color COLOR_TILE = new Color(24, 0, 0);
@@ -77,6 +81,15 @@ public class QuorPanel extends JPanel {
     /** Player Names */
     private final String[] playerNames;
     
+    /** Background image */
+    private BufferedImage bgImage;
+    
+    /** LCD font for headers */
+    private static Font lcdFontHeaders;
+    
+    /** LCD font for headers */
+    private static Font lcdFontLabels;
+    
     /**
      * Default constructor
      * @param b the Board object to update from
@@ -92,9 +105,35 @@ public class QuorPanel extends JPanel {
         setBackground(COLOR_BG);
         System.err.println("Panel constructed.");
         System.err.print("Players: ");
+        
+        // Set background image and font
+        try {
+          switch(board.getTotalPlayers()) {
+            case 4:
+              bgImage = ImageIO.read(new File("res/img/QuoridorBG-4p.png"));
+            break;
+            case 2:
+              bgImage = ImageIO.read(new File("res/img/QuoridorBG-2p.png"));
+            break;
+            default:
+              bgImage = null;
+          }
+          
+          // Load font
+          lcdFontHeaders = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/digital.ttf")).deriveFont(34f);
+          lcdFontLabels = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/digital.ttf")).deriveFont(28f);
+          GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/digital.ttf")));
+        } catch (IOException fnf) {
+          System.err.println("Could not find BG image.");
+        } catch (FontFormatException ffe) {
+          System.err.println("Something blew up with the font.");
+        }
+        
         for(int i = 0; i < playerNames.length; i++) {
             System.err.print(playerNames[i] + " ");
         }
+        
         System.err.println();
         
     }
@@ -106,6 +145,7 @@ public class QuorPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        g.drawImage(bgImage, 0, 0, null);
         if(board.wasWinner())
           return;
         updateGUI(g);
@@ -148,16 +188,13 @@ public class QuorPanel extends JPanel {
     private void paintGrid(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         
-        // Draw board background
-        
-        
         // Draw Tile rows
         for(int row = 0; row < 9; row++) {
             
             g2.setColor(COLOR_PAWN);
             int lrx = MARGIN_BOARD_LEFT - (TILE_SIZE / 2);
             int lry = MARGIN_BOARD_TOP + (TILE_SIZE / 2) + row * (TILE_SIZE + WALL_SIZE);
-            g2.drawString("" + row, lrx, lry);
+            // g2.drawString("" + row, lrx, lry);
             
             // Columns
             for(int col = 0; col < 9; col++) {
@@ -168,7 +205,7 @@ public class QuorPanel extends JPanel {
                 int lcy = MARGIN_BOARD_TOP - (TILE_SIZE / 2) + 8;
                 
                 g2.setColor(COLOR_PAWN);
-                g2.drawString("" + col, lcx, lcy);
+                // g2.drawString("" + col, lcx, lcy);
                 g2.setColor(COLOR_TILE);
                 g2.fillRect(orgX, orgY, TILE_SIZE, TILE_SIZE);
             }
@@ -252,12 +289,13 @@ public class QuorPanel extends JPanel {
      */
     private void paintInfo(Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
+        g2.setColor(COLOR_PATH[2]);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setFont(FONT_LABELS);
+        g2.setFont(lcdFontHeaders);
         
         for(int i = 0; i < playerNames.length; i++) {
             
-            g2.setFont(FONT_LABELS);
+            g2.setFont(lcdFontHeaders);
             // Draw labels
             int labelx = (i % 2 == 0) ? (BOARD_SIZE * (i % 2)) : ((BOARD_SIZE + MARGIN_BOARD_LEFT) * (i % 2)) - 8;
             labelx += MARGIN_TEXT_LEFT;
@@ -265,7 +303,7 @@ public class QuorPanel extends JPanel {
             
             // If the player ID is kicked
             if(board.isPlayerKicked(i)) {
-                g2.drawString("#REKT", labelx, labely);
+                g2.drawString("KICKED", labelx, labely);
             
             // Still playing
             } else {
@@ -274,13 +312,11 @@ public class QuorPanel extends JPanel {
                 g2.drawString("Player " + (i+1), labelx, labely);
                 
                 // Draw player names
-                g2.setFont(FONT_INFO);
-                int textx = labelx + MARGIN_TEXT_LEFT;
+                g2.setFont(lcdFontLabels);
+                int textx = labelx + MARGIN_TEXT_LEFT + 4;
                 int texty = labely + MARGIN_TEXT_LINE;
-                g2.drawString("\"" + playerNames[i] + "\"", textx, texty);
                 
                 // Draw walls left
-                texty += MARGIN_TEXT_LINE;
                 g2.drawString("Walls: " + board.wallsRemaining(i), textx, texty);
             
             }
