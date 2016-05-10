@@ -182,7 +182,7 @@ public class QuorPanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
         for(int i = 0; i < board.getTotalPlayers(); i++) {
-            g2.setColor(COLOR_PAWN);
+            g2.setColor(COLOR_PATH[i]);
 
             // If the player has already been kicked, skip drawing them.
             if(board.isPlayerKicked(i))
