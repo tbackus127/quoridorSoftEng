@@ -147,6 +147,10 @@ public class QuorPanel extends JPanel {
      */
     private void paintGrid(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
+        
+        // Draw board background
+        
+        
         // Draw Tile rows
         for(int row = 0; row < 9; row++) {
             
@@ -288,6 +292,9 @@ public class QuorPanel extends JPanel {
      * @param g the Graphics object
      */
     private void paintPaths(Graphics g) {
+      
+      if(board.wasWinner())
+        return;
       
       ArrayList<Coord> path = null;
       
