@@ -1,8 +1,0 @@
-ideas 2 player
-move one: place verticle wall to opposite players turn and up one space 
-if they move forward
-move two: place horizontal wall infront of them making a upside down T 
-if they chose the shortest path 
-move three: place wall to the left of the T inorder to cut off that side completely
-            forcing a complete back track 
-move four: pawn forward 
