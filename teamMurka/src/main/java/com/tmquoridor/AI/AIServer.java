@@ -17,7 +17,10 @@ public class AIServer extends ManualInputServer {
     /** How much of a difference a wall would have to make to have us counter it */
     private int wallCounterThreshold = 5;
 
-    // Main that uses the command line arguments
+    /**
+     * Main method. Creates a new AIServer object with the specified runtime arguments
+     * @param args runtime args as a String array
+     */
     public static void main(String[] args) {
           
         // This sets the defaults
@@ -60,19 +63,28 @@ public class AIServer extends ManualInputServer {
     }
 
 
-    // Lets them know if they put in an invalid argument
+    /**
+     * Prints the usage message if the user entered invalid runtime arguments
+     */
     private static void usage() {
-        System.err.print("usage: java BirthdayServer [options]\n" +
-            "       where options:\n" + "       --port port\n");
+        System.err.print("usage: \"java AIServer [--port <port>] [--name <name>] [--delay <delay>]\"");
     }
 
-    //constructor
-    // Uses internal wall placement (W:[(4,7),V] would place a wall on the LEFT of (4,7)
+    /**
+     * Default constructor. Uses internal wall placement!
+     * @param port the port number to use
+     * @param name the server's name
+     * @param delay the delay to wait until making a move (in milliseconds)
+     */
     public AIServer(int port, String name, int delay) {
         super(port, name, delay, true);
     }
 
     
+    /**
+     * Generates and sends a move across the wire
+     * @param cout the PrintStream hooked to the client socket
+     */
     public void sendMove(PrintStream cout) {
       System.err.println("Generating move...");
       Random rand = new Random();
