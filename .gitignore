@@ -1,8 +1,8 @@
 # .gitignore for Java and Gradle
 
-teamMurka/build/**
-teamMurka/debug/**
-teamMurka/.gradle/**
+build/**
+debug/**
+.gradle/**
 **.java~
 **.sh~
 **.kate-swp
