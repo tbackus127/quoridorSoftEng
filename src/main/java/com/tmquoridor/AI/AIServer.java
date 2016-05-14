@@ -12,10 +12,22 @@ import java.util.*;
 public class AIServer extends ManualInputServer {
 
     /** How many more moves the opponent has before they win before we start preventing them */
-    private int attackThreshold = 5;
+    private int remainingPathThreshold = 5;
+    
+    /** How much of a difference in path length a wall would make to attack with */
+    private int attackDeltaThreshold = 5;
     
     /** How much of a difference a wall would have to make to have us counter it */
     private int wallCounterThreshold = 5;
+    
+    /** The chance we will place a wall anyways, even if it doesn't screw the opponent much */
+    private double randomWallChance = 0.15D;
+    
+    /** Chance to do hard-coded opening */
+    private double openingChance = 0.8D;
+    
+    /** Turn counter */
+    private int turnCount = 0;
 
     /**
      * Main method. Creates a new AIServer object with the specified runtime arguments
@@ -92,7 +104,58 @@ public class AIServer extends ManualInputServer {
       boolean noWallsLeft = (board.wallsRemaining(pid) <= 0);
       String move = "";
       
+      // 80% chance to do Schiller's opening
+      if(rand.nextDouble() <= openingChance && board.getTotalPlayers() == 2) {
+        System.err.println("Doing schiller's opening.");
+        int swx = -1;
+        int swy = -1;
+        Orientation swOrt = Orientation.VERT;
+        if(turnCount <= 1) {
+          switch(pid) {
+            
+            // Player 2
+            case 1:
+              if(turnCount == 0) {
+                swx = 3;
+                swy = 2;
+              } else {
+                swx = 6;
+                swy = 2;
+                swOrt = Orientation.HORIZ;
+              }
+            break;
+            
+            // Player 1
+            default:
+              if(turnCount == 0) {
+                swx = 4;
+                swy = 5;
+              } else {
+                swx = 1;
+                swy = 5;
+                swOrt = Orientation.HORIZ;
+                
+              }
+          }
+          
+          Wall sw = new Wall(new Coord(swx, swy), swOrt);
+          System.err.println("Generated wall " + sw);
+          
+          if(board.isLegalWall(pid, sw)) {
+            System.err.println("Wall is legal");
+            move = moveWrapper("" + swOrt.toString() + " " + swx + " " + swy);
+            cout.print(move);
+            turnCount++;
+            return;
+          } else {
+            System.err.println("Wall isn't legal: " + sw);
+          }
+        }
+          
+      }
+      
       // Get all players' shortest paths
+      System.err.println("Computing paths...");
       ArrayList<ArrayList<Coord>> paths = new ArrayList<ArrayList<Coord>>();
       int pidWithShortestPath = -1;
       int pathSizeOfLeader = 9001;
@@ -174,7 +237,7 @@ public class AIServer extends ManualInputServer {
         if(!noWallsLeft) {
                   
           // If the opponent is close enough to bother blocking them off
-          if(currPathLength <= attackThreshold) {
+          if(currPathLength <= remainingPathThreshold || rand.nextDouble() <= randomWallChance) {
             System.err.println("Opponent is close to winning!");
           
             Wall bestWall = null;
@@ -183,9 +246,11 @@ public class AIServer extends ManualInputServer {
             // Find the wall that would do the most damage
             for(Wall w : blockingWalls) {
               ArrayList<Coord> theoreticalPath = board.getShortestPath(pidWithShortestPath, w);
+              
+              int theoreticalDelta = theoreticalPath.size() - currPathLength;
             
-              // If this wall is better, track it as the best
-              if(theoreticalPath.size() > bestWallPathLength) {
+              // If this wall is better, track it as the best (if we care about it)
+              if(theoreticalPath.size() > bestWallPathLength && theoreticalDelta + (7 - currPathLength) >= attackDeltaThreshold) {
                 System.err.println("  Found new best wall: " + w);
                 bestWall = w;
                 bestWallPathLength = theoreticalPath.size();
@@ -226,6 +291,7 @@ public class AIServer extends ManualInputServer {
       
       System.err.println("    Sending \"" + move + "\"");
       cout.print(move);
+      turnCount++;
     }
 }
 
