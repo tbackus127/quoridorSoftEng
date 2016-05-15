@@ -117,6 +117,9 @@ public class QuorPanel extends JPanel {
     /** The results of the match, after it is over, with the winner being in index 0. */
     private String[] matchResults;
     
+    /** Resource directory */
+    private String resDir = "res/";
+    
     /**
      * Default constructor
      * @param b the Board object to update from
@@ -133,21 +136,31 @@ public class QuorPanel extends JPanel {
         System.err.println("Panel constructed.");
         System.err.print("Players: ");
         
+        // Check if we're executing this from a level back
+        if(!(new File(resDir + "img/murkaBG.png")).exists()) {
+          resDir = "teamMurka/res/";
+        }
+        
         // Set background image and fonts
         try {
           
+          File fileBGMain = new File(resDir + "img/murkaBG.png");
+          File fileBGRes = new File(resDir + "img/declBG.jpg");
+          File fileFontMain = new File(resDir + "fonts/freedom.ttf");
+          File fileFontRes = new File(resDir + "fonts/declScript.ttf");
+          
           // Load background images
-          bgImage = ImageIO.read(new File("res/img/murkaBG.png"));
-          winImage = ImageIO.read(new File("res/img/declBG.jpg"));
+          bgImage = ImageIO.read(fileBGMain);
+          winImage = ImageIO.read(fileBGRes);
           
           // Load and set up fonts
-          fontHeaders = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/freedom.ttf")).deriveFont(38f);
-          fontLabels = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/freedom.ttf")).deriveFont(32f);
-          fontResHeaders = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/declScript.ttf")).deriveFont(38f);
-          fontResText = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/declScript.ttf")).deriveFont(26f);
+          fontHeaders = Font.createFont(Font.TRUETYPE_FONT, fileFontMain).deriveFont(38f);
+          fontLabels = Font.createFont(Font.TRUETYPE_FONT, fileFontMain).deriveFont(32f);
+          fontResHeaders = Font.createFont(Font.TRUETYPE_FONT, fileFontRes).deriveFont(38f);
+          fontResText = Font.createFont(Font.TRUETYPE_FONT, fileFontRes).deriveFont(26f);
           GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/freedom.ttf")));
-          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/declScript.ttf")));
+          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, fileFontMain));
+          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, fileFontRes));
         } catch (IOException fnf) {
           System.err.println("  !! Could not find one or more background images!");
         } catch (FontFormatException ffe) {
