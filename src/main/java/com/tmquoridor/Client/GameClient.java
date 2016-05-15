@@ -107,7 +107,7 @@ public class GameClient {
      * Sets up the internal Board instance
      */
     private void setupBoard() {
-    	// Set up board
+        // Set up board
         System.err.println("Setting up...");
         board = new Board(socks.length);
     }
@@ -116,7 +116,8 @@ public class GameClient {
      * Performs the game loop
      */
     private void doGameLoop() {
-    	// show that game is beginning
+      
+        // show that game is beginning
         System.err.println("Entering game loop...");
         
         board.printBoard();	// print board to console
@@ -223,6 +224,13 @@ public class GameClient {
           Thread.sleep(3000);
         } catch(InterruptedException ign) {}
         
+        // Swap winner's name to index 0
+        int winID = board.getWinner() - 1;
+        if(winID != 0) {
+          String tmp = srvNames[0];
+          srvNames[0] = srvNames[winID];
+          srvNames[winID] = tmp;
+        }
         gui.declareWinner(srvNames);
     }
     
