@@ -204,7 +204,13 @@ public class GameClient {
             }
             
         }
-        gui.repaintGUI();
+        
+        // Let people actually see that someone has won
+        try {
+          Thread.sleep(3000);
+        } catch(InterruptedException ign) {}
+        
+        gui.declareWinner(srvNames);
     }
     
     /**

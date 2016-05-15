@@ -58,4 +58,13 @@ public class QuorGUI {
         else
           System.err.println("Panel is null!");
     }
+    
+    /**
+     * Declares the winner and opponents
+     * @param players player names with the winner at index 0
+     */
+    public void declareWinner(String[] players) {
+      panel.setResult(players);
+      panel.repaint();
+    }
 }

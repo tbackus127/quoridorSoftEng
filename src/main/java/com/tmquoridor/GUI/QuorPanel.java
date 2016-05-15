@@ -56,9 +56,12 @@ public class QuorPanel extends JPanel {
     
     /** Spacing for label X-Offset */
     private static final int PADDING_LABEL = 8;
+    
+    /** Spacing for results lines */
+    private static final int MARGIN_RESLINE = 32;
 
     /** Background color */
-    private static final Color COLOR_BG = new Color(180, 24, 24);
+    private static final Color COLOR_BG = Color.BLACK;
     
     /** Tile color */
     private static final Color COLOR_TILE[] = {
@@ -81,11 +84,23 @@ public class QuorPanel extends JPanel {
                                             new Color(255, 0, 255)
     };
     
-    /** Font for drawing information labels */
-    private static final Font FONT_LABELS = new Font("Serif", Font.PLAIN, 24);
+    /** Results screen text color */
+    private static final Color COLOR_SCRIPT = new Color(32, 10, 10);
     
-    /** Font for drawing information text */
-    private static final Font FONT_INFO = new Font("Serif", Font.PLAIN, 14);
+    /** Results screen winner color */
+    private static final Color COLOR_WINNER = new Color(160, 32, 32);
+    
+    /** Font for player status headers */
+    private static Font fontHeaders;
+    
+    /** Font for player status labels */
+    private static Font fontLabels;
+    
+    /** Font for results screen headers */
+    private static Font fontResHeaders;
+    
+    /** Font for results screen text */
+    private static Font fontResText;
     
     /** Board to get info from */
     private final Board board;
@@ -93,14 +108,14 @@ public class QuorPanel extends JPanel {
     /** Player Names */
     private final String[] playerNames;
     
-    /** Background image */
+    /** In-game background */
     private BufferedImage bgImage;
     
-    /** LCD font for headers */
-    private static Font fontHeaders;
+    /** Results screen background */
+    private BufferedImage winImage;
     
-    /** LCD font for headers */
-    private static Font fontLabels;
+    /** The results of the match, after it is over, with the winner being in index 0. */
+    private String[] matchResults;
     
     /**
      * Default constructor
@@ -118,23 +133,28 @@ public class QuorPanel extends JPanel {
         System.err.println("Panel constructed.");
         System.err.print("Players: ");
         
-        // Set background image and font
+        // Set background image and fonts
         try {
           
-          // Load background image
+          // Load background images
           bgImage = ImageIO.read(new File("res/img/murkaBG.png"));
+          winImage = ImageIO.read(new File("res/img/declBG.jpg"));
           
-          // Load and set up font
+          // Load and set up fonts
           fontHeaders = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/freedom.ttf")).deriveFont(38f);
           fontLabels = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/freedom.ttf")).deriveFont(32f);
+          fontResHeaders = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/declScript.ttf")).deriveFont(38f);
+          fontResText = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/declScript.ttf")).deriveFont(26f);
           GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
           ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/freedom.ttf")));
+          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/declScript.ttf")));
         } catch (IOException fnf) {
-          System.err.println("Could not find BG image.");
+          System.err.println("  !! Could not find one or more background images!");
         } catch (FontFormatException ffe) {
-          System.err.println("Something blew up with the font.");
+          System.err.println("  !! Something blew up with the font!");
         }
         
+        // Print player names (debug)
         for(int i = 0; i < playerNames.length; i++) {
             System.err.print(playerNames[i] + " ");
         }
@@ -150,9 +170,13 @@ public class QuorPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(bgImage, 0, 0, null);
-        if(board.wasWinner())
-          return;
+        if(matchResults == null) {
+          g.drawImage(bgImage, 0, 0, null);
+          if(board.wasWinner())
+            return;
+        } else {
+          g.drawImage(winImage, 0, 0, null);
+        }
         updateGUI(g);
     }
     
@@ -171,19 +195,85 @@ public class QuorPanel extends JPanel {
      */
     private void updateGUI(Graphics g) {
         if(board != null) {
-          paintGrid(g);
-          paintPawns(g);
-          paintWalls(g);
-          paintInfo(g);
           
-          if(!board.wasWinner())
-            paintPaths(g);
-          else
-            System.err.println("Game is over");
+          // Match still going on
+          if(matchResults == null) {
+            paintGrid(g);
+            paintPawns(g);
+            paintWalls(g);
+            paintInfo(g);
+            
+            if(!board.wasWinner())
+              paintPaths(g);
+            else
+              System.err.println("Game is over");
           
+          // Match over
+          } else {
+            paintResults(g);
+          }
         } else {
           System.err.println("Board is null.");
         }
+    }
+    
+    /**
+     * Sets the match results. Causes the GUI to display the results screen
+     * @param names server names, with the winner being in index 0.
+     */
+    public void setResult(String[] names) {
+      matchResults = names;
+    }
+    
+    /**
+     * Draws the results screen
+     * @param g the Graphics object
+     */
+    private void paintResults(Graphics g) {
+      Graphics2D g2 = (Graphics2D) g;
+      
+      // Enable antialiasing
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      
+      // Draw header of independenceDecls
+      g2.setFont(fontResHeaders);
+      g2.setColor(COLOR_SCRIPT);
+      g2.rotate(Math.toRadians(-4));
+      String resHeaderString = "IN CONGRESS, May 17, 2016.";
+      g2.drawString(resHeaderString, (640 - g2.getFontMetrics(fontResHeaders).stringWidth(resHeaderString)) / 2, MARGIN_RESLINE * 2);
+      
+      // Draw line 1 of colonial babble
+      g2.setFont(fontResText);
+      String resLine1 = "The unanimous declaration of victory between";
+      g2.drawString(resLine1, (640 - g2.getFontMetrics(fontResText).stringWidth(resLine1)) / 2, MARGIN_RESLINE * 4);
+      
+      // Get list of players, calculate width and draw
+      String resPlayerList = matchResults[0];
+      for(int i = 1; i < matchResults.length; i++) {
+        if(matchResults.length > 2)
+          resPlayerList += ",";
+        if(i == matchResults.length - 1)
+          resPlayerList += " and";
+        resPlayerList += " " + matchResults[i];
+      }
+      g2.drawString(resPlayerList, (640 - g2.getFontMetrics(fontResText).stringWidth(resPlayerList)) / 2, MARGIN_RESLINE * 6);
+      
+      // Draw line 2 of colonial babble
+      String resLine2 = "Henceforth, on this day it shall be knownst that";
+      g2.drawString(resLine2, (640 - g2.getFontMetrics(fontResText).stringWidth(resLine2)) / 2, MARGIN_RESLINE * 8);
+      
+      // Draw winner's name
+      String winName = matchResults[0];
+      g2.setFont(fontResHeaders);
+      g2.setColor(COLOR_WINNER);
+      g2.drawString(winName, (640 - g2.getFontMetrics(fontResText).stringWidth(winName)) / 2, MARGIN_RESLINE * 10);
+      
+      // Draw last line of colonial babble
+      g2.setFont(fontResText);
+      g2.setColor(COLOR_SCRIPT);
+      String resLine3 = "has triumphed against all odds and secured victory.";
+      g2.drawString(resLine3, (640 - g2.getFontMetrics(fontResText).stringWidth(resLine3)) / 2, MARGIN_RESLINE * 12);
+      
     }
     
     /**

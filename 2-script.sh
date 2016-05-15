@@ -6,4 +6,4 @@
 # give the servers time to start up
 sleep 1
 
-./client-script.sh localhost:6000 localhost:6001 --delay 500
+./client-script.sh localhost:6000 localhost:6001 --delay 50
