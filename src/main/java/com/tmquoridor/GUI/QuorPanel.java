@@ -31,13 +31,13 @@ public class QuorPanel extends JPanel {
     private static final int MARGIN_BOARD_TOP = 72;
     
     /** How far the info text is indented from the left */
-    private static final int MARGIN_TEXT_LEFT = 10;
+    private static final int MARGIN_TEXT_LEFT = 6;
     
     /** How far the player info is indented from the top */
     private static final int MARGIN_TEXT_TOP = 138;
     
     /** How far down the next line of info is */
-    private static final int MARGIN_TEXT_LINE = 24;
+    private static final int MARGIN_TEXT_LINE = 28;
     
     /** Pixels to shrink the pawn circle */
     private static final int PADDING_PAWN = 2;
@@ -61,10 +61,14 @@ public class QuorPanel extends JPanel {
     private static final Color COLOR_BG = new Color(180, 24, 24);
     
     /** Tile color */
-    private static final Color COLOR_TILE = new Color(24, 0, 0);
+    private static final Color COLOR_TILE[] = {
+                                            new Color(128, 0, 0),
+                                            new Color(128, 128, 128),
+                                            new Color(0, 0, 128)
+    };
     
     /** Walls' color */
-    private static final Color COLOR_WALL = new Color(255, 236, 160);
+    private static final Color COLOR_WALL = new Color(255, 255, 0);
     
     /** The pawn's color */
     private static final Color COLOR_PAWN = COLOR_WALL;
@@ -93,10 +97,10 @@ public class QuorPanel extends JPanel {
     private BufferedImage bgImage;
     
     /** LCD font for headers */
-    private static Font lcdFontHeaders;
+    private static Font fontHeaders;
     
     /** LCD font for headers */
-    private static Font lcdFontLabels;
+    private static Font fontLabels;
     
     /**
      * Default constructor
@@ -116,22 +120,15 @@ public class QuorPanel extends JPanel {
         
         // Set background image and font
         try {
-          switch(board.getTotalPlayers()) {
-            case 4:
-              bgImage = ImageIO.read(new File("res/img/QuoridorBG-4p.png"));
-            break;
-            case 2:
-              bgImage = ImageIO.read(new File("res/img/QuoridorBG-2p.png"));
-            break;
-            default:
-              bgImage = null;
-          }
           
-          // Load font
-          lcdFontHeaders = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/digital.ttf")).deriveFont(34f);
-          lcdFontLabels = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/digital.ttf")).deriveFont(28f);
+          // Load background image
+          bgImage = ImageIO.read(new File("res/img/murkaBG.png"));
+          
+          // Load and set up font
+          fontHeaders = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/freedom.ttf")).deriveFont(38f);
+          fontLabels = Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/freedom.ttf")).deriveFont(32f);
           GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/digital.ttf")));
+          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("res/fonts/freedom.ttf")));
         } catch (IOException fnf) {
           System.err.println("Could not find BG image.");
         } catch (FontFormatException ffe) {
@@ -213,8 +210,7 @@ public class QuorPanel extends JPanel {
                 int lcy = MARGIN_BOARD_TOP - (TILE_SIZE / 2) + 8;
                 
                 g2.setColor(COLOR_PAWN);
-                // g2.drawString("" + col, lcx, lcy);
-                g2.setColor(COLOR_TILE);
+                g2.setColor(COLOR_TILE[row % 3]);
                 g2.fillRect(orgX, orgY, TILE_SIZE, TILE_SIZE);
             }
         }
@@ -297,13 +293,13 @@ public class QuorPanel extends JPanel {
      */
     private void paintInfo(Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
-        g2.setColor(COLOR_PATH[2]);
+        g2.setColor(Color.WHITE);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setFont(lcdFontHeaders);
+        g2.setFont(fontHeaders);
         
         for(int i = 0; i < playerNames.length; i++) {
             
-            g2.setFont(lcdFontHeaders);
+            g2.setFont(fontHeaders);
             // Draw labels
             int labelx = (i % 2 == 0) ? (BOARD_SIZE * (i % 2)) : ((BOARD_SIZE + MARGIN_BOARD_LEFT) * (i % 2)) - 8;
             labelx += MARGIN_TEXT_LEFT;
@@ -311,16 +307,16 @@ public class QuorPanel extends JPanel {
             
             // If the player ID is kicked
             if(board.isPlayerKicked(i)) {
-                g2.drawString("KICKED", labelx, labely);
+                g2.drawString("Terrorist!", labelx, labely);
             
             // Still playing
             } else {
                 
                 
-                g2.drawString("Player " + (i+1), labelx, labely);
+                g2.drawString("Citizen " + (i+1), labelx, labely);
                 
                 // Draw player names
-                g2.setFont(lcdFontLabels);
+                g2.setFont(fontLabels);
                 int textx = labelx + MARGIN_TEXT_LEFT + 4;
                 int texty = labely + MARGIN_TEXT_LINE;
                 
