@@ -57,11 +57,19 @@ public class QuorPanel extends JPanel {
     /** Spacing for label X-Offset */
     private static final int PADDING_LABEL = 8;
 
-    // Various RGB colors for GUI components
+    /** Background color */
     private static final Color COLOR_BG = new Color(180, 24, 24);
+    
+    /** Tile color */
     private static final Color COLOR_TILE = new Color(24, 0, 0);
+    
+    /** Walls' color */
     private static final Color COLOR_WALL = new Color(255, 236, 160);
-    private static final Color COLOR_PAWN = new Color(255, 236, 160);
+    
+    /** The pawn's color */
+    private static final Color COLOR_PAWN = COLOR_WALL;
+    
+    /** Path colors */
     private static final Color COLOR_PATH[] = {
                                             new Color(0, 255, 0),
                                             new Color(255, 255, 0),
