@@ -50,9 +50,10 @@ public class Wall {
      * @return true if they are equal; false if not
      */
     public boolean equals(Wall other) {
-      Coord oc = other.getPos();
-      Coord tc = this.getPos();
+      Coord oc = other.getPos();	// other walls pos
+      Coord tc = this.getPos();		// temp variable to hold coord
       
+      // if the coords are not equal then the wall is not equal
       if(!tc.equals(oc))
         return false;
       
@@ -72,6 +73,7 @@ public class Wall {
      * @return an Orientation of the direction
      */
     public Orientation getOrt() {
+    	// returns Hor or vert wall placment
         return ort;
     }
     
@@ -92,6 +94,7 @@ public class Wall {
           wx--;
           wy++;
       }
+      //use wall Dc to created using the orientation of the current object.
       return new Wall(new Coord(wx, wy), ort.neg());
     }
     
@@ -101,6 +104,7 @@ public class Wall {
      */
     @Override
     public String toString() {
+    	// return string that interprets object's orientation.
         return "[" + pos + ":" + ((ort == Orientation.VERT) ? "V" : "H") + "]";
     }
 }
