@@ -36,16 +36,16 @@ public class AIServer extends ManualInputServer {
     public static void main(String[] args) {
           
         // This sets the defaults
-        int port = DEFAULT_PORT_NUMBER;
-        String name = DEFAULT_NAME;
-        int delay = DEFAULT_DELAY;
+        int port = DEFAULT_PORT_NUMBER;		// port for use
+        String name = DEFAULT_NAME;			// name fro game
+        int delay = DEFAULT_DELAY;			// Delay for game
       
         int argNdx = 0;
 
         // This runs through all of the command line arguments and applies the proper ones
         while (argNdx < args.length) {
             String curr = args[argNdx];
-
+            
             if (curr.equals(ARG_PORT)) {
                 ++argNdx;
 
@@ -66,11 +66,14 @@ public class AIServer extends ManualInputServer {
                 usage();
                 System.exit(1);
             }
-
+            
+            // modify LCV for the length of args for AI game
             ++argNdx;
         }
-
+        
+        // open new server with args from consts above
         AIServer ms = new AIServer(port, name, delay);
+        // run the server.
         ms.run();
     }
 
@@ -100,7 +103,7 @@ public class AIServer extends ManualInputServer {
     public void sendMove(PrintStream cout) {
       System.err.println("Generating move...");
       
-      //this ibject generates random numbers based on a seed
+      //this object generates random numbers based on a seed
       Random rand = new Random();
       int pid = thisServersPlayerNumber - 1;
       boolean noWallsLeft = (board.wallsRemaining(pid) <= 0);
@@ -291,16 +294,9 @@ public class AIServer extends ManualInputServer {
         }
       }
       
+      // Display and send move. modify the count.
       System.err.println("    Sending \"" + move + "\"");
       cout.print(move);
       turnCount++;
     }
 }
-
-
-
-
-
-
-
-

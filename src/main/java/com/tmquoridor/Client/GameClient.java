@@ -58,6 +58,7 @@ public class GameClient {
         int argc = rawArgs.length;
         for(int i = 0; i < rawArgs.length; i++) {
           String s = rawArgs[i];
+          // if delay is requested
           if(s.equals("--delay")) {
             this.clientDelay = Long.parseLong(rawArgs[++i]);
             argc -= 2;
@@ -67,6 +68,8 @@ public class GameClient {
         // Copy each arg from rawArgs to args (what we're handshaking with)
         String[] args = new String[argc];
         int argidx = 0;
+        
+        // for each arg in rawArgs
         for(int i = 0; i < rawArgs.length; i++) {
           String s = rawArgs[i];
           
@@ -79,6 +82,7 @@ public class GameClient {
         try {
             socks = buildSocks(args);
         } catch (IllegalArgumentException e) {
+        	// throw exception if socket not able to build
             e.printStackTrace();
         }
         
@@ -86,7 +90,11 @@ public class GameClient {
         if(handshake()) {
             try {
               Thread.sleep(1000);
-            } catch(InterruptedException ign) {}
+            }
+            // do nothing if Thread sleeps successfully
+            catch(InterruptedException ign) {}
+            
+            // begin game if client successfully starts
             sendStartMsgs();
             setupBoard();
             gui = new QuorGUI(board, srvNames);
@@ -99,6 +107,7 @@ public class GameClient {
      * Sets up the internal Board instance
      */
     private void setupBoard() {
+    	// Set up board
         System.err.println("Setting up...");
         board = new Board(socks.length);
     }
@@ -107,9 +116,13 @@ public class GameClient {
      * Performs the game loop
      */
     private void doGameLoop() {
+    	// show that game is beginning
         System.err.println("Entering game loop...");
-        board.printBoard();
-        playing = true;
+        
+        board.printBoard();	// print board to console
+        playing = true;		// LCV for loop
+        
+        // continue to play until there is a winner or everyone is a loser
         while(playing) {
             for(int i = 0; i < socks.length; i++) {
                 long sleepTime = 500L;
@@ -231,6 +244,8 @@ public class GameClient {
           broadcastAll("KIKASHI " + winID);
           playing = false;
         }
+        
+        // refresh the GUI
         gui.repaintGUI();
     }
     
@@ -250,14 +265,20 @@ public class GameClient {
      * @return a Coord representing the desired move. Returns null if in the improper format.
      */
     private Coord extractCoord(String msg) {
-        int[] res = new int[2];
-        int cnt = 0;
+        int[] res = new int[2]; // create int array for coords
+        int cnt = 0;			// counter for array placeholder
+        
+        // interate through msg to get coords
         for(int i = 0; i < msg.length(); i++) {
             char c = msg.charAt(i);
             if(c >= '0' && c <= '9') {
+            	// convert char into int.
+            	// love ASCII
                 res[cnt++] = c - '0';
             }
         }
+        
+        // return the newly found coords
         return new Coord(res[0], res[1]);
     }
     
@@ -437,11 +458,3 @@ public class GameClient {
         GameClient gc = new GameClient(args);
     }
 }
-
-
-
-
-
-
-
-

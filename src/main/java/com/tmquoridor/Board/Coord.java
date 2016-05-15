@@ -73,6 +73,9 @@ public class Coord {
           System.err.println("!! Coord.translate(): dir is null!");
         int x2 = this.x;
         int y2 = this.y;
+
+        // switch to find new pos for player
+        // Don't allow for player outside of board
         switch(dir) {
             case NORTH:
                 y2--;
@@ -109,8 +112,11 @@ public class Coord {
     public boolean equals(Coord other) {
         int ox = other.getX();
         int oy = other.getY();
+        // if players x or y do not match return false.
         if(ox != this.x || oy != this.y)
             return false;
+        
+        //otherwise player is at same pos.
         return true;
     }
     
@@ -136,6 +142,7 @@ public class Coord {
      */
     @Override
     public String toString() {
+    	//return the x and y coordinates 
         return "(" + getX() + "," + getY() + ")";
     }
     
@@ -144,6 +151,7 @@ public class Coord {
      * @return the Coord ID (int)
      */
     public int id() {
+    	//returns a unigue value for each position on the board.
       return x * 9 + y;
     }
 }

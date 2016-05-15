@@ -58,6 +58,7 @@ public enum Direction {
      * @return Orientation.HORIZ if even, Orientation.VERT otherwise
      */
     public static Orientation getOrientation(int d) {
+    	// convert int to dir, if even Hor wall else odd vert wall
         return (d % 2 == 0) ? Orientation.HORIZ : Orientation.VERT;
     }
 }
