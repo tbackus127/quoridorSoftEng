@@ -46,7 +46,6 @@ public class AIServer extends ManualInputServer {
         while (argNdx < args.length) {
             String curr = args[argNdx];
             
-            // 
             if (curr.equals(ARG_PORT)) {
                 ++argNdx;
 
