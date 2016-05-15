@@ -307,7 +307,7 @@ public class QuorPanel extends JPanel {
             
             // If the player ID is kicked
             if(board.isPlayerKicked(i)) {
-                g2.drawString("Terrorist!", labelx, labely);
+                g2.drawString("Deported!", labelx, labely);
             
             // Still playing
             } else {
@@ -317,7 +317,7 @@ public class QuorPanel extends JPanel {
                 
                 // Draw player names
                 g2.setFont(fontLabels);
-                int textx = labelx + MARGIN_TEXT_LEFT + 4;
+                int textx = labelx + MARGIN_TEXT_LEFT + 2;
                 int texty = labely + MARGIN_TEXT_LINE;
                 
                 // Draw walls left
