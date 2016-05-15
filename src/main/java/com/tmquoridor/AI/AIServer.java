@@ -99,6 +99,8 @@ public class AIServer extends ManualInputServer {
      */
     public void sendMove(PrintStream cout) {
       System.err.println("Generating move...");
+      
+      //this ibject generates random numbers based on a seed
       Random rand = new Random();
       int pid = thisServersPlayerNumber - 1;
       boolean noWallsLeft = (board.wallsRemaining(pid) <= 0);
