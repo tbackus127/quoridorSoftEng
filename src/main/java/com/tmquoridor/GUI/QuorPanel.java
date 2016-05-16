@@ -46,10 +46,10 @@ public class QuorPanel extends JPanel {
     private static final int PADDING_PATH = 15;
     
     /** Pixels to offset player number pawn label (x) */
-    private static final int MARGIN_PNUM_X = 11;
+    private static final int MARGIN_PNUM_X = 10;
     
     /** Pixels to offset player number pawn label (y) */
-    private static final int MARGIN_PNUM_Y = 19;
+    private static final int MARGIN_PNUM_Y = 18;
     
     /** So path lines don't overlap, extra pixels to push points to the side */
     private static final int PATH_OFFSET = 2;
@@ -98,6 +98,9 @@ public class QuorPanel extends JPanel {
     
     /** Font for results screen headers */
     private static Font fontResHeaders;
+    
+    /** Font for pawn name labels */
+    private static Font fontPawnLabels;
     
     /** Font for results screen text */
     private static Font fontResText;
@@ -148,6 +151,7 @@ public class QuorPanel extends JPanel {
           File fileBGRes = new File(resDir + "img/declBG.jpg");
           File fileFontMain = new File(resDir + "fonts/freedom.ttf");
           File fileFontRes = new File(resDir + "fonts/declScript.ttf");
+          File fileFontPLabels = new File(resDir + "fonts/plabel.ttf");
           
           // Load background images
           bgImage = ImageIO.read(fileBGMain);
@@ -158,9 +162,11 @@ public class QuorPanel extends JPanel {
           fontLabels = Font.createFont(Font.TRUETYPE_FONT, fileFontMain).deriveFont(32f);
           fontResHeaders = Font.createFont(Font.TRUETYPE_FONT, fileFontRes).deriveFont(38f);
           fontResText = Font.createFont(Font.TRUETYPE_FONT, fileFontRes).deriveFont(26f);
+          fontPawnLabels = Font.createFont(Font.TRUETYPE_FONT, fileFontPLabels).deriveFont(10f);
           GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
           ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, fileFontMain));
           ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, fileFontRes));
+          ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, fileFontPLabels));
         } catch (IOException fnf) {
           System.err.println("  !! Could not find one or more background images!");
         } catch (FontFormatException ffe) {
@@ -287,6 +293,9 @@ public class QuorPanel extends JPanel {
       String resLine3 = "has triumphed against all odds and secured victory.";
       g2.drawString(resLine3, (640 - g2.getFontMetrics(fontResText).stringWidth(resLine3)) / 2, MARGIN_RESLINE * 12);
       
+      String resLine4 = "You have our deepest thanks in making America great again!";
+      g2.drawString(resLine4, (640 - g2.getFontMetrics(fontResText).stringWidth(resLine4)) / 2, MARGIN_RESLINE * 14);
+      
     }
     
     /**
@@ -347,9 +356,12 @@ public class QuorPanel extends JPanel {
             
             g2.fillOval(gx, gy, TILE_SIZE - PADDING_PAWN * 2, TILE_SIZE - PADDING_PAWN * 2);
             
-            // Player numbers
+            // Get player names and calculate where to place them
+            g2.setFont(fontPawnLabels);
             g2.setColor(Color.BLACK);
-            g2.drawString("" + (i+1), gx + MARGIN_PNUM_X, gy + MARGIN_PNUM_Y);
+            String pcode = playerNames[i].split(":")[0];
+            int pLabelPadding = ((TILE_SIZE - PADDING_PAWN * 2) - g2.getFontMetrics(fontPawnLabels).stringWidth(pcode)) / 2;
+            g2.drawString(pcode, gx + pLabelPadding, gy + MARGIN_PNUM_Y);
         }
     }
     
