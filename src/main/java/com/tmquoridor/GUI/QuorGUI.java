@@ -1,70 +1,76 @@
+
 package com.tmquoridor.GUI;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 
-import com.tmquoridor.Board.*;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
+import com.tmquoridor.Board.Board;
 
 public class QuorGUI {
+  
+  /** Width of the JFrame */
+  public static final int FRAME_WIDTH = 640;
+  
+  /** Height of the JFrame */
+  public static final int FRAME_HEIGHT = 480;
+  
+  /** Reference to QuorPanel (JPanel subclass) */
+  public QuorPanel panel = null;
+  
+  /**
+   * Default constructor
+   * 
+   * @param b a reference to the Board to draw the info of
+   * @param plNames the names of the players playing
+   */
+  public QuorGUI(Board b, String[] plNames) {
     
-    /** Width of the JFrame */
-    public static final int FRAME_WIDTH = 640;
-    
-    /** Height of the JFrame */
-    public static final int FRAME_HEIGHT = 480;
-    
-    /** Reference to QuorPanel (JPanel subclass) */
-    public QuorPanel panel = null;
-    
-    /**
-     * Default constructor
-     * @param b a reference to the Board to draw the info of
-     * @param plNames the names of the players playing
-     */
-    public QuorGUI(Board b, String[] plNames) {
+    // Do painting on the Event Dispatch Queue instead of the main thread
+    SwingUtilities.invokeLater(new Runnable() {
+      
+      public void run() {
+        System.err.println("GUI Launched");
         
-        // Do painting on the Event Dispatch Queue instead of the main thread
-        SwingUtilities.invokeLater(new Runnable() {
-           
-            public void run() {
-                System.err.println("GUI Launched");
-                
-                // Setup frame layouts
-                JFrame frame = new JFrame("Quoridor");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
-                frame.setLayout(new BorderLayout(0, 0));
-                
-                // Add the "canvas" and revalidate
-                panel = new QuorPanel(b, plNames);
-                frame.add(panel, BorderLayout.PAGE_START);
-                frame.validate();
-                
-                // Finish setup and display GUI
-                frame.setLocationRelativeTo(null);
-                frame.setResizable(false);
-                frame.setVisible(true);
-            }
-        });
-        System.err.println("GUI Constructed.");
-    }
-    
-    /**
-     * Repaints the GUI, called in the client after a move is made.
-     */
-    public void repaintGUI() {
-        if(panel != null)
-          panel.repaint();
-        else
-          System.err.println("Panel is null!");
-    }
-    
-    /**
-     * Declares the winner and opponents
-     * @param players player names with the winner at index 0
-     */
-    public void declareWinner(String[] players) {
-      panel.setResult(players);
+        // Setup frame layouts
+        JFrame frame = new JFrame("Quoridor");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
+        frame.setLayout(new BorderLayout(0, 0));
+        
+        // Add the "canvas" and revalidate
+        panel = new QuorPanel(b, plNames);
+        frame.add(panel, BorderLayout.PAGE_START);
+        frame.validate();
+        
+        // Finish setup and display GUI
+        frame.setLocationRelativeTo(null);
+        frame.setResizable(false);
+        frame.setVisible(true);
+      }
+    });
+    System.err.println("GUI Constructed.");
+  }
+  
+  /**
+   * Repaints the GUI, called in the client after a move is made.
+   */
+  public void repaintGUI() {
+    if (panel != null)
       panel.repaint();
-    }
+    else
+      System.err.println("Panel is null!");
+  }
+  
+  /**
+   * Declares the winner and opponents
+   * 
+   * @param players player names with the winner at index 0
+   */
+  public void declareWinner(String[] players) {
+    panel.setResult(players);
+    panel.repaint();
+  }
 }

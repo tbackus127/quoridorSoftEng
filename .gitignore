@@ -7,3 +7,5 @@ debug/**
 **.sh~
 **.kate-swp
 **.gradle~
+.classpath
+.project

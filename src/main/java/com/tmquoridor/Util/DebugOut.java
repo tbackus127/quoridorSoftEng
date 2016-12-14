@@ -1,12 +1,10 @@
 package com.tmquoridor.Util;
 
-import java.util.Date;
-
-import java.io.PrintStream;
 import java.io.File;
 import java.io.IOException;
-
+import java.io.PrintStream;
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * This class performs writing debugging comments to a text file rather than spamming the console.
@@ -17,6 +15,7 @@ public class DebugOut {
   private static final boolean ENABLED = true;
   
   /** The file name, minus ".txt" */
+  @SuppressWarnings("unused")
   private String name;
   
   /** The file handle for this PrintStream */
